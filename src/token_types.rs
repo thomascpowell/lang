@@ -2,16 +2,18 @@
 * Token data
 * */
 
+// metadata
 #[derive(Debug, Clone, PartialEq)]
-pub struct TokenData {
-    pub kind: Token,
+pub struct Token {
+    pub kind: TokenKind,
     pub original: String,
     pub line: usize,
     pub col: usize,
 }
 
+// meaning
 #[derive(Debug, Clone, PartialEq)]
-pub enum Token {
+pub enum TokenKind {
     Identifier(String),
     Keyword(Keyword),
     Separator(Separator),

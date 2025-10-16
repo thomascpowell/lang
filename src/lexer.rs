@@ -1,7 +1,42 @@
-use crate::token_types::*;
 use crate::error_types::*;
+use crate::token_types::*;
 
-fn tokenize(source: String) -> Result<Vec<Token>, LexerError> {
-    // separate on whitespace or separators
-    Err(LexerError::Default)
+struct Lexer {
+    src: Vec<char>,
+    pos: usize,
+    line: usize,
+    col: usize,
+}
+
+impl Lexer {
+    pub fn new(input: String) -> Self {
+        Self {
+            src: get_chars(&input),
+            pos: 0,
+            line: 1,
+            col: 1,
+        }
+    }
+    pub fn next_token(&mut self) -> Result<Token, LexerError> {
+
+
+        Err(LexerError::Default)
+    }
+
+    pub fn has_next(&mut self) -> bool {
+        true
+    }
+}
+
+pub fn tokenize(input: String) -> Result<Vec<Token>, LexerError> {
+    let mut res = Vec::new();
+    let mut lexer = Lexer::new(input);
+    while lexer.has_next() {
+        res.push(lexer.next_token()?)
+    }
+    Ok(res)
+}
+
+pub fn get_chars(source: &str) -> Vec<char> {
+    source.chars().collect()
 }
