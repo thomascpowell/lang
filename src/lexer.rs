@@ -25,8 +25,23 @@ impl Lexer {
         self.peek().is_some()
     }
 
-    pub fn peek(&self) -> Option<char> {
+    fn peek(&self) -> Option<char> {
         self.src.get(self.pos).cloned()
+    }
+
+    fn advance(&mut self) -> Option<char> {
+        if let Some(c) = self.peek() {
+            self.pos += 1;
+            if c == '\n' {
+                self.line += 1;
+                self.col = 1;
+            } else {
+                self.col += 1;
+            }
+            Some(c)
+        } else {
+            None
+        }
     }
 }
 
