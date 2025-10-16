@@ -1,6 +1,6 @@
 // A program is a list of statements
 <program> ::= <statement_list>
-<statement_list> ::= <statement_list> <statement> | None
+<statement_list> ::= <statement_list> <statement> | epsilon
 
 // A statement is either an assignent or an expression
 <statement> ::= <assignment> ";" | <expression> ";"

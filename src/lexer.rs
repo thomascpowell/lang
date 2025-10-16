@@ -11,13 +11,31 @@ struct Lexer {
 impl Lexer {
     pub fn new(input: String) -> Self {
         Self {
-            src: get_chars(&input),
+            src: input.chars().collect(),
             pos: 0,
             line: 1,
             col: 1,
         }
     }
     pub fn next_token(&mut self) -> Result<Token, LexerError> {
+        self.skip_whitespace();
+
+        let start_line = self.line;
+        let start_col = self.col;
+
+        let c = self.peek().ok_or(LexerError::UnexpectedEOF)?;
+
+        let token = match c {
+            c if c.is_alphanumeric() => {
+                let identifier = self.consume_while(|c| c.is_alphanumeric());
+                classify_keyword_or_identifier(identifier)
+            }
+
+
+            // temporary default case to silence static analysis
+            _ => TokenKind::Keyword(Keyword::False)
+        };
+
         Err(LexerError::Default)
     }
 
@@ -25,8 +43,30 @@ impl Lexer {
         self.peek().is_some()
     }
 
+    fn consume_while<F>(&mut self, mut predicate: F) -> String
+    where
+        F: FnMut(char) -> bool,
+    {
+        let mut buf = String::new();
+        while let Some(c) = self.peek() {
+            if predicate(c) {
+                buf.push(c);
+                self.advance();
+            } else {
+                break;
+            }
+        }
+        buf
+    }
+
     fn peek(&self) -> Option<char> {
         self.src.get(self.pos).cloned()
+    }
+
+    fn skip_whitespace(&mut self) {
+        while self.peek().unwrap().is_whitespace() {
+            self.advance();
+        }
     }
 
     fn advance(&mut self) -> Option<char> {
@@ -38,10 +78,9 @@ impl Lexer {
             } else {
                 self.col += 1;
             }
-            Some(c)
-        } else {
-            None
+            return Some(c);
         }
+        None
     }
 }
 
@@ -54,6 +93,15 @@ pub fn tokenize(input: String) -> Result<Vec<Token>, LexerError> {
     Ok(res)
 }
 
-pub fn get_chars(source: &str) -> Vec<char> {
-    source.chars().collect()
+fn classify_keyword_or_identifier(identifier: String) -> TokenKind {
+    match identifier.as_str() {
+        "fn" => TokenKind::Keyword(Keyword::Fn),
+        "i32" => TokenKind::Keyword(Keyword::I32),
+        "u32" => TokenKind::Keyword(Keyword::U32),
+        "bool" => TokenKind::Keyword(Keyword::Bool),
+        "string" => TokenKind::Keyword(Keyword::String),
+        "true" => TokenKind::Keyword(Keyword::True),
+        "false" => TokenKind::Keyword(Keyword::False),
+         _ => TokenKind::Identifier(identifier),
+    }
 }
