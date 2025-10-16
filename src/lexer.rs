@@ -18,13 +18,15 @@ impl Lexer {
         }
     }
     pub fn next_token(&mut self) -> Result<Token, LexerError> {
-
-
         Err(LexerError::Default)
     }
 
     pub fn has_next(&mut self) -> bool {
-        true
+        self.peek().is_some()
+    }
+
+    pub fn peek(&self) -> Option<char> {
+        self.src.get(self.pos).cloned()
     }
 }
 
