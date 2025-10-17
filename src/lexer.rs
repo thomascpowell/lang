@@ -40,8 +40,16 @@ impl Lexer {
                 (classify_keyword_or_identifier(&t), t)
             }
 
-            // TODO:
             // Literal (String)
+            c if c == '"' => {
+                self.advance();
+                let s = self.consume_while(|c| c != '"');
+                self.advance();
+                (TokenKind::Literal(Literal::String(s.clone())), s)
+            }
+
+
+            // TODO:
             // Operator
             // Separator
             // Comment
