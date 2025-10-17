@@ -23,54 +23,88 @@ impl Lexer {
         // this stuff will useful for error reporting later on probably
         let start_line = self.line;
         let start_col = self.col;
-
-        let c = self.peek().ok_or(LexerError::UnexpectedEOF)?;
-
+        let c = self
+            .peek()
+            .ok_or(LexerError::UnexpectedEOF("TEMP".to_string()))?;
         let (kind, original) = match c {
-
             // Literal (Int)
             c if c.is_ascii_digit() => {
                 let digits = self.consume_while(|c| c.is_ascii_digit());
-                (TokenKind::Literal(Literal::Int(digits.parse().unwrap())), digits)
+                let val = digits
+                    .parse()
+                    .map_err(|_| LexerError::InvalidIntLiteral("TEMP".to_string()))
+                    .unwrap();
+                (TokenKind::Literal(Literal::Int(val)), digits)
             }
-
             // Identifier, Keyword
             c if c.is_alphanumeric() => {
                 let t = self.consume_while(|c| c.is_alphanumeric());
                 (classify_keyword_or_identifier(&t), t)
             }
-
             // Literal (String)
-            c if c == '"' => {
+            '"' => {
                 self.advance();
-                let s = self.consume_while(|c| c != '"');
+                let s = self.consume_while(|c| c != '"' && c != '\0');
+                if !self.has_next() {
+                    return Err(LexerError::UnterminatedStringLiteral(
+                        "TEMPORARY ERROR MESSAGE".to_string(),
+                    ));
+                }
                 self.advance();
                 (TokenKind::Literal(Literal::String(s.clone())), s)
             }
-
             // Comment
-            c if c == '/' && self.peek().is_some_and(|c| c == '/') => {
+            c if c == '/' && self.peek_next().is_some_and(|c| c == '/') => {
+                self.advance_n(2);
                 let comment = self.consume_while(|c| c != '\n');
                 (TokenKind::Comment(comment.clone()), comment)
             }
-
             // Separators
-            '(' => {(TokenKind::Separator(Separator::LParen), c.to_string())}
-            ')' => {(TokenKind::Separator(Separator::RParen), c.to_string())}
-            '{' => {(TokenKind::Separator(Separator::LBrace), c.to_string())}
-            '}' => {(TokenKind::Separator(Separator::RBrace), c.to_string())}
-            ',' => {(TokenKind::Separator(Separator::Comma), c.to_string())}
-            ';' => {(TokenKind::Separator(Separator::Semicolon), c.to_string())}
+            '(' => self.make_simple_token(TokenKind::Separator(Separator::LParen), '('),
+            ')' => self.make_simple_token(TokenKind::Separator(Separator::RParen), ')'),
+            '{' => self.make_simple_token(TokenKind::Separator(Separator::LBrace), '{'),
+            '}' => self.make_simple_token(TokenKind::Separator(Separator::RBrace), '}'),
+            ',' => self.make_simple_token(TokenKind::Separator(Separator::Comma), ','),
+            ';' => self.make_simple_token(TokenKind::Separator(Separator::Semicolon), ';'),
 
+            // Operators (Double)
+            '!' if self.peek_next().is_some_and(|c| c == '=') => {
+                self.advance_n(2);
+                (TokenKind::Operator(Operator::Ne), "!=".to_string())
+            }
+            '<' if self.peek_next().is_some_and(|c| c == '=') => {
+                self.advance_n(2);
+                (TokenKind::Operator(Operator::Le), "<=".to_string())
+            }
+            '>' if self.peek_next().is_some_and(|c| c == '=') => {
+                self.advance_n(2);
+                (TokenKind::Operator(Operator::Ge), ">=".to_string())
+            }
+            '&' if self.peek_next().is_some_and(|c| c == '&') => {
+                self.advance_n(2);
+                (TokenKind::Operator(Operator::And), "&&".to_string())
+            }
+            '|' if self.peek_next().is_some_and(|c| c == '|') => {
+                self.advance_n(2);
+                (TokenKind::Operator(Operator::Or), "||".to_string())
+            }
+            // Operators (Single)
+            '+' => self.make_simple_token(TokenKind::Operator(Operator::Add), '+'),
+            '-' => self.make_simple_token(TokenKind::Operator(Operator::Sub), '-'),
+            '*' => self.make_simple_token(TokenKind::Operator(Operator::Mul), '*'),
+            '/' => self.make_simple_token(TokenKind::Operator(Operator::Div), '/'),
+            '<' => self.make_simple_token(TokenKind::Operator(Operator::Lt), '<'),
+            '>' => self.make_simple_token(TokenKind::Operator(Operator::Gt), '>'),
+            '!' => self.make_simple_token(TokenKind::Operator(Operator::Not), '!'),
+            '=' => self.make_simple_token(TokenKind::Operator(Operator::Assign), '='),
 
-            // TODO:
-            // Operator
-
-            
-            // temporary default case to silence static analysis
-            _ => (TokenKind::Keyword(Keyword::False), "default".to_owned()),
+            // TODO: Create function that takes contextual info and turns it into a good error
+            _ => {
+                return Err(LexerError::InvalidChar(
+                    "TEMPORARY ERROR MESSAGE".to_string(),
+                ));
+            }
         };
-
         let token = Token {
             kind,
             original,
@@ -104,8 +138,12 @@ impl Lexer {
         self.src.get(self.pos).cloned()
     }
 
+    fn peek_next(&self) -> Option<char> {
+        self.src.get(self.pos + 1).cloned()
+    }
+
     fn skip_whitespace(&mut self) {
-        while self.peek().unwrap().is_whitespace() {
+        while self.peek().is_some_and(|c| c.is_whitespace()) {
             self.advance();
         }
     }
@@ -123,6 +161,17 @@ impl Lexer {
         }
         None
     }
+
+    fn advance_n(&mut self, n: usize) {
+        for _ in 0..n {
+            self.advance();
+        }
+    }
+
+    fn make_simple_token(&mut self, kind: TokenKind, ch: char) -> (TokenKind, String) {
+        self.advance();
+        (kind, ch.to_string())
+    }
 }
 
 pub fn tokenize(input: String) -> Result<Vec<Token>, LexerError> {
@@ -134,14 +183,14 @@ pub fn tokenize(input: String) -> Result<Vec<Token>, LexerError> {
     Ok(res)
 }
 
-fn classify_keyword_or_identifier(identifier: &String) -> TokenKind {
-    match identifier.as_str() {
+fn classify_keyword_or_identifier(identifier: &str) -> TokenKind {
+    match identifier {
         "fn" => TokenKind::Keyword(Keyword::Fn),
         "i32" => TokenKind::Keyword(Keyword::I32),
         "bool" => TokenKind::Keyword(Keyword::Bool),
         "string" => TokenKind::Keyword(Keyword::String),
         "true" => TokenKind::Keyword(Keyword::True),
         "false" => TokenKind::Keyword(Keyword::False),
-        _ => TokenKind::Identifier(identifier.clone()),
+        _ => TokenKind::Identifier(identifier.to_string()),
     }
 }

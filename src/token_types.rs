@@ -30,17 +30,18 @@ pub enum TokenKind {
 pub enum Operator {
     Add,
     Sub,
-    Mult,
+    Mul,
     Div,
     Eq,
     Ne,
     Lt,
-    LtEq,
+    Le,
     Gt,
-    GtEq,
+    Ge,
     And,
     Or,
     Assign,
+    Not
 }
 
 #[derive(Debug, Clone, PartialEq)]
