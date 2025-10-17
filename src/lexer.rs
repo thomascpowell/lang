@@ -54,10 +54,17 @@ impl Lexer {
                 (TokenKind::Comment(comment.clone()), comment)
             }
 
+            // Separators
+            '(' => {(TokenKind::Separator(Separator::LParen), c.to_string())}
+            ')' => {(TokenKind::Separator(Separator::RParen), c.to_string())}
+            '{' => {(TokenKind::Separator(Separator::LBrace), c.to_string())}
+            '}' => {(TokenKind::Separator(Separator::RBrace), c.to_string())}
+            ',' => {(TokenKind::Separator(Separator::Comma), c.to_string())}
+            ';' => {(TokenKind::Separator(Separator::Semicolon), c.to_string())}
+
 
             // TODO:
             // Operator
-            // Separator
 
             
             // temporary default case to silence static analysis

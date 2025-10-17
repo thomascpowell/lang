@@ -52,6 +52,9 @@ pub enum Separator {
     Comma,
     Semicolon,
 }
+pub const OPEN_SEPARATORS: [char; 2] = ['(', '{'];
+pub const CLOSE_SEPARATORS: [char; 2] = [')', '}'];
+
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
