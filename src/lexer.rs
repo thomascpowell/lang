@@ -48,11 +48,16 @@ impl Lexer {
                 (TokenKind::Literal(Literal::String(s.clone())), s)
             }
 
+            // Comment
+            c if c == '/' && self.peek().is_some_and(|c| c == '/') => {
+                let comment = self.consume_while(|c| c != '\n');
+                (TokenKind::Comment(comment.clone()), comment)
+            }
+
 
             // TODO:
             // Operator
             // Separator
-            // Comment
 
             
             // temporary default case to silence static analysis
