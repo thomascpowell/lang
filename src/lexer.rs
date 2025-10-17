@@ -19,24 +19,45 @@ impl Lexer {
     }
     pub fn next_token(&mut self) -> Result<Token, LexerError> {
         self.skip_whitespace();
-
+        // need to report the line the token starts on
+        // this stuff will useful for error reporting later on probably
         let start_line = self.line;
         let start_col = self.col;
 
         let c = self.peek().ok_or(LexerError::UnexpectedEOF)?;
 
-        let token = match c {
-            c if c.is_alphanumeric() => {
-                let identifier = self.consume_while(|c| c.is_alphanumeric());
-                classify_keyword_or_identifier(identifier)
+        let (kind, original) = match c {
+
+            // Literal (Int)
+            c if c.is_ascii_digit() => {
+                let digits = self.consume_while(|c| c.is_ascii_digit());
+                (TokenKind::Literal(Literal::Int(digits.parse().unwrap())), digits)
             }
 
+            // Identifier, Keyword
+            c if c.is_alphanumeric() => {
+                let t = self.consume_while(|c| c.is_alphanumeric());
+                (classify_keyword_or_identifier(&t), t)
+            }
 
+            // TODO:
+            // Literal (String)
+            // Operator
+            // Separator
+            // Comment
+
+            
             // temporary default case to silence static analysis
-            _ => TokenKind::Keyword(Keyword::False)
+            _ => (TokenKind::Keyword(Keyword::False), "default".to_owned()),
         };
 
-        Err(LexerError::Default)
+        let token = Token {
+            kind,
+            original,
+            line: start_line,
+            col: start_col,
+        };
+        Ok(token)
     }
 
     pub fn has_next(&mut self) -> bool {
@@ -93,15 +114,14 @@ pub fn tokenize(input: String) -> Result<Vec<Token>, LexerError> {
     Ok(res)
 }
 
-fn classify_keyword_or_identifier(identifier: String) -> TokenKind {
+fn classify_keyword_or_identifier(identifier: &String) -> TokenKind {
     match identifier.as_str() {
         "fn" => TokenKind::Keyword(Keyword::Fn),
         "i32" => TokenKind::Keyword(Keyword::I32),
-        "u32" => TokenKind::Keyword(Keyword::U32),
         "bool" => TokenKind::Keyword(Keyword::Bool),
         "string" => TokenKind::Keyword(Keyword::String),
         "true" => TokenKind::Keyword(Keyword::True),
         "false" => TokenKind::Keyword(Keyword::False),
-         _ => TokenKind::Identifier(identifier),
+        _ => TokenKind::Identifier(identifier.clone()),
     }
 }

@@ -48,7 +48,7 @@ pub enum Separator {
     LParen,
     RParen,
     LBrace,
-    Rbrace,
+    RBrace,
     Comma,
     Semicolon,
 }
@@ -56,7 +56,6 @@ pub enum Separator {
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
     Int(i32),
-    Uint(u32),
     Bool(bool),
     String(String),
 }
@@ -65,7 +64,6 @@ pub enum Literal {
 pub enum Keyword {
     Fn,
     I32,
-    U32,
     Bool,
     String,
     True,
