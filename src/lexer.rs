@@ -24,7 +24,6 @@ impl Lexer {
     }
 
     pub fn next_token(&mut self) -> Result<Token, LexerError> {
-        self.skip_whitespace();
         // need to report the line the token starts on
         // this stuff will useful for error reporting later on probably
         let start_line = self.line;
@@ -88,6 +87,7 @@ impl Lexer {
             }
             '<' if self.peek_next().is_some_and(|c| c == '=') => {
                 self.advance_n(2);
+                
                 (TokenKind::Operator(Operator::Le), "<=".to_string())
             }
             '>' if self.peek_next().is_some_and(|c| c == '=') => {
@@ -194,8 +194,10 @@ impl Lexer {
 pub fn tokenize(input: String) -> Result<Vec<Token>, LexerError> {
     let mut res = Vec::new();
     let mut lexer = Lexer::new(input);
+    lexer.skip_whitespace();
     while lexer.has_next() {
-        res.push(lexer.next_token()?)
+        res.push(lexer.next_token()?);
+        lexer.skip_whitespace();
     }
     Ok(res)
 }

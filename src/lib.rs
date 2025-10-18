@@ -1,3 +1,3 @@
-mod token_types;
-mod error_types;
-mod lexer;
+pub mod token_types;
+pub mod error_types;
+pub mod lexer;

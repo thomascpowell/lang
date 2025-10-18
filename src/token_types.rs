@@ -11,6 +11,12 @@ pub struct Token {
     pub col: usize,
 }
 
+impl Token {
+    pub fn display(&self) -> String {
+        format!("{:?} - {}", self.kind, self.original)
+    }
+}
+
 // meaning
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenKind {
@@ -41,7 +47,7 @@ pub enum Operator {
     And,
     Or,
     Assign,
-    Not
+    Not,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -55,7 +61,6 @@ pub enum Separator {
 }
 pub const OPEN_SEPARATORS: [char; 2] = ['(', '{'];
 pub const CLOSE_SEPARATORS: [char; 2] = [')', '}'];
-
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {

@@ -36,7 +36,7 @@ impl LexerError {
 
     pub fn display(&self) -> String {
         format!(
-            "error: {:?} at line {}, col {}\nfound: '{}'\ninfo: {}",
+            "---\nerror: {:?} at line {}, col {}\nfound: '{}'\ninfo: {}\n---",
             self.error_type,
             self.start_line,
             self.start_col,
