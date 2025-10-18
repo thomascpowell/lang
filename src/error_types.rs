@@ -23,14 +23,14 @@ impl LexerError {
         start_line: usize,
         start_col: usize,
         found: impl Into<String>,
-        message: impl Into<String>,
+        message: Option<impl Into<String>>,
     ) -> Self {
         Self {
             error_type,
             start_line,
             start_col,
             found: found.into(),
-            message: Some(message.into()),
+            message: message.map(|m| m.into()),
         }
     }
 

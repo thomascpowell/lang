@@ -24,17 +24,30 @@ impl Lexer {
         // this stuff will useful for error reporting later on probably
         let start_line = self.line;
         let start_col = self.col;
-        let c = self
-            .peek()
-            .ok_or(LexerError::UnexpectedEOF("TEMP".to_string()))?;
+        // get the start character
+        let c = self.peek().ok_or(LexerError::new(
+            LexerErrorType::UnexpectedEOF,
+            start_line,
+            start_col,
+            "EOF",
+            None,
+        ))?;
+        // match every type of character
         let (kind, original) = match c {
             // Literal (Int)
             c if c.is_ascii_digit() => {
                 let digits = self.consume_while(|c| c.is_ascii_digit());
                 let val = digits
                     .parse()
-                    .map_err(|_| LexerError::InvalidIntLiteral("TEMP".to_string()))
-                    .unwrap();
+                    .map_err(|_| {
+                        LexerError::new(
+                            LexerErrorType::InvalidIntLiteral,
+                            start_line,
+                            start_col,
+                            digits,
+                            Some("probably overflow (i32)"),
+                        )
+                    })?;
                 (TokenKind::Literal(Literal::Int(val)), digits)
             }
             // Identifier, Keyword
