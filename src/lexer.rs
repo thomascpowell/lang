@@ -17,6 +17,7 @@ impl Lexer {
             col: 1,
         }
     }
+
     pub fn next_token(&mut self) -> Result<Token, LexerError> {
         self.skip_whitespace();
         // need to report the line the token starts on
