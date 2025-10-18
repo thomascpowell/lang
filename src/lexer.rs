@@ -1,6 +1,11 @@
 use crate::error_types::*;
 use crate::token_types::*;
 
+/*
+* Strict lexer
+* (With helpful errors)
+* */
+
 struct Lexer {
     src: Vec<char>,
     pos: usize,
@@ -25,29 +30,21 @@ impl Lexer {
         let start_line = self.line;
         let start_col = self.col;
         // get the start character
-        let c = self.peek().ok_or(LexerError::new(
-            LexerErrorType::UnexpectedEOF,
-            start_line,
-            start_col,
-            "EOF",
-            None,
-        ))?;
+        let c = self.peek().unwrap();
         // match every type of character
         let (kind, original) = match c {
             // Literal (Int)
             c if c.is_ascii_digit() => {
                 let digits = self.consume_while(|c| c.is_ascii_digit());
-                let val = digits
-                    .parse()
-                    .map_err(|_| {
-                        LexerError::new(
-                            LexerErrorType::InvalidIntLiteral,
-                            start_line,
-                            start_col,
-                            digits,
-                            Some("probably overflow (i32)"),
-                        )
-                    })?;
+                let val = digits.parse().map_err(|_| {
+                    LexerError::new(
+                        LexerErrorType::InvalidIntLiteral,
+                        start_line,
+                        start_col,
+                        &digits,
+                        Some("probably overflow (i32)"),
+                    )
+                })?;
                 (TokenKind::Literal(Literal::Int(val)), digits)
             }
             // Identifier, Keyword
@@ -58,10 +55,14 @@ impl Lexer {
             // Literal (String)
             '"' => {
                 self.advance();
-                let s = self.consume_while(|c| c != '"' && c != '\0');
+                let s = self.consume_while(|c| c != '"');
                 if !self.has_next() {
-                    return Err(LexerError::UnterminatedStringLiteral(
-                        "TEMPORARY ERROR MESSAGE".to_string(),
+                    return Err(LexerError::new(
+                        LexerErrorType::UnterminatedStringLiteral,
+                        start_line,
+                        start_col,
+                        s,
+                        Some("you dropped this: \""),
                     ));
                 }
                 self.advance();
@@ -80,7 +81,6 @@ impl Lexer {
             '}' => self.make_simple_token(TokenKind::Separator(Separator::RBrace), '}'),
             ',' => self.make_simple_token(TokenKind::Separator(Separator::Comma), ','),
             ';' => self.make_simple_token(TokenKind::Separator(Separator::Semicolon), ';'),
-
             // Operators (Double)
             '!' if self.peek_next().is_some_and(|c| c == '=') => {
                 self.advance_n(2);
@@ -111,11 +111,14 @@ impl Lexer {
             '>' => self.make_simple_token(TokenKind::Operator(Operator::Gt), '>'),
             '!' => self.make_simple_token(TokenKind::Operator(Operator::Not), '!'),
             '=' => self.make_simple_token(TokenKind::Operator(Operator::Assign), '='),
-
-            // TODO: Create function that takes contextual info and turns it into a good error
+            // Unknown
             _ => {
-                return Err(LexerError::InvalidChar(
-                    "TEMPORARY ERROR MESSAGE".to_string(),
+                return Err(LexerError::new(
+                    LexerErrorType::InvalidChar,
+                    start_line,
+                    start_col,
+                    c,
+                    None,
                 ));
             }
         };

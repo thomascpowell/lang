@@ -23,7 +23,7 @@ impl LexerError {
         start_line: usize,
         start_col: usize,
         found: impl Into<String>,
-        message: Option<impl Into<String>>,
+        message: Option<&str>,
     ) -> Self {
         Self {
             error_type,
