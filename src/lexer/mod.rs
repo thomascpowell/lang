@@ -1,10 +1,22 @@
 use crate::error_types::*;
-use crate::token_types::*;
+use crate::lexer::token::*;
+pub mod token;
 
 /*
 * Strict lexer
 * (With helpful errors)
 * */
+
+pub fn tokenize(input: String) -> Result<Vec<Token>, LexerError> {
+    let mut res = Vec::new();
+    let mut lexer = Lexer::new(input);
+    lexer.skip_whitespace();
+    while lexer.has_next() {
+        res.push(lexer.next_token()?);
+        lexer.skip_whitespace();
+    }
+    Ok(res)
+}
 
 struct Lexer {
     src: Vec<char>,
@@ -14,7 +26,7 @@ struct Lexer {
 }
 
 impl Lexer {
-    pub fn new(input: String) -> Self {
+    fn new(input: String) -> Self {
         Self {
             src: input.chars().collect(),
             pos: 0,
@@ -23,7 +35,7 @@ impl Lexer {
         }
     }
 
-    pub fn next_token(&mut self) -> Result<Token, LexerError> {
+    fn next_token(&mut self) -> Result<Token, LexerError> {
         // need to report the line the token starts on
         // this stuff will useful for error reporting later on probably
         let start_line = self.line;
@@ -87,7 +99,7 @@ impl Lexer {
             }
             '<' if self.peek_next().is_some_and(|c| c == '=') => {
                 self.advance_n(2);
-                
+
                 (TokenKind::Operator(Operator::Le), "<=".to_string())
             }
             '>' if self.peek_next().is_some_and(|c| c == '=') => {
@@ -135,7 +147,7 @@ impl Lexer {
         Ok(token)
     }
 
-    pub fn has_next(&mut self) -> bool {
+    fn has_next(&mut self) -> bool {
         self.peek().is_some()
     }
 
@@ -193,17 +205,6 @@ impl Lexer {
         self.advance();
         (kind, ch.to_string())
     }
-}
-
-pub fn tokenize(input: String) -> Result<Vec<Token>, LexerError> {
-    let mut res = Vec::new();
-    let mut lexer = Lexer::new(input);
-    lexer.skip_whitespace();
-    while lexer.has_next() {
-        res.push(lexer.next_token()?);
-        lexer.skip_whitespace();
-    }
-    Ok(res)
 }
 
 fn classify_keyword_or_identifier(identifier: &str) -> TokenKind {

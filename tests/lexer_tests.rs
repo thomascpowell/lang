@@ -1,4 +1,5 @@
-use lang::{lexer::*, token_types::*};
+use lang::lexer::tokenize;
+use lang::lexer::token::*;
 
 #[test]
 fn test_full_parse() {
@@ -56,6 +57,23 @@ fn test_operators() {
         TokenKind::Operator(Operator::Assign),
     ];
     compare_output(program, expected, false);
+}
+
+#[test]
+fn test_error() {
+    let program = "\"i am not going to terminal this string literal".to_string();
+    let tokens = tokenize(program);
+    assert!(tokens.is_err());
+    println!("{}", tokens.unwrap_err().display());
+    let program = "
+        // this number is really big lol
+        3965264536463463462346243643664326646243623462436643
+    ".to_string();
+    let tokens = tokenize(program);
+    assert!(tokens.is_err());
+    println!("{}", tokens.unwrap_err().display())
+
+
 }
 
 fn compare_output(program: String, expected: Vec<TokenKind>, should_print: bool) {
