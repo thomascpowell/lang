@@ -102,6 +102,10 @@ impl Lexer {
                 self.advance_n(2);
                 (TokenKind::Operator(Operator::Or), "||".to_string())
             }
+            '=' if self.peek_next().is_some_and(|c| c == '=') => {
+                self.advance_n(2);
+                (TokenKind::Operator(Operator::Eq), "==".to_string())
+            }
             // Operators (Single)
             '+' => self.make_simple_token(TokenKind::Operator(Operator::Add), '+'),
             '-' => self.make_simple_token(TokenKind::Operator(Operator::Sub), '-'),
