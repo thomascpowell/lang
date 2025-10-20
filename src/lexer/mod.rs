@@ -92,6 +92,7 @@ impl Lexer {
             '}' => self.make_simple_token(TokenKind::Separator(Separator::RBrace), '}'),
             ',' => self.make_simple_token(TokenKind::Separator(Separator::Comma), ','),
             ';' => self.make_simple_token(TokenKind::Separator(Separator::Semicolon), ';'),
+            ':' => self.make_simple_token(TokenKind::Separator(Separator::Colon), ':'),
             // Operators (Double)
             '!' if self.peek_next().is_some_and(|c| c == '=') => {
                 self.advance_n(2);
@@ -99,7 +100,6 @@ impl Lexer {
             }
             '<' if self.peek_next().is_some_and(|c| c == '=') => {
                 self.advance_n(2);
-
                 (TokenKind::Operator(Operator::Le), "<=".to_string())
             }
             '>' if self.peek_next().is_some_and(|c| c == '=') => {

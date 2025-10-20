@@ -58,6 +58,7 @@ pub enum Separator {
     RBrace,
     Comma,
     Semicolon,
+    Colon,
 }
 pub const OPEN_SEPARATORS: [char; 2] = ['(', '{'];
 pub const CLOSE_SEPARATORS: [char; 2] = [')', '}'];

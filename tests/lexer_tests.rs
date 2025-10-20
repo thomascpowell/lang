@@ -1,13 +1,13 @@
-use lang::lexer::tokenize;
 use lang::lexer::token::*;
+use lang::lexer::tokenize;
 
 #[test]
 fn test_full_parse() {
     let program = "
-        fn main() { 
+        fn main(n: i32) { 
             //some comment
             string x = \"hello\";
-            i32 y = 4 / 2;
+            i32 y = 4 / n;
         }
         "
     .to_string();
@@ -16,6 +16,9 @@ fn test_full_parse() {
         TokenKind::Keyword(Keyword::Fn),
         TokenKind::Identifier("main".to_string()),
         TokenKind::Separator(Separator::LParen),
+        TokenKind::Identifier("n".to_string()),
+        TokenKind::Separator(Separator::Colon),
+        TokenKind::Keyword(Keyword::I32),
         TokenKind::Separator(Separator::RParen),
         TokenKind::Separator(Separator::LBrace),
         TokenKind::Comment("some comment".to_string()),
@@ -29,18 +32,23 @@ fn test_full_parse() {
         TokenKind::Operator(Operator::Assign),
         TokenKind::Literal(Literal::Int(4)),
         TokenKind::Operator(Operator::Div),
-        TokenKind::Literal(Literal::Int(2)),
+        TokenKind::Identifier("n".to_string()),
         TokenKind::Separator(Separator::Semicolon),
         TokenKind::Separator(Separator::RBrace),
     ];
     compare_output(program, expected, false);
-
 }
 
 #[test]
-fn test_operators() {
-    let program = "+ -/ * ==!= < > <=>= && || ! =".to_string();
+fn test_operators_separators() {
+    let program = "{}(())+ -/ * ==!= <;; > <=>= && || ! =:".to_string();
     let expected = vec![
+        TokenKind::Separator(Separator::LBrace),
+        TokenKind::Separator(Separator::RBrace),
+        TokenKind::Separator(Separator::LParen),
+        TokenKind::Separator(Separator::LParen),
+        TokenKind::Separator(Separator::RParen),
+        TokenKind::Separator(Separator::RParen),
         TokenKind::Operator(Operator::Add),
         TokenKind::Operator(Operator::Sub),
         TokenKind::Operator(Operator::Div),
@@ -48,6 +56,8 @@ fn test_operators() {
         TokenKind::Operator(Operator::Eq),
         TokenKind::Operator(Operator::Ne),
         TokenKind::Operator(Operator::Lt),
+        TokenKind::Separator(Separator::Semicolon),
+        TokenKind::Separator(Separator::Semicolon),
         TokenKind::Operator(Operator::Gt),
         TokenKind::Operator(Operator::Le),
         TokenKind::Operator(Operator::Ge),
@@ -55,6 +65,7 @@ fn test_operators() {
         TokenKind::Operator(Operator::Or),
         TokenKind::Operator(Operator::Not),
         TokenKind::Operator(Operator::Assign),
+        TokenKind::Separator(Separator::Colon),
     ];
     compare_output(program, expected, false);
 }
@@ -64,16 +75,21 @@ fn test_error() {
     let program = "\"i am not going to terminal this string literal".to_string();
     let tokens = tokenize(program);
     assert!(tokens.is_err());
-    println!("{}", tokens.unwrap_err().display());
+    print_err(&tokens.unwrap_err().display(), false);
     let program = "
         // this number is really big lol
         3965264536463463462346243643664326646243623462436643
-    ".to_string();
+    "
+    .to_string();
     let tokens = tokenize(program);
     assert!(tokens.is_err());
-    println!("{}", tokens.unwrap_err().display())
+    print_err(&tokens.unwrap_err().display(), false);
+}
 
-
+fn print_err(error_string: &String, should_print: bool) {
+    if should_print {
+        println!("{}", error_string)
+    }
 }
 
 fn compare_output(program: String, expected: Vec<TokenKind>, should_print: bool) {
