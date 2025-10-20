@@ -72,6 +72,8 @@ pub enum Literal {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Keyword {
+    If,
+    Else,
     Fn,
     I32,
     Bool,

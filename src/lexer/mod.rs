@@ -215,6 +215,8 @@ fn classify_keyword_or_identifier(identifier: &str) -> TokenKind {
         "string" => TokenKind::Keyword(Keyword::String),
         "true" => TokenKind::Keyword(Keyword::True),
         "false" => TokenKind::Keyword(Keyword::False),
+        "if" => TokenKind::Keyword(Keyword::If),
+        "else" => TokenKind::Keyword(Keyword::Else),
         _ => TokenKind::Identifier(identifier.to_string()),
     }
 }

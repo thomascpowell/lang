@@ -86,6 +86,22 @@ fn test_error() {
     print_err(&tokens.unwrap_err().display(), false);
 }
 
+#[test]
+fn test_keywords() {
+    let program = "fn i32 bool string true false if else".to_string();
+    let expected = vec![
+        TokenKind::Keyword(Keyword::Fn),
+        TokenKind::Keyword(Keyword::I32),
+        TokenKind::Keyword(Keyword::Bool),
+        TokenKind::Keyword(Keyword::String),
+        TokenKind::Keyword(Keyword::True),
+        TokenKind::Keyword(Keyword::False),
+        TokenKind::Keyword(Keyword::If),
+        TokenKind::Keyword(Keyword::Else),
+    ];
+    compare_output(program, expected, false);
+}
+
 fn print_err(error_string: &String, should_print: bool) {
     if should_print {
         println!("{}", error_string)
