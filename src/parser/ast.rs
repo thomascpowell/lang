@@ -24,7 +24,6 @@ pub enum Expression {
     ParenExp(Box<Expression>),
 }
 
-
 pub struct Assignment {
     pub position: Position,
     pub assignment_type: Type,
@@ -32,19 +31,51 @@ pub struct Assignment {
     pub expression: Expression,
 }
 
+pub struct Return {
+    pub position: Position,
+    pub expression: Expression,
+}
 
-pub struct Return {}
+pub struct Function {
+    pub position: Position,
+    pub args: Vec<Param>,
+    pub body: StatementList,
+}
+pub struct Param {
+    // for def
+    pub position: Position,
+    pub param_type: Type,
+    pub identifier: String,
+}
 
-pub struct Function {}
+pub struct Call {
+    pub position: Position,
+    // any expression can be called
+    pub callee: Box<Expression>,
+    pub args: Vec<Argument>,
+}
+pub struct Argument {
+    // for call
+    pub position: Position,
+    pub value: Expression,
+}
 
-pub struct Call {}
+pub struct BinaryExp {
+    pub position: Position,
+    pub left: Box<Expression>,
+    pub right: Box<Expression>,
+    pub operator: Operator,
+}
 
-pub struct BinaryExp {}
-
-pub struct IfExp {}
+pub struct IfExp {
+    // if is an expression
+    pub if_cond: Box<Expression>,
+    pub then_branch: Box<Statement>,
+    pub else_branch: Option<Box<Statement>>,
+}
 
 /*
-* Keywords
+* Keywords & Operators
 * */
 
 pub enum Type {
@@ -53,11 +84,28 @@ pub enum Type {
     Bool,
 }
 
+pub enum Operator {
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Eq,
+    Ne,
+    Lt,
+    Le,
+    Gt,
+    Ge,
+    And,
+    Or,
+    Assign,
+    Not,
+}
+
 /*
 * Metadata
 * */
 
 pub struct Position {
-    start_line: usize,
-    start_col: usize,
+    pub start_line: usize,
+    pub start_col: usize,
 }

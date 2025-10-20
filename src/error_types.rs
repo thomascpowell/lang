@@ -1,3 +1,5 @@
+// TODO: make this generic, it could be generalized
+
 #[derive(Debug)]
 pub enum LexerErrorType {
     InvalidChar,
