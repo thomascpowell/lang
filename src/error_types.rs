@@ -1,27 +1,31 @@
-// TODO: make this generic, it could be generalized
-
 #[derive(Debug)]
-pub enum LexerErrorType {
+pub enum ErrorType {
+    // Lexer
     InvalidChar,
     UnterminatedStringLiteral,
     InvalidIntLiteral,
     InvalidOperator,
     UnexpectedEOF,
+
+    // Parser
+    UnexpectedTokenType,
+
+    // Shared
     Default,
 }
 
 #[derive(Debug)]
-pub struct LexerError {
-    pub error_type: LexerErrorType,
+pub struct Error {
+    pub error_type: ErrorType,
     pub start_line: usize,
     pub start_col: usize,
     pub found: String,
     pub message: Option<String>,
 }
 
-impl LexerError {
+impl Error {
     pub fn new(
-        error_type: LexerErrorType,
+        error_type: ErrorType,
         start_line: usize,
         start_col: usize,
         found: impl Into<String>,

@@ -7,7 +7,7 @@ pub mod token;
 * (With helpful errors)
 * */
 
-pub fn tokenize(input: String) -> Result<Vec<Token>, LexerError> {
+pub fn tokenize(input: String) -> Result<Vec<Token>, Error> {
     let mut res = Vec::new();
     let mut lexer = Lexer::new(input);
     lexer.skip_whitespace();
@@ -35,7 +35,7 @@ impl Lexer {
         }
     }
 
-    fn next_token(&mut self) -> Result<Token, LexerError> {
+    fn next_token(&mut self) -> Result<Token, Error> {
         // need to report the line the token starts on
         // this stuff will useful for error reporting later on probably
         let start_line = self.line;
@@ -48,8 +48,8 @@ impl Lexer {
             c if c.is_ascii_digit() => {
                 let digits = self.consume_while(|c| c.is_ascii_digit());
                 let val = digits.parse().map_err(|_| {
-                    LexerError::new(
-                        LexerErrorType::InvalidIntLiteral,
+                    Error::new(
+                        ErrorType::InvalidIntLiteral,
                         start_line,
                         start_col,
                         &digits,
@@ -68,8 +68,8 @@ impl Lexer {
                 self.advance();
                 let s = self.consume_while(|c| c != '"');
                 if !self.has_next() {
-                    return Err(LexerError::new(
-                        LexerErrorType::UnterminatedStringLiteral,
+                    return Err(Error::new(
+                        ErrorType::UnterminatedStringLiteral,
                         start_line,
                         start_col,
                         s,
@@ -129,8 +129,8 @@ impl Lexer {
             '=' => self.make_simple_token(TokenKind::Operator(Operator::Assign), '='),
             // Unknown
             _ => {
-                return Err(LexerError::new(
-                    LexerErrorType::InvalidChar,
+                return Err(Error::new(
+                    ErrorType::InvalidChar,
                     start_line,
                     start_col,
                     c,
