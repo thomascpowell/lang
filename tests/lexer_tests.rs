@@ -8,6 +8,7 @@ fn test_full_parse() {
             //some comment
             string x = \"hello\";
             i32 y = 4 / n;
+            return 0;
         }
         "
     .to_string();
@@ -33,6 +34,9 @@ fn test_full_parse() {
         TokenKind::Literal(Literal::Int(4)),
         TokenKind::Operator(Operator::Div),
         TokenKind::Identifier("n".to_string()),
+        TokenKind::Separator(Separator::Semicolon),
+        TokenKind::Keyword(Keyword::Return),
+        TokenKind::Literal(Literal::Int(0)),
         TokenKind::Separator(Separator::Semicolon),
         TokenKind::Separator(Separator::RBrace),
     ];

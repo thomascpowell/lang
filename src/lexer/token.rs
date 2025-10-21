@@ -78,4 +78,5 @@ pub enum Keyword {
     String,
     True,
     False,
+    Return,
 }

@@ -40,6 +40,19 @@ impl Error {
         }
     }
 
+    // this happens rather often
+    // dont have the location because thats in the token
+    // the token that does not exist
+    pub fn generic_eof(expected: &str) -> Self {
+        Error::new(
+            ErrorType::UnexpectedEOF,
+            0,
+            0,
+            "EOF",
+            Some(expected),
+        )
+    }
+
     pub fn display(&self) -> String {
         format!(
             "---\nerror: {:?} at line {}, col {}\nfound: '{}'\ninfo: {}\n---",

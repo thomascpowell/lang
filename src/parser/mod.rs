@@ -1,10 +1,20 @@
-use crate::{error_types::*, lexer::token::*};
+use crate::{error_types::*, lexer::token::*, parser::ast::*};
 
 pub mod ast;
 
 /*
 * Parser
 * */
+
+pub fn parse(tokens: Vec<Token>) -> Result<StatementList, Error> {
+    let mut res = Vec::new();
+    let mut parser = Parser::new(tokens);
+    while parser.has_next() {
+        let statement = parser.parse_statement()?;
+        res.push(statement);
+    }
+    Ok(StatementList { statements: res })
+}
 
 struct Parser {
     tokens: Vec<Token>,
@@ -19,8 +29,20 @@ impl Parser {
         }
     }
 
-    fn parse_statement_list(&mut self) {
-        // start the top down parse
+    fn parse_statement(&mut self) -> Result<Statement, Error> {
+        let tok = self
+            .peek()
+            .ok_or_else(|| Error::generic_eof("expected a statement"))?;
+
+        match &tok.kind {
+            // statement: return
+            // temp errors
+            _ if self.compare_kind(|k| matches!(k, TokenKind::Keyword(Keyword::Return))) => {
+                Err(Error::generic_eof("expected a statement"))
+            }
+            
+            _ => Err(Error::generic_eof("expected a statement")),
+        }
     }
 
     fn has_next(&mut self) -> bool {
@@ -62,6 +84,17 @@ impl Parser {
                 None,
             )),
             None => Err(Error::new(ErrorType::UnexpectedEOF, 0, 0, "EOF", None)),
+        }
+    }
+
+    // like expect, but used for conditionals
+    fn compare_kind<F>(&self, cond: F) -> bool
+    where
+        F: Fn(&TokenKind) -> bool,
+    {
+        match self.peek() {
+            Some(tok) if cond(&tok.kind) => true,
+            _ => false,
         }
     }
 }
