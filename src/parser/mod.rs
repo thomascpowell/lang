@@ -23,20 +23,28 @@ impl Parser {
         // start the top down parse
     }
 
-    fn peek(&self) -> Option<Token> {
-        self.tokens.get(self.pos).cloned()
-    }
-
     fn has_next(&mut self) -> bool {
         self.peek().is_some()
     }
 
-    fn advance(&mut self) -> Option<Token> {
+    fn peek_n(&self, n: usize) -> Option<Token> {
+        self.tokens.get(self.pos + n).cloned()
+    }
+
+    fn peek(&self) -> Option<Token> {
+        self.peek_n(1)
+    }
+
+    fn advance_n(&mut self, n: usize) -> Option<Token> {
         let tok = self.peek();
         if tok.is_some() {
-            self.pos += 1;
+            self.pos += n;
         }
         tok
+    }
+
+    fn advance(&mut self) -> Option<Token> {
+        self.advance_n(1)
     }
 
     fn expect(&mut self, expected: &TokenKind) -> Result<Token, Error> {
