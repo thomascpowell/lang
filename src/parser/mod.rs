@@ -32,7 +32,7 @@ impl Parser {
     }
 
     fn peek(&self) -> Option<Token> {
-        self.peek_n(1)
+        self.peek_n(0)
     }
 
     fn advance_n(&mut self, n: usize) -> Option<Token> {
