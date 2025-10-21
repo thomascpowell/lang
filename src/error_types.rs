@@ -44,13 +44,13 @@ impl Error {
     // dont have the location because thats in the token
     // the token that does not exist
     pub fn generic_eof(expected: &str) -> Self {
-        Error::new(
-            ErrorType::UnexpectedEOF,
-            0,
-            0,
-            "EOF",
-            Some(expected),
-        )
+        Error::new(ErrorType::UnexpectedEOF, 0, 0, "EOF", Some(expected))
+    }
+
+    // this also happens rather often
+    // mainly when im not done
+    pub fn generic() -> Self {
+        Error::new(ErrorType::Default, 0, 0, "unknown. likely incomplete", None)
     }
 
     pub fn display(&self) -> String {

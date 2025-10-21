@@ -29,6 +29,7 @@ impl Parser {
         }
     }
 
+    // top down parse
     fn parse_statement(&mut self) -> Result<Statement, Error> {
         let tok = self
             .peek()
@@ -36,13 +37,40 @@ impl Parser {
 
         match &tok.kind {
             // statement: return
-            // temp errors
-            _ if self.compare_kind(|k| matches!(k, TokenKind::Keyword(Keyword::Return))) => {
-                Err(Error::generic_eof("expected a statement"))
+            _ if self.compare_kind(|x| matches!(x, TokenKind::Keyword(Keyword::Return))) => {
+                self.parse_return_statement()
             }
-            
-            _ => Err(Error::generic_eof("expected a statement")),
+
+            // match assignments (only other valid use of keywords)
+
+            // other keyword (not a valid statement)
+            kw if self.compare_kind(|x| matches!(x, TokenKind::Keyword(_))) => {
+                let found = format!("{:?}", kw);
+                Err(Error::new(
+                    ErrorType::UnexpectedTokenType,
+                    tok.line,
+                    tok.col,
+                    found,
+                    Some("unexpected keyword"),
+                ))
+            }
+
+            // everything else is an expression
+            // may or may not be valid though
+            _ => self.parse_expression(),
         }
+    }
+
+    fn parse_assignment_statment(&mut self) -> Result<Statement, Error> {
+        todo!();
+    }
+
+    fn parse_expression(&mut self) -> Result<Statement, Error> {
+        todo!();
+    }
+
+    fn parse_return_statement(&mut self) -> Result<Statement, Error> {
+        todo!();
     }
 
     fn has_next(&mut self) -> bool {
@@ -70,6 +98,7 @@ impl Parser {
     }
 
     // matches a provided condition, returns the token or an error
+    // accepts a closure containing a match macro
     fn expect<F>(&mut self, cond: F) -> Result<Token, Error>
     where
         F: Fn(&TokenKind) -> bool,
@@ -83,7 +112,7 @@ impl Parser {
                 format!("{:?}", tok.kind),
                 None,
             )),
-            None => Err(Error::new(ErrorType::UnexpectedEOF, 0, 0, "EOF", None)),
+            None => Err(Error::generic_eof("unknown")),
         }
     }
 
@@ -96,5 +125,15 @@ impl Parser {
             Some(tok) if cond(&tok.kind) => true,
             _ => false,
         }
+    }
+}
+
+// returns true if token kind is a type
+fn is_type(kind: TokenKind) -> bool {
+    match kind {
+        TokenKind::Keyword(Keyword::I32) => true,
+        TokenKind::Keyword(Keyword::String) => true,
+        TokenKind::Keyword(Keyword::Bool) => true,
+        _ => false,
     }
 }
