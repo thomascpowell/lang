@@ -34,18 +34,14 @@ impl Parser {
         let tok = self
             .peek()
             .ok_or_else(|| Error::generic_eof("expected a statement"))?;
-
         match &tok.kind {
             // statement: return
-            _ if self.compare_kind(|x| matches!(x, TokenKind::Keyword(Keyword::Return))) => {
-                self.parse_return_statement()
-            }
-
+            TokenKind::Keyword(Keyword::Return) => self.parse_return_statement(),
             // match assignments (only other valid use of keywords)
-
+            kind if is_type(kind) => self.parse_assignment_statement(),
             // other keyword (not a valid statement)
-            kw if self.compare_kind(|x| matches!(x, TokenKind::Keyword(_))) => {
-                let found = format!("{:?}", kw);
+            TokenKind::Keyword(k) => {
+                let found = format!("{:?}", k);
                 Err(Error::new(
                     ErrorType::UnexpectedTokenType,
                     tok.line,
@@ -54,14 +50,13 @@ impl Parser {
                     Some("unexpected keyword"),
                 ))
             }
-
             // everything else is an expression
             // may or may not be valid though
             _ => self.parse_expression(),
         }
     }
 
-    fn parse_assignment_statment(&mut self) -> Result<Statement, Error> {
+    fn parse_assignment_statement(&mut self) -> Result<Statement, Error> {
         todo!();
     }
 
@@ -117,6 +112,7 @@ impl Parser {
     }
 
     // like expect, but used for conditionals
+    // probably wont need this long term
     fn compare_kind<F>(&self, cond: F) -> bool
     where
         F: Fn(&TokenKind) -> bool,
@@ -129,7 +125,7 @@ impl Parser {
 }
 
 // returns true if token kind is a type
-fn is_type(kind: TokenKind) -> bool {
+fn is_type(kind: &TokenKind) -> bool {
     match kind {
         TokenKind::Keyword(Keyword::I32) => true,
         TokenKind::Keyword(Keyword::String) => true,
