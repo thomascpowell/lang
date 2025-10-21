@@ -47,8 +47,21 @@ impl Parser {
         self.advance_n(1)
     }
 
-    fn expect(&mut self, expected: &TokenKind) -> Result<Token, Error> {
-        // should be able to expect a certain token type
-        Err(Error::new(ErrorType::Default, 0, 0, "", Some("")))
+    // matches a provided condition, returns the token or an error
+    fn expect<F>(&mut self, cond: F) -> Result<Token, Error>
+    where
+        F: Fn(&TokenKind) -> bool,
+    {
+        match self.advance() {
+            Some(tok) if cond(&tok.kind) => Ok(tok),
+            Some(tok) => Err(Error::new(
+                ErrorType::UnexpectedTokenType,
+                tok.line,
+                tok.col,
+                format!("{:?}", tok.kind),
+                None,
+            )),
+            None => Err(Error::new(ErrorType::UnexpectedEOF, 0, 0, "EOF", None)),
+        }
     }
 }
