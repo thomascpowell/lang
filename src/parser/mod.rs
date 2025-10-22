@@ -29,16 +29,21 @@ impl Parser {
         }
     }
 
-    // top down parse
+    // top down parser
+    // design:
+    // - caller validates tokens (e.g. return statement begins w/ return)
+    // - callee consumes the token
+    // - callee returns the lowest level possible (e.g. parse_return -> Ok(Return))
+
     fn parse_statement(&mut self) -> Result<Statement, Error> {
         let tok = self
             .peek()
             .ok_or_else(|| Error::generic_eof("expected a statement"))?;
         match &tok.kind {
             // statement: return
-            TokenKind::Keyword(Keyword::Return) => self.parse_return_statement(),
+            TokenKind::Keyword(Keyword::Return) => Ok(Statement::Return(self.parse_return()?)),
             // match assignments (only other valid use of keywords)
-            kind if is_type(kind) => self.parse_assignment_statement(),
+            kind if is_type(kind) => Ok(Statement::Assignment(self.parse_assignment()?)),
             // other keyword (not a valid statement)
             TokenKind::Keyword(k) => {
                 let found = format!("{:?}", k);
@@ -52,19 +57,33 @@ impl Parser {
             }
             // everything else is an expression
             // may or may not be valid though
-            _ => self.parse_expression(),
+            _ => Ok(Statement::Expression(self.parse_expression()?)),
         }
     }
 
-    fn parse_assignment_statement(&mut self) -> Result<Statement, Error> {
+    fn parse_return(&mut self) -> Result<Return, Error> {
+        // get the return token
+        // or generic error because this should be impossible (caller validated)
+        let tok = self.advance().ok_or_else(|| Error::generic())?;
+        // store the start position
+        let pos = Position {
+            start_line: tok.line,
+            start_col: tok.col,
+        };
+        // parse the expression that follows
+        let expr = self.parse_expression()?;
+        let ret = Return {
+            position: pos,
+            expression: expr,
+        };
+        Ok(ret)
+    }
+
+    fn parse_assignment(&mut self) -> Result<Assignment, Error> {
         todo!();
     }
 
-    fn parse_expression(&mut self) -> Result<Statement, Error> {
-        todo!();
-    }
-
-    fn parse_return_statement(&mut self) -> Result<Statement, Error> {
+    fn parse_expression(&mut self) -> Result<Expression, Error> {
         todo!();
     }
 
