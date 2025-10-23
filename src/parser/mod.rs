@@ -6,6 +6,13 @@ pub mod ast;
 * Parser
 * */
 
+/*
+* design notes:
+* - caller validates tokens (e.g. return statement begins w/ return)
+* - callee consumes the token (self.advance())
+* - callee returns the lowest level possible (e.g. parse_return -> Ok(Return))
+* */
+
 pub fn parse(tokens: Vec<Token>) -> Result<StatementList, Error> {
     let mut res = Vec::new();
     let mut parser = Parser::new(tokens);
@@ -28,12 +35,6 @@ impl Parser {
             pos: 0,
         }
     }
-
-    // top down parser
-    // design:
-    // - caller validates tokens (e.g. return statement begins w/ return)
-    // - callee consumes the token
-    // - callee returns the lowest level possible (e.g. parse_return -> Ok(Return))
 
     fn parse_statement(&mut self) -> Result<Statement, Error> {
         let tok = self
@@ -80,12 +81,48 @@ impl Parser {
     }
 
     fn parse_assignment(&mut self) -> Result<Assignment, Error> {
-        todo!();
+        let type_tok = self.expect(|x| matches!(x, TokenKind::Keyword(_)))?;
+        let pos = Position {
+            start_line: type_tok.line,
+            start_col: type_tok.col,
+        };
+        match type_tok.kind {
+            TokenKind::Keyword(Keyword::I32) => {
+                let identifier = self.expect(|k| matches!(k, TokenKind::Identifier(_)))?;
+                let ident_str = match identifier.kind {
+                    TokenKind::Identifier(s) => s,
+                    _ => unreachable!(),
+                };
+                Ok(Assignment {
+                    position: pos,
+                    assignment_type: Type::I32,
+                    identifier: ident_str,
+                    expression: self.parse_expression()?,
+                })
+            }
+            TokenKind::Keyword(Keyword::Bool) => {
+                todo!()
+            }
+            TokenKind::Keyword(Keyword::String) => {
+                todo!()
+            }
+            _ => Err(Error::new(
+                ErrorType::UnexpectedTokenType,
+                type_tok.line,
+                type_tok.col,
+                type_tok.original,
+                Some("expected: i32, bool, or string"),
+            )),
+        }
     }
 
     fn parse_expression(&mut self) -> Result<Expression, Error> {
         todo!();
     }
+
+    /*
+     * utility functions
+     * */
 
     fn has_next(&mut self) -> bool {
         self.peek().is_some()
