@@ -87,25 +87,9 @@ impl Parser {
             start_col: type_tok.col,
         };
         match type_tok.kind {
-            TokenKind::Keyword(Keyword::I32) => {
-                let identifier = self.expect(|k| matches!(k, TokenKind::Identifier(_)))?;
-                let ident_str = match identifier.kind {
-                    TokenKind::Identifier(s) => s,
-                    _ => unreachable!(),
-                };
-                Ok(Assignment {
-                    position: pos,
-                    assignment_type: Type::I32,
-                    identifier: ident_str,
-                    expression: self.parse_expression()?,
-                })
-            }
-            TokenKind::Keyword(Keyword::Bool) => {
-                todo!()
-            }
-            TokenKind::Keyword(Keyword::String) => {
-                todo!()
-            }
+            TokenKind::Keyword(Keyword::I32) => self.handle_assignment(Type::I32, pos),
+            TokenKind::Keyword(Keyword::Bool) => self.handle_assignment(Type::Bool, pos),
+            TokenKind::Keyword(Keyword::String) => self.handle_assignment(Type::String, pos),
             _ => Err(Error::new(
                 ErrorType::UnexpectedTokenType,
                 type_tok.line,
@@ -114,6 +98,20 @@ impl Parser {
                 Some("expected: i32, bool, or string"),
             )),
         }
+    }
+
+    fn handle_assignment(&mut self, a_type: Type, pos: Position) -> Result<Assignment, Error> {
+        let identifier = self.expect(|k| matches!(k, TokenKind::Identifier(_)))?;
+        let ident_str = match identifier.kind {
+            TokenKind::Identifier(s) => s,
+            _ => unreachable!(),
+        };
+        Ok(Assignment {
+            position: pos,
+            assignment_type: a_type,
+            identifier: ident_str,
+            expression: self.parse_expression()?,
+        })
     }
 
     fn parse_expression(&mut self) -> Result<Expression, Error> {
