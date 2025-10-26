@@ -118,6 +118,22 @@ impl Parser {
         todo!();
     }
 
+    fn parse_literal(&mut self) -> Result<Expression, Error> {
+        todo!()
+    }
+    fn parse_identifier(&mut self) -> Result<Expression, Error> {
+        todo!()
+    }
+    fn parse_function(&mut self) -> Result<Function, Error> {
+        todo!()
+    }
+    fn parse_if_expr(&mut self) -> Result<IfExp, Error> {
+        todo!()
+    }
+    fn parse_paren_expr(&mut self) -> Result<Expression, Error> {
+        todo!()
+    }
+
     /*
      * utility functions
      * */
