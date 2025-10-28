@@ -170,16 +170,53 @@ impl Parser {
         let tok = self.expect(|x| matches!(x, TokenKind::Literal(_)))?;
         Ok(Expression::Literal(tok))
     }
+
     fn parse_identifier(&mut self) -> Result<Expression, Error> {
         let tok = self.expect(|x| matches!(x, TokenKind::Identifier(_)))?;
         Ok(Expression::Literal(tok))
     }
+
     fn parse_function(&mut self) -> Result<Function, Error> {
+        // consume fn
+        self.advance();
+        // parse param list
+        let params = self.parse_params()?;
+
+        // TODO
+        // should be an statement list, ending in return statement
+        // then return Ok(Function)
         todo!()
     }
+
+    fn parse_params(&mut self) -> Result<Vec<Param>, Error> {
+        // open paren
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
+        // define res
+        let mut res = Vec::new();
+        loop {
+            let tok = self
+                .peek()
+                .ok_or_else(|| Error::generic_eof("expected an expression"))?;
+
+            match tok.kind {
+                TokenKind::Separator(Separator::RParen) => break,
+                _ => res.push(self.parse_param()?),
+            };
+        }
+        // close paren
+        self.advance();
+        Ok(res)
+    }
+
+    fn parse_param(&mut self) -> Result<Param, Error> {
+        // should be identifier -> colon -> type
+        todo!()
+    }
+
     fn parse_if_expr(&mut self) -> Result<IfExp, Error> {
         todo!()
     }
+
     fn parse_paren_expr(&mut self) -> Result<Expression, Error> {
         todo!()
     }

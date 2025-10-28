@@ -30,7 +30,7 @@
 // Function (anonymous)
 <function> ::= "fn" "(" <parameter_list> ")" "{"  <statement_list> "}"
 <parameter_list> ::= <parameter> ("," <parameter>)*
-<parameter> ::= <type> ":" <identifier>
+<parameter> ::= <identifier> ":" <type>
 
 // Call
 <call> ::= <expression> "(" <argument_list> ")"
