@@ -15,9 +15,11 @@ pub enum Statement {
 }
 
 pub enum Expression {
+    // standalone expressions just contain their tokens
     Literal(Token),
     Identifier(Token),
     Function(Function),
+    // the rest have complete structs
     Call(Call),
     BinaryExp(BinaryExp),
     IfExp(IfExp),

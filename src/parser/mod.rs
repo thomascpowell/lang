@@ -116,12 +116,12 @@ impl Parser {
     fn parse_expression(&mut self, min_prec: u8) -> Result<Expression, Error> {
         let tok = self
             .peek()
-            .ok_or_else(|| Error::generic_eof("expected a statement"))?;
+            .ok_or_else(|| Error::generic_eof("expected an expression"))?;
         let pos = Position {
-            start_line:tok.line,
-            start_col: tok.col
+            start_line: tok.line,
+            start_col: tok.col,
         };
-        // prefix expressions
+        // prefix (starter) expressions
         match &tok.kind {
             TokenKind::Keyword(Keyword::Fn) => {
                 return Ok(Expression::Function(self.parse_function()?));
@@ -144,6 +144,7 @@ impl Parser {
                 });
             }
         };
+        // right-recursive descent (if operator is present)
         while let Some(tok) = self.peek() {
             let op = match &tok.kind {
                 TokenKind::Operator(op) => op.clone(),
@@ -166,10 +167,12 @@ impl Parser {
     }
 
     fn parse_literal(&mut self) -> Result<Expression, Error> {
-        todo!()
+        let tok = self.expect(|x| matches!(x, TokenKind::Literal(_)))?;
+        Ok(Expression::Literal(tok))
     }
     fn parse_identifier(&mut self) -> Result<Expression, Error> {
-        todo!()
+        let tok = self.expect(|x| matches!(x, TokenKind::Identifier(_)))?;
+        Ok(Expression::Literal(tok))
     }
     fn parse_function(&mut self) -> Result<Function, Error> {
         todo!()
