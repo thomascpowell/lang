@@ -1,3 +1,5 @@
+use crate::{lexer::token::Token, parser::ast::Position};
+
 #[derive(Debug)]
 pub enum ErrorType {
     // Lexer
@@ -38,6 +40,17 @@ impl Error {
             found: found.into(),
             message: message.map(|m| m.into()),
         }
+    }
+
+    // lazy error - unexpected token type
+    pub fn generic_utt(tok: Token) -> Self {
+        Error::new(
+            ErrorType::UnexpectedTokenType,
+            tok.line,
+            tok.col,
+            "unexpected token",
+            None,
+        )
     }
 
     // this happens rather often

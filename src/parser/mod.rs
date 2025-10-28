@@ -1,3 +1,4 @@
+use crate::parser::ast::Literal;make
 use crate::{error_types::*, lexer::token::*, parser::ast::*};
 pub mod ast;
 
@@ -124,7 +125,7 @@ impl Parser {
         // prefix (starter) expressions
         match &tok.kind {
             TokenKind::Keyword(Keyword::Fn) => {
-                return Ok(Expression::Function(self.parse_function()?));
+                return Ok(Expression::FunctionExp(self.parse_function()?));
             }
             TokenKind::Keyword(Keyword::If) => return Ok(Expression::IfExp(self.parse_if_expr()?)),
             TokenKind::Separator(Separator::LParen) => return self.parse_paren_expr(),
@@ -132,13 +133,13 @@ impl Parser {
         }
         // pratt parsing
         let mut lhs = match tok.kind {
-            TokenKind::Literal(_) => self.parse_literal()?,
-            TokenKind::Identifier(_) => self.parse_identifier()?,
+            TokenKind::Literal(_) => Expression::LiteralExp(self.parse_literal()?),
+            TokenKind::Identifier(_) => Expression::IdentifierExp(self.parse_identifier()?),
             _ => {
                 return Err(Error {
                     error_type: ErrorType::UnexpectedTokenType,
                     start_line: tok.line,
-                    start_col: tok.line,
+                    start_col: tok.col,
                     found: tok.original,
                     message: Some("unexpected token".to_string()),
                 });
@@ -166,14 +167,31 @@ impl Parser {
         Ok(lhs)
     }
 
-    fn parse_literal(&mut self) -> Result<Expression, Error> {
+    fn parse_literal(&mut self) -> Result<Literal, Error> {
         let tok = self.expect(|x| matches!(x, TokenKind::Literal(_)))?;
-        Ok(Expression::Literal(tok))
+        let pos = Position {
+            start_line: tok.line,
+            start_col: tok.col,
+        };
+        if let TokenKind::Literal(val) = tok.kind {
+            return Ok(Literal {
+                position: pos,
+                value: val,
+            });
+        }
+        Err(Error::generic_utt(tok))
     }
 
-    fn parse_identifier(&mut self) -> Result<Expression, Error> {
+    fn parse_identifier(&mut self) -> Result<Identifier, Error> {
         let tok = self.expect(|x| matches!(x, TokenKind::Identifier(_)))?;
-        Ok(Expression::Literal(tok))
+        let pos = Position {
+            start_line: tok.line,
+            start_col: tok.col,
+        };
+        Ok(Identifier {
+            position: pos,
+            name: tok.original,
+        })
     }
 
     fn parse_function(&mut self) -> Result<Function, Error> {
@@ -197,10 +215,26 @@ impl Parser {
             let tok = self
                 .peek()
                 .ok_or_else(|| Error::generic_eof("expected an expression"))?;
-
             match tok.kind {
                 TokenKind::Separator(Separator::RParen) => break,
-                _ => res.push(self.parse_param()?),
+                _ => {
+                    res.push(self.parse_param()?);
+                    if self.compare_kind(|k| matches!(k, TokenKind::Separator(Separator::Comma))) {
+                        self.advance();
+                    }
+                    if self.compare_kind(|k| matches!(k, TokenKind::Separator(Separator::RParen))) {
+                        let comma = self
+                            .peek()
+                            .ok_or_else(|| Error::generic_eof("trailing comma"))?;
+                        return Err(Error {
+                            start_col: comma.col,
+                            start_line: comma.line,
+                            error_type: ErrorType::UnexpectedTokenType,
+                            found: comma.original,
+                            message: Some("trailing comma".to_string()),
+                        });
+                    }
+                }
             };
         }
         // close paren
@@ -209,8 +243,30 @@ impl Parser {
     }
 
     fn parse_param(&mut self) -> Result<Param, Error> {
-        // should be identifier -> colon -> type
-        todo!()
+        // match identifier -> colon -> type
+        let id = self.expect(|x| matches!(x, TokenKind::Identifier(_)))?;
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::Colon)))?;
+        let type_token = self.expect(is_type)?;
+        let ty = match type_token.kind {
+            TokenKind::Keyword(Keyword::Bool) => Type::Bool,
+            TokenKind::Keyword(Keyword::I32) => Type::I32,
+            TokenKind::Keyword(Keyword::String) => Type::String,
+            _ => return Err(Error::generic_utt(type_token)),
+        };
+        let pos = Position {
+            start_line: id.line,
+            start_col: id.col,
+        };
+        let ident_str = if let TokenKind::Identifier(ref s) = id.kind {
+            s.clone()
+        } else {
+            unreachable!();
+        };
+        Ok(Param {
+            position: pos,
+            param_type: ty,
+            identifier: ident_str,
+        })
     }
 
     fn parse_if_expr(&mut self) -> Result<IfExp, Error> {

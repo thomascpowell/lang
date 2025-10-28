@@ -15,15 +15,24 @@ pub enum Statement {
 }
 
 pub enum Expression {
-    // standalone expressions just contain their tokens
-    Literal(Token),
-    Identifier(Token),
-    Function(Function),
-    // the rest have complete structs
-    Call(Call),
+    LiteralExp(Literal),
+    IdentifierExp(Identifier),
+    FunctionExp(Function),
+    CallExp(Call),
     BinaryExp(BinaryExp),
     IfExp(IfExp),
     ParenExp(Box<Expression>),
+}
+
+pub struct Literal {
+    pub position: Position,
+    pub value: LiteralValue, 
+}
+pub type LiteralValue = crate::lexer::token::Literal;
+
+pub struct Identifier {
+    pub position: Position,
+    pub name: String,
 }
 
 pub struct Assignment {
@@ -71,6 +80,7 @@ pub struct BinaryExp {
 
 pub struct IfExp {
     // if is an expression
+    pub position: Position,
     pub if_cond: Box<Expression>,
     pub then_branch: Box<Statement>,
     pub else_branch: Option<Box<Statement>>,
