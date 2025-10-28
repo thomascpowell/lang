@@ -49,6 +49,19 @@ pub enum Operator {
     Assign,
     Not,
 }
+impl Operator {
+    pub fn get_precedence(&self) -> u8 {
+        match self {
+            Operator::Or => 1,
+            Operator::And => 2,
+            Operator::Eq | Operator::Ne => 3,
+            Operator::Lt | Operator::Le | Operator::Gt | Operator::Ge => 4,
+            Operator::Add | Operator::Sub => 5,
+            Operator::Mul | Operator::Div => 6,
+            _ => 0,
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Separator {

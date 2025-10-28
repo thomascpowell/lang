@@ -1,5 +1,4 @@
 use crate::{error_types::*, lexer::token::*, parser::ast::*};
-
 pub mod ast;
 
 /*
@@ -58,7 +57,7 @@ impl Parser {
             }
             // everything else is an expression
             // may or may not be valid though
-            _ => Ok(Statement::Expression(self.parse_expression()?)),
+            _ => Ok(Statement::Expression(self.parse_expression(0)?)),
         }
     }
 
@@ -72,7 +71,7 @@ impl Parser {
             start_col: tok.col,
         };
         // parse the expression that follows
-        let expr = self.parse_expression()?;
+        let expr = self.parse_expression(0)?;
         let ret = Return {
             position: pos,
             expression: expr,
@@ -110,12 +109,60 @@ impl Parser {
             position: pos,
             assignment_type: a_type,
             identifier: ident_str,
-            expression: self.parse_expression()?,
+            expression: self.parse_expression(0)?,
         })
     }
 
-    fn parse_expression(&mut self) -> Result<Expression, Error> {
-        todo!();
+    fn parse_expression(&mut self, min_prec: u8) -> Result<Expression, Error> {
+        let tok = self
+            .peek()
+            .ok_or_else(|| Error::generic_eof("expected a statement"))?;
+        let pos = Position {
+            start_line:tok.line,
+            start_col: tok.col
+        };
+        // prefix expressions
+        match &tok.kind {
+            TokenKind::Keyword(Keyword::Fn) => {
+                return Ok(Expression::Function(self.parse_function()?));
+            }
+            TokenKind::Keyword(Keyword::If) => return Ok(Expression::IfExp(self.parse_if_expr()?)),
+            TokenKind::Separator(Separator::LParen) => return self.parse_paren_expr(),
+            _ => {}
+        }
+        // pratt parsing
+        let mut lhs = match tok.kind {
+            TokenKind::Literal(_) => self.parse_literal()?,
+            TokenKind::Identifier(_) => self.parse_identifier()?,
+            _ => {
+                return Err(Error {
+                    error_type: ErrorType::UnexpectedTokenType,
+                    start_line: tok.line,
+                    start_col: tok.line,
+                    found: tok.original,
+                    message: Some("unexpected token".to_string()),
+                });
+            }
+        };
+        while let Some(tok) = self.peek() {
+            let op = match &tok.kind {
+                TokenKind::Operator(op) => op.clone(),
+                _ => break,
+            };
+            let prec = op.get_precedence();
+            if prec < min_prec {
+                break;
+            }
+            self.advance();
+            let rhs = self.parse_expression(prec + 1)?;
+            lhs = Expression::BinaryExp(BinaryExp {
+                position: pos.clone(),
+                left: Box::new(lhs),
+                right: Box::new(rhs),
+                operator: op,
+            });
+        }
+        Ok(lhs)
     }
 
     fn parse_literal(&mut self) -> Result<Expression, Error> {

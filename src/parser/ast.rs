@@ -84,27 +84,13 @@ pub enum Type {
     Bool,
 }
 
-pub enum Operator {
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Eq,
-    Ne,
-    Lt,
-    Le,
-    Gt,
-    Ge,
-    And,
-    Or,
-    Assign,
-    Not,
-}
+pub type Operator = crate::lexer::token::Operator;
 
 /*
 * Metadata
 * */
 
+#[derive(Clone)]
 pub struct Position {
     pub start_line: usize,
     pub start_col: usize,
