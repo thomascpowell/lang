@@ -40,7 +40,7 @@ impl Parser {
         let tok = self
             .peek()
             .ok_or_else(|| Error::generic_eof("expected a statement"))?;
-        match &tok.kind {
+        let res = match &tok.kind {
             // statement: return
             TokenKind::Keyword(Keyword::Return) => Ok(Statement::Return(self.parse_return()?)),
             // match assignments (only other valid use of keywords)
@@ -59,7 +59,9 @@ impl Parser {
             // everything else is an expression
             // may or may not be valid though
             _ => Ok(Statement::Expression(self.parse_expression(0)?)),
-        }
+        };
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::Semicolon)))?;
+        res
     }
 
     fn parse_return(&mut self) -> Result<Return, Error> {
@@ -199,7 +201,6 @@ impl Parser {
         self.advance();
         // parse param list
         let params = self.parse_params()?;
-
         // TODO
         // should be an statement list, ending in return statement
         // then return Ok(Function)
