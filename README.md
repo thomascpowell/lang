@@ -12,3 +12,8 @@ Not sure what to call it, but it's a programming language.
 - Lexer: Complete
 - Parser: In Progress
 - Interpreter: Planned
+
+## Next Steps
+- Create syntax examples matching grammar
+- Write unit tests for parser, clean up code
+- Start working on the interpreter
