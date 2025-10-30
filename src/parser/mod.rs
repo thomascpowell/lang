@@ -1,5 +1,5 @@
-use crate::{error_types::*, lexer::token::*, parser::ast::*};
 use crate::parser::ast::Literal;
+use crate::{error_types::*, lexer::token::*, parser::ast::*};
 pub mod ast;
 
 /*
@@ -148,6 +148,7 @@ impl Parser {
             }
         };
         // right-recursive descent (if operator is present)
+        // TODO: what about right associative operators?
         while let Some(tok) = self.peek() {
             let op = match &tok.kind {
                 TokenKind::Operator(op) => op.clone(),
@@ -208,38 +209,39 @@ impl Parser {
     }
 
     fn parse_params(&mut self) -> Result<Vec<Param>, Error> {
-        // open paren
+        // match paren
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
-        // define res
         let mut res = Vec::new();
+        // case: no params
+        if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
+            self.advance();
+            return Ok(res);
+        }
+        // loop: params until Rparen
         loop {
+            res.push(self.parse_param()?);
+            // case: comma, go again
+            if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::Comma))) {
+                self.advance();
+                continue;
+            }
+            // case: finished
+            if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
+                self.advance();
+                break;
+            }
+            // case: anything else
             let tok = self
                 .peek()
-                .ok_or_else(|| Error::generic_eof("expected an expression"))?;
-            match tok.kind {
-                TokenKind::Separator(Separator::RParen) => break,
-                _ => {
-                    res.push(self.parse_param()?);
-                    if self.compare_kind(|k| matches!(k, TokenKind::Separator(Separator::Comma))) {
-                        self.advance();
-                    }
-                    if self.compare_kind(|k| matches!(k, TokenKind::Separator(Separator::RParen))) {
-                        let comma = self
-                            .peek()
-                            .ok_or_else(|| Error::generic_eof("trailing comma"))?;
-                        return Err(Error {
-                            start_col: comma.col,
-                            start_line: comma.line,
-                            error_type: ErrorType::UnexpectedTokenType,
-                            found: comma.original,
-                            message: Some("trailing comma".to_string()),
-                        });
-                    }
-                }
-            };
+                .ok_or_else(|| Error::generic_eof("incomplete params list"))?;
+            return Err(Error::new(
+                ErrorType::UnexpectedTokenType,
+                tok.line,
+                tok.col,
+                tok.original,
+                Some("expected valid params"),
+            ));
         }
-        // close paren
-        self.advance();
         Ok(res)
     }
 
@@ -271,11 +273,45 @@ impl Parser {
     }
 
     fn parse_if_expr(&mut self) -> Result<IfExp, Error> {
-        todo!()
+        // match if
+        let if_tok = self.expect(|x| matches!(x, TokenKind::Keyword(Keyword::If)))?;
+        // get the position
+        let pos = Position {
+            start_col: if_tok.col,
+            start_line: if_tok.line,
+        };
+        // parse condition
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
+        let cond = self.parse_expression(0)?;
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::RParen)))?;
+        // parse block
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
+        let then_branch = self.parse_expression(0)?;
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::RBrace)))?;
+        let mut res = IfExp {
+            position: pos,
+            if_cond: Box::new(cond),
+            then_branch: Box::new(then_branch),
+            else_branch: None,
+        };
+        // case: f no else
+        if !self.compare_kind(|x| matches!(x, TokenKind::Keyword(Keyword::Else))) {
+            return Ok(res);
+        }
+        // case: else
+        self.advance();
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
+        let else_branch = self.parse_expression(0)?;
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::RBrace)))?;
+        res.else_branch = Some(Box::new(else_branch));
+        Ok(res)
     }
 
     fn parse_paren_expr(&mut self) -> Result<Expression, Error> {
-        todo!()
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
+        let expr = self.parse_expression(0)?;
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::RParen)))?;
+        Ok(Expression::ParenExp(Box::new(expr)))
     }
 
     /*
