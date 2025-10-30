@@ -49,7 +49,7 @@ pub struct Return {
 
 pub struct Function {
     pub position: Position,
-    pub args: Vec<Param>,
+    pub params: Vec<Param>,
     pub body: StatementList,
 }
 pub struct Param {

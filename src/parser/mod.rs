@@ -198,14 +198,46 @@ impl Parser {
     }
 
     fn parse_function(&mut self) -> Result<Function, Error> {
-        // consume fn
-        self.advance();
+        // consume fn (shouldnt be unsafe)
+        let fn_keyword = self.advance().unwrap();
+        let pos = Position {
+            start_col: fn_keyword.col,
+            start_line: fn_keyword.line,
+        };
         // parse param list
         let params = self.parse_params()?;
-        // TODO
-        // should be an statement list, ending in return statement
-        // then return Ok(Function)
-        todo!()
+
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
+        let mut statement_list: Vec<Statement> = Vec::new();
+        loop {
+            if let Some(tok) = self.peek() {
+                if matches!(tok.kind, TokenKind::Separator(Separator::RBrace)) {
+                    self.advance(); // consume '}'
+                    break;
+                }
+            } else {
+                return Err(Error::generic_eof("expected closing '}' in function"));
+            }
+            statement_list.push(self.parse_statement()?);
+        }
+        // confirm last statement is return
+        let last = statement_list.last();
+        if last.is_none() || !matches!(last.unwrap(), &Statement::Return(_)) {
+            return Err(Error {
+                start_line: fn_keyword.line,
+                start_col: fn_keyword.col,
+                error_type: ErrorType::FunctionShouldEndWithReturn,
+                message: Some("expected function body to end with a return".to_string()),
+                found: "no return statement".to_string(),
+            });
+        }
+        Ok(Function {
+            position: pos,
+            params: params,
+            body: StatementList {
+                statements: statement_list,
+            },
+        })
     }
 
     fn parse_params(&mut self) -> Result<Vec<Param>, Error> {
@@ -220,15 +252,15 @@ impl Parser {
         // loop: params until Rparen
         loop {
             res.push(self.parse_param()?);
-            // case: comma, go again
-            if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::Comma))) {
-                self.advance();
-                continue;
-            }
             // case: finished
             if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
                 self.advance();
                 break;
+            }
+            // case: comma, go again
+            if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::Comma))) {
+                self.advance();
+                continue;
             }
             // case: anything else
             let tok = self

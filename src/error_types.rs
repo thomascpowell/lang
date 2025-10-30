@@ -8,10 +8,9 @@ pub enum ErrorType {
     InvalidIntLiteral,
     InvalidOperator,
     UnexpectedEOF,
-
     // Parser
     UnexpectedTokenType,
-
+    FunctionShouldEndWithReturn,
     // Shared
     Default,
 }
