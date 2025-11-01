@@ -10,7 +10,7 @@ Not sure what to call it, but it's a programming language.
 
 ## Project Status
 - Lexer: Complete
-- Parser: In Progress
+- Parser: Complete
 - Interpreter: Planned
 
 ## Next Steps

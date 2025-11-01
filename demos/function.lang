@@ -1,0 +1,4 @@
+i32 max = fn(a: i32, b: i32) {
+  i32 res = if (a > b) { a } else { b };
+  return res;
+};
