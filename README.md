@@ -14,6 +14,6 @@ Not sure what to call it, but it's a programming language.
 - Interpreter: Planned
 
 ## Next Steps
-- Create syntax examples matching grammar
-- Write unit tests for parser, clean up code
-- Start working on the interpreter
+- Print the AST to confirm correct structure
+- Write the interpreter and CLI
+- Name the project (maybe)
