@@ -1,4 +1,5 @@
 use crate::parser::ast::Literal;
+use crate::parser::ast::Operator;
 use crate::{error_types::*, lexer::token::*, parser::ast::*};
 pub mod ast;
 
@@ -108,6 +109,7 @@ impl Parser {
             TokenKind::Identifier(s) => s,
             _ => unreachable!(),
         };
+        self.expect(|k| matches!(k, TokenKind::Operator(Operator::Assign)))?;
         Ok(Assignment {
             position: pos,
             assignment_type: a_type,
@@ -143,7 +145,7 @@ impl Parser {
                     start_line: tok.line,
                     start_col: tok.col,
                     found: tok.original,
-                    message: Some("unexpected token".to_string()),
+                    message: Some("expected literal or identifier".to_string()),
                 });
             }
         };
@@ -326,7 +328,7 @@ impl Parser {
             then_branch: Box::new(then_branch),
             else_branch: None,
         };
-        // case: f no else
+        // case: no else
         if !self.compare_kind(|x| matches!(x, TokenKind::Keyword(Keyword::Else))) {
             return Ok(res);
         }
