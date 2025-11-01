@@ -10,10 +10,10 @@ Not sure what to call it, but it's a programming language.
 
 ## Project Status
 - Lexer: Complete
-- Parser: Complete
+- Parser: Functional\*
 - Interpreter: Planned
 
 ## Next Steps
-- Print the AST to confirm correct structure
+- Fix issues with Parser
 - Write the interpreter and CLI
 - Name the project (maybe)

@@ -1,4 +1,4 @@
-use crate::{lexer::token::Token, parser::ast::Position};
+use crate::{lexer::token::Token};
 
 #[derive(Debug)]
 pub enum ErrorType {

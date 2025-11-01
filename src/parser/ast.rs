@@ -1,19 +1,20 @@
-use crate::lexer::token::*;
-
 /*
 * Nonterminal types
 * */
 
+#[derive(Debug)]
 pub struct StatementList {
     pub statements: Vec<Statement>,
 }
 
+#[derive(Debug)]
 pub enum Statement {
     Assignment(Assignment),
     Expression(Expression),
     Return(Return),
 }
 
+#[derive(Debug)]
 pub enum Expression {
     LiteralExp(Literal),
     IdentifierExp(Identifier),
@@ -24,17 +25,20 @@ pub enum Expression {
     ParenExp(Box<Expression>),
 }
 
+#[derive(Debug)]
 pub struct Literal {
     pub position: Position,
-    pub value: LiteralValue, 
+    pub value: LiteralValue,
 }
 pub type LiteralValue = crate::lexer::token::Literal;
 
+#[derive(Debug)]
 pub struct Identifier {
     pub position: Position,
     pub name: String,
 }
 
+#[derive(Debug)]
 pub struct Assignment {
     pub position: Position,
     pub assignment_type: Type,
@@ -42,16 +46,20 @@ pub struct Assignment {
     pub expression: Expression,
 }
 
+#[derive(Debug)]
 pub struct Return {
     pub position: Position,
     pub expression: Expression,
 }
 
+#[derive(Debug)]
 pub struct Function {
     pub position: Position,
     pub params: Vec<Param>,
     pub body: StatementList,
 }
+
+#[derive(Debug)]
 pub struct Param {
     // for def
     pub position: Position,
@@ -59,18 +67,21 @@ pub struct Param {
     pub identifier: String,
 }
 
+#[derive(Debug)]
 pub struct Call {
     pub position: Position,
     // any expression can be called
     pub callee: Box<Expression>,
     pub args: Vec<Argument>,
 }
+#[derive(Debug)]
 pub struct Argument {
     // for call
     pub position: Position,
     pub value: Expression,
 }
 
+#[derive(Debug)]
 pub struct BinaryExp {
     pub position: Position,
     pub left: Box<Expression>,
@@ -78,6 +89,7 @@ pub struct BinaryExp {
     pub operator: Operator,
 }
 
+#[derive(Debug)]
 pub struct IfExp {
     // if is an expression
     pub position: Position,
@@ -90,6 +102,7 @@ pub struct IfExp {
 * Keywords & Operators
 * */
 
+#[derive(Debug)]
 pub enum Type {
     I32,
     String,
@@ -102,8 +115,74 @@ pub type Operator = crate::lexer::token::Operator;
 * Metadata
 * */
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Position {
     pub start_line: usize,
     pub start_col: usize,
+}
+
+impl StatementList {
+    pub fn print_ast(&self, indent: usize) {
+        println!(" Program");
+        for stmt in &self.statements {
+            stmt.print_ast(indent);
+        }
+    }
+}
+impl Statement {
+    pub fn print_ast(&self, indent: usize) {
+        let padding = "   ".repeat(indent);
+        match self {
+            Statement::Return(rst) => {
+                println!("{} |_ Return", padding);
+                rst.expression.print_ast(indent + 1);
+            }
+            Statement::Assignment(ast) => {
+                println!(
+                    "{} |_ Assignment: {:?} {}",
+                    padding, ast.assignment_type, ast.identifier
+                );
+                ast.expression.print_ast(indent + 1);
+            }
+            Statement::Expression(expr) => {
+                println!("{}Expression", padding);
+                expr.print_ast(indent + 1);
+            }
+        }
+    }
+}
+impl Expression {
+    pub fn print_ast(&self, indent: usize) {
+        let padding = "   ".repeat(indent);
+        match self {
+            Expression::IdentifierExp(i) => println!("{} |_ Identifier: {}", padding, i.name),
+            Expression::LiteralExp(lexp) => println!("{} |_ Literal: {:?}", padding, lexp.value),
+            Expression::BinaryExp(bexp) => {
+                println!("{} |_ BinaryExp: {:?}", padding, bexp.operator);
+                bexp.left.print_ast(indent + 1);
+                bexp.right.print_ast(indent + 1);
+            }
+            Expression::FunctionExp(fexp) => {
+                println!("{} |_ Function", padding);
+                fexp.body.print_ast(indent + 1);
+            }
+            Expression::IfExp(iexp) => {
+                println!("{} |_ IfExp", padding);
+                println!("{} |_ Condition", padding);
+                iexp.if_cond.as_ref().print_ast(indent + 2);
+                println!("{} |_ Then", padding);
+                iexp.then_branch.as_ref().print_ast(indent + 2);
+                if let Some(else_branch) = iexp.else_branch.as_ref() {
+                    println!("{} |_ Else", padding);
+                    else_branch.print_ast(indent + 2);
+                }
+            }
+            Expression::ParenExp(inner) => {
+                println!("{} |_ ParenExp", padding);
+                inner.print_ast(indent + 1);
+            }
+
+            Expression::CallExp(_) => unreachable!(),
+        }
+    }
 }
