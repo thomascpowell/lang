@@ -1,0 +1,9 @@
+string hello = fn(name: string) {
+  print("hello ");
+  print(name);
+  return 0;
+};
+
+hello("thomas");
+
+

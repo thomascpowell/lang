@@ -150,8 +150,11 @@ impl Parser {
             }
         };
         // right-recursive descent (if operator is present)
-        // TODO: what about right associative operators?
         while let Some(tok) = self.peek() {
+            if matches!(tok.kind, TokenKind::Separator(Separator::LParen)) {
+                lhs = Expression::CallExp(self.parse_call(lhs)?);
+                continue;
+            }
             let op = match &tok.kind {
                 TokenKind::Operator(op) => op.clone(),
                 _ => break,
@@ -170,6 +173,43 @@ impl Parser {
             });
         }
         Ok(lhs)
+    }
+
+    fn parse_call(&mut self, callee: Expression) -> Result<Call, Error> {
+        let tok = self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
+        let pos = Position {
+            start_line: tok.line,
+            start_col: tok.col,
+        };
+        // no args
+        let mut args = Vec::new();
+        if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
+            self.advance();
+            return Ok(Call {
+                position: pos.clone(),
+                callee: Box::new(callee),
+                args,
+            });
+        }
+        // args
+        loop {
+            args.push(Argument {
+                position: pos.clone(),
+                value: self.parse_expression(0)?,
+            });
+            if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::Comma))) {
+                self.advance();
+                continue;
+            }
+            break;
+        }
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::RParen)))?;
+
+        Ok(Call {
+            position: pos,
+            callee: Box::new(callee),
+            args,
+        })
     }
 
     fn parse_literal(&mut self) -> Result<Literal, Error> {
