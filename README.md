@@ -6,7 +6,7 @@ Not sure what to call it, but it's a programming language.
 ## Features
 - Minimal syntax with a functional paradigm
 - Reasonably helpful error messages
-- Doesn't run yet, probably still better than using Python
+- Not finished, probably still better than using Python
 
 ## Project Status
 - Lexer: Complete
@@ -14,6 +14,6 @@ Not sure what to call it, but it's a programming language.
 - Interpreter: Planned
 
 ## Next Steps
-- Fix issues with Parser
-- Write the interpreter and CLI
+- Write the interpreter
+- Write a CLI + REPL
 - Name the project (maybe)
