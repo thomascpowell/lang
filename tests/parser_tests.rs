@@ -18,24 +18,24 @@ fn test_call() {
     let program = read_file("demos/call.lang").unwrap();
     let tokens = tokenize(program).unwrap();
     let ast = parse(tokens).unwrap();
-    ast.print_ast(0);
+    // ast.print_ast(0);
 }
 
 #[test]
 fn test_file_parse_1() {
     let program = read_file("demos/function.lang").unwrap();
-    assert!(check(parse_str(&program)))
+    assert!(check(parse_str(&program)));
+    let program = read_file("demos/expression.lang").unwrap();
+    assert!(check(parse_str(&program)));
+    let program = read_file("demos/print_test.lang").unwrap();
+    let tokens = tokenize(program).unwrap();
+    let ast = parse(tokens).unwrap();
 }
 
 #[test]
 fn test_file_parse_2() {
-    let program = read_file("demos/expression.lang").unwrap();
-    assert!(check(parse_str(&program)))
-}
-
-#[test]
-fn test_file_parse_3() {
-    let program = read_file("demos/print_test.lang").unwrap();
+    // Possible bug here:
+    let program = read_file("demos/priority.lang").unwrap();
     let tokens = tokenize(program).unwrap();
     let ast = parse(tokens).unwrap();
     ast.print_ast(0);
