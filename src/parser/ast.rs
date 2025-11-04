@@ -189,7 +189,7 @@ impl Expression {
                 } else {
                     println!("{}|_ Args:", padding);
                     for arg in &cexp.args {
-                        arg.value.print_ast(indent+1);
+                        arg.value.print_ast(indent + 1);
                     }
                 }
             }
