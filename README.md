@@ -6,11 +6,11 @@ Not sure what to call it, but it's a programming language.
 ## Features
 - Minimal syntax with a functional paradigm
 - Reasonably helpful error messages
-- Probably better than using Python
+- Doesn't run yet, probably still better than using Python
 
 ## Project Status
 - Lexer: Complete
-- Parser: Functional\*
+- Parser: Complete
 - Interpreter: Planned
 
 ## Next Steps
