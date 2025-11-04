@@ -22,7 +22,7 @@ fn test_call() {
 }
 
 #[test]
-fn test_file_parse_1() {
+fn test_file_parse() {
     let program = read_file("demos/function.lang").unwrap();
     assert!(check(parse_str(&program)));
     let program = read_file("demos/expression.lang").unwrap();
@@ -30,15 +30,15 @@ fn test_file_parse_1() {
     let program = read_file("demos/print_test.lang").unwrap();
     let tokens = tokenize(program).unwrap();
     let ast = parse(tokens).unwrap();
+    // ast.print_ast(0);
+    let program = read_file("demos/priority.lang").unwrap();
+    let tokens = tokenize(program).unwrap();
+    let ast = parse(tokens).unwrap();
+    // ast.print_ast(0);
 }
 
 #[test]
 fn test_file_parse_2() {
-    // Possible bug here:
-    let program = read_file("demos/priority.lang").unwrap();
-    let tokens = tokenize(program).unwrap();
-    let ast = parse(tokens).unwrap();
-    ast.print_ast(0);
 }
 
 fn parse_str(program: &str) -> Result<StatementList, Error> {
