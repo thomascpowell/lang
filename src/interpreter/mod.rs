@@ -1,11 +1,10 @@
 use crate::{
-    error_types::Error,
-    interpreter::symbol::Scope,
+    error_types::{Error, ErrorType},
+    interpreter::symbol::{Scope, ScopeStack, Symbol},
     parser::ast::{Statement, StatementList},
 };
 pub mod symbol;
 
-// TODO: interpreter
 pub fn interpret(ast: StatementList) -> Result<(), Error> {
     let mut interpreter = Interpreter::new(ast);
     todo!()
@@ -14,7 +13,7 @@ pub fn interpret(ast: StatementList) -> Result<(), Error> {
 struct Interpreter {
     pub ast: StatementList,
     pub pos: usize,
-    pub scopes: Vec<Scope>,
+    pub scopes: ScopeStack
 }
 
 impl Interpreter {
@@ -22,11 +21,11 @@ impl Interpreter {
         Interpreter {
             ast: ast,
             pos: 0,
-            scopes: Vec::new(),
+            scopes: ScopeStack::new(),
         }
     }
-
     fn peek(&mut self) -> Statement {
         todo!()
     }
+
 }

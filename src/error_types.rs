@@ -11,6 +11,8 @@ pub enum ErrorType {
     // Parser
     UnexpectedTokenType,
     FunctionShouldEndWithReturn,
+    // Interpreter
+    InvalidSymbol,
     // Shared
     Default,
 }
