@@ -5,8 +5,15 @@ use crate::{
 };
 pub mod symbol;
 
+/**
+* wip interpreter
+* */
+
 pub fn interpret(ast: StatementList) -> Result<(), Error> {
     let mut interpreter = Interpreter::new(ast);
+    while interpreter.has_next() {
+
+    }
     todo!()
 }
 
@@ -24,8 +31,13 @@ impl Interpreter {
             scopes: ScopeStack::new(),
         }
     }
-    fn peek(&mut self) -> Statement {
-        todo!()
+
+    fn has_next(&mut self) -> bool {
+        self.peek().is_some()
+    }
+
+    fn peek(&self) -> Option<Statement> {
+        self.ast.statements.get(0).cloned()
     }
 
 }

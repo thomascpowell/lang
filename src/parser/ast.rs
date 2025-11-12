@@ -7,14 +7,14 @@ pub struct StatementList {
     pub statements: Vec<Statement>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Statement {
     Assignment(Assignment),
     Expression(Expression),
     Return(Return),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Expression {
     LiteralExp(Literal),
     IdentifierExp(Identifier),
@@ -25,20 +25,20 @@ pub enum Expression {
     ParenExp(Box<Expression>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Literal {
     pub position: Position,
     pub value: LiteralValue,
 }
 pub type LiteralValue = crate::lexer::token::Literal;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Identifier {
     pub position: Position,
     pub name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Assignment {
     pub position: Position,
     pub assignment_type: Type,
@@ -46,20 +46,20 @@ pub struct Assignment {
     pub expression: Expression,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Return {
     pub position: Position,
     pub expression: Expression,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Function {
     pub position: Position,
     pub params: Vec<Param>,
     pub body: StatementList,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Param {
     // for def
     pub position: Position,
@@ -67,21 +67,21 @@ pub struct Param {
     pub identifier: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Call {
     pub position: Position,
     // any expression can be called
     pub callee: Box<Expression>,
     pub args: Vec<Argument>,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Argument {
     // for call
     pub position: Position,
     pub value: Expression,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BinaryExp {
     pub position: Position,
     pub left: Box<Expression>,
@@ -89,7 +89,7 @@ pub struct BinaryExp {
     pub operator: Operator,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct IfExp {
     // if is an expression
     pub position: Position,
@@ -102,7 +102,7 @@ pub struct IfExp {
 * Keywords & Operators
 * */
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Type {
     I32,
     String,
