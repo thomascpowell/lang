@@ -1,5 +1,5 @@
-# Untitled
-Not sure what to call it, but it's a programming language.
+# "Lang"
+An untitled/unfinished programming language.
 
 [![tests](https://github.com/thomascpowell/lang/actions/workflows/rust.yml/badge.svg)](https://github.com/thomascpowell/lang/actions/workflows/rust.yml)
 
@@ -9,11 +9,11 @@ Not sure what to call it, but it's a programming language.
 - Not finished, probably still better than using Python
 
 ## Project Status
-- Lexer: Complete
-- Parser: Complete
-- Interpreter: Planned
+- Lexer, Parser: Complete
+- Interpreter: WIP
+- CLI: Planned
 
 ## Next Steps
-- Write the interpreter
-- Write a CLI + REPL
-- Name the project (maybe)
+- Finish the interpreter
+- Write more code samples (see /demos)
+- Come up with a name (biggest challenge)
