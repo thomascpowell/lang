@@ -1,18 +1,17 @@
-use crate::{
-    error_types::Error,
-    interpreter::symbol::ScopeStack,
-    parser::ast::{Statement, StatementList},
-};
+use crate::{error_types::Error, interpreter::symbol::*, parser::ast::*};
 pub mod symbol;
 
 /**
 * wip interpreter
 * */
 
+// this matches the general structure of the other components
 pub fn interpret(ast: StatementList) -> Result<(), Error> {
     let mut interpreter = Interpreter::new(ast);
-    while interpreter.has_next() {}
-    todo!()
+    while interpreter.has_next() {
+        interpreter.interpret_statement()?;
+    }
+    Ok(())
 }
 
 struct Interpreter {
@@ -31,6 +30,31 @@ impl Interpreter {
     }
 
     /*
+     * Interpreter logic
+     * */
+
+    pub fn interpret_statement(&mut self) -> Result<(), Error> {
+        let stmt = self.peek().unwrap();
+        return match stmt {
+            // cannot pass stmt contents to self.interpret_x()
+            // because it is an interal reference and the methods borrow self
+            Statement::Assignment(_) => self.interpret_assignment(),
+            Statement::Expression(_) => self.interpret_expression(),
+            Statement::Return(_) => self.interpret_return(),
+        }
+    }
+
+    fn interpret_assignment(&mut self) -> Result<(), Error> {
+        todo!()
+    }
+    fn interpret_expression(&mut self) -> Result<(), Error> {
+        todo!()
+    }
+    fn interpret_return(&mut self) -> Result<(), Error> {
+        todo!()
+    }
+
+    /*
      * Utility functions
      * */
 
@@ -38,7 +62,11 @@ impl Interpreter {
         self.peek().is_some()
     }
 
-    fn peek(&self) -> Option<Statement> {
-        self.ast.statements.get(self.pos).cloned()
+    fn peek(&self) -> Option<&Statement> {
+        self.ast.statements.get(self.pos)
+    }
+
+    fn advance(&mut self) {
+        self.pos += 1
     }
 }
