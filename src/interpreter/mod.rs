@@ -1,6 +1,6 @@
 use crate::{
-    error_types::{Error, ErrorType},
-    interpreter::symbol::{Scope, ScopeStack, Symbol},
+    error_types::Error,
+    interpreter::symbol::ScopeStack,
     parser::ast::{Statement, StatementList},
 };
 pub mod symbol;
@@ -11,16 +11,14 @@ pub mod symbol;
 
 pub fn interpret(ast: StatementList) -> Result<(), Error> {
     let mut interpreter = Interpreter::new(ast);
-    while interpreter.has_next() {
-
-    }
+    while interpreter.has_next() {}
     todo!()
 }
 
 struct Interpreter {
     pub ast: StatementList,
     pub pos: usize,
-    pub scopes: ScopeStack
+    pub scopes: ScopeStack,
 }
 
 impl Interpreter {
@@ -32,12 +30,15 @@ impl Interpreter {
         }
     }
 
+    /*
+     * Utility functions
+     * */
+
     fn has_next(&mut self) -> bool {
         self.peek().is_some()
     }
 
     fn peek(&self) -> Option<Statement> {
-        self.ast.statements.get(0).cloned()
+        self.ast.statements.get(self.pos).cloned()
     }
-
 }
