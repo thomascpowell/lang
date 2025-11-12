@@ -13,6 +13,7 @@ pub enum ErrorType {
     FunctionShouldEndWithReturn,
     // Interpreter
     InvalidSymbol,
+    UnexpectedStatementType,
     // Shared
     Default,
 }
@@ -50,6 +51,17 @@ impl Error {
             tok.line,
             tok.col,
             "unexpected token",
+            None,
+        )
+    }
+
+    // unexpected statement type
+    pub fn generic_ust() -> Self {
+        Error::new(
+            ErrorType::UnexpectedStatementType,
+            0,
+            0,
+            "unexpected statement type",
             None,
         )
     }

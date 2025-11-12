@@ -2,6 +2,8 @@
 * Nonterminal types
 * */
 
+use crate::error_types::Error;
+
 #[derive(Debug, Clone)]
 pub struct StatementList {
     pub statements: Vec<Statement>,
@@ -12,6 +14,27 @@ pub enum Statement {
     Assignment(Assignment),
     Expression(Expression),
     Return(Return),
+}
+
+impl Statement {
+    pub fn expect_assignment(&self) -> Result<&Assignment, Error> {
+        if let Statement::Assignment(r) = self {
+            return Ok(r)
+        }
+        Err(Error::generic_ust())
+    }
+    pub fn expect_expression(&self) -> Result<&Expression, Error> {
+        if let Statement::Expression(r) = self {
+            return Ok(r)
+        }
+        Err(Error::generic_ust())
+    }
+    pub fn expect_return(&self) -> Result<&Return, Error> {
+        if let Statement::Return(r) = self {
+            return Ok(r)
+        }
+        Err(Error::generic_ust())
+    }
 }
 
 #[derive(Debug, Clone)]

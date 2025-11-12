@@ -10,6 +10,7 @@ pub fn interpret(ast: StatementList) -> Result<(), Error> {
     let mut interpreter = Interpreter::new(ast);
     while interpreter.has_next() {
         interpreter.interpret_statement()?;
+        interpreter.advance()
     }
     Ok(())
 }
@@ -45,12 +46,15 @@ impl Interpreter {
     }
 
     fn interpret_assignment(&mut self) -> Result<(), Error> {
+        let asn = self.peek().unwrap().expect_assignment()?;
         todo!()
     }
     fn interpret_expression(&mut self) -> Result<(), Error> {
+        let exp = self.peek().unwrap().expect_assignment()?;
         todo!()
     }
     fn interpret_return(&mut self) -> Result<(), Error> {
+        let ret = self.peek().unwrap().expect_assignment()?;
         todo!()
     }
 
