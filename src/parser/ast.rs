@@ -2,7 +2,7 @@
 * Nonterminal types
 * */
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StatementList {
     pub statements: Vec<Statement>,
 }
