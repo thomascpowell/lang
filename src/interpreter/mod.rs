@@ -42,7 +42,7 @@ impl Interpreter {
             Statement::Assignment(_) => self.interpret_assignment(),
             Statement::Expression(_) => self.interpret_expression(),
             Statement::Return(_) => self.interpret_return(),
-        }
+        };
     }
 
     fn interpret_assignment(&mut self) -> Result<(), Error> {

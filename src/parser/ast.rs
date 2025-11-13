@@ -17,23 +17,31 @@ pub enum Statement {
 }
 
 impl Statement {
+    pub fn get_position(&self) -> &Position {
+        return match self {
+            Statement::Return(x) => &x.position,
+            Statement::Assignment(x) => &x.position,
+            Statement::Expression(x) => x.get_position(),
+        };
+    }
+
     pub fn expect_assignment(&self) -> Result<&Assignment, Error> {
         if let Statement::Assignment(r) = self {
-            return Ok(r)
+            return Ok(r);
         }
-        Err(Error::generic_ust())
+        Err(Error::generic_ust(self))
     }
     pub fn expect_expression(&self) -> Result<&Expression, Error> {
         if let Statement::Expression(r) = self {
-            return Ok(r)
+            return Ok(r);
         }
-        Err(Error::generic_ust())
+        Err(Error::generic_ust(self))
     }
     pub fn expect_return(&self) -> Result<&Return, Error> {
         if let Statement::Return(r) = self {
-            return Ok(r)
+            return Ok(r);
         }
-        Err(Error::generic_ust())
+        Err(Error::generic_ust(self))
     }
 }
 
@@ -46,6 +54,20 @@ pub enum Expression {
     BinaryExp(BinaryExp),
     IfExp(IfExp),
     ParenExp(Box<Expression>),
+}
+
+impl Expression {
+    pub fn get_position(&self) -> &Position {
+        match self {
+            Expression::LiteralExp(x) => &x.position,
+            Expression::IdentifierExp(x) => &x.position,
+            Expression::FunctionExp(x) => &x.position,
+            Expression::CallExp(x) => &x.position,
+            Expression::BinaryExp(x) => &x.position,
+            Expression::IfExp(x) => &x.position,
+            Expression::ParenExp(x) => &x.get_position(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

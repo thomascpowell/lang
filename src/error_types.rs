@@ -1,4 +1,4 @@
-use crate::{lexer::token::Token};
+use crate::{lexer::token::Token, parser::ast::Statement};
 
 #[derive(Debug)]
 pub enum ErrorType {
@@ -56,11 +56,13 @@ impl Error {
     }
 
     // unexpected statement type
-    pub fn generic_ust() -> Self {
+    // uses recursive Statement::get_position() function
+    pub fn generic_ust(stmt: &Statement) -> Self {
+        let pos = stmt.get_position();
         Error::new(
             ErrorType::UnexpectedStatementType,
-            0,
-            0,
+            pos.start_line,
+            pos.start_col,
             "unexpected statement type",
             None,
         )
