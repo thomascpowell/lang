@@ -1,9 +1,7 @@
-string hello = fn(name: string) {
+i32 hello = fn(name: string) {
   print("hello ");
   print(name);
   return 0;
 };
 
-hello("thomas");
-
-
+hello("name");
