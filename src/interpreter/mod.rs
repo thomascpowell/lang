@@ -46,8 +46,17 @@ impl Interpreter {
     }
 
     fn interpret_assignment(&mut self) -> Result<(), Error> {
+        // get parts of the assignment
         let asn = self.peek().unwrap().expect_assignment()?;
-        todo!()
+        let assignment_type = asn.assignment_type.clone();
+        let identifier = asn.identifier.clone();
+        let symbol_value = self.handle_expression(asn.expression.clone())?;
+        let symbol = Symbol {
+            ty: assignment_type,
+            val: symbol_value,
+        };
+        // push to the scope stack
+        self.scopes.set_symbol(&identifier, symbol)
     }
     fn interpret_expression(&mut self) -> Result<(), Error> {
         let exp = self.peek().unwrap().expect_assignment()?;
@@ -55,6 +64,9 @@ impl Interpreter {
     }
     fn interpret_return(&mut self) -> Result<(), Error> {
         let ret = self.peek().unwrap().expect_assignment()?;
+        todo!()
+    }
+    fn handle_expression(&mut self, expression: Expression) -> Result<SymbolValue, Error> {
         todo!()
     }
 

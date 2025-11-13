@@ -1,4 +1,4 @@
-use crate::{lexer::token::Token, parser::ast::Statement};
+use crate::{lexer::token::Token, parser::ast::{Position, Statement}};
 
 #[derive(Debug)]
 pub enum ErrorType {
@@ -52,6 +52,17 @@ impl Error {
             tok.col,
             "unexpected token",
             None,
+        )
+    }
+
+    // unexpected scope error
+    pub fn generic_se(identifier: String) -> Self {
+        Error::new(
+            ErrorType::UnexpectedTokenType,
+            0,
+            0,
+            identifier,
+            Some("unexpected error setting identifier"),
         )
     }
 

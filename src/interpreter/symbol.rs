@@ -2,11 +2,15 @@ use std::{collections::HashMap};
 
 use crate::{
     error_types::{Error, ErrorType},
-    parser::ast::{Function, Literal},
+    parser::ast::{Function, Literal, Type},
 };
 
 // borrows from AST
-pub enum Symbol {
+pub struct Symbol {
+    pub ty: Type,
+    pub val: SymbolValue,
+}
+pub enum SymbolValue {
     Literal(Literal),
     Function(Function),
 }
@@ -16,15 +20,15 @@ pub struct Scope {
 }
 
 impl Scope {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self {
             symbols: HashMap::new(),
         }
     }
-    pub fn define(&mut self, name: String, value: Symbol) {
-        self.symbols.insert(name, value);
+    fn define(&mut self, name: &str, value: Symbol) {
+        self.symbols.insert(name.to_string(), value);
     }
-    pub fn get(&self, name: &str) -> Option<&Symbol> {
+    fn get(&self, name: &str) -> Option<&Symbol> {
         self.symbols.get(name)
     }
 }
@@ -38,12 +42,13 @@ impl ScopeStack {
         Self { scopes: Vec::new() }
     }
 
-    fn get_symbol(&mut self, identifier: String) -> Result<&Symbol, Error> {
+    pub fn get_symbol(&self, identifier: &str) -> Result<&Symbol, Error> {
         // start with most recent/specific scope
         // look for symbol
+        // this is dynamic scoping (kinda bad)
         for scope in self.scopes.iter().rev() {
-            if let Some(sym) = scope.get(&identifier) {
-                return Ok(sym);
+            if let Some(symbol) = scope.get(identifier) {
+                return Ok(symbol);
             }
         }
         // no symbol -> error
@@ -51,8 +56,26 @@ impl ScopeStack {
             error_type: ErrorType::InvalidSymbol,
             start_line: 0,
             start_col: 0,
-            found: identifier,
-            message: Some("invalid identifer name".to_string()),
+            found: identifier.to_string(),
+            message: Some("identifer name not found".to_string()),
         })
+    }
+
+    // sets a new symbol at the top of the stack
+    pub fn set_symbol(&mut self, identifier: &str, symbol: Symbol) -> Result<(), Error> {
+        if let Some(scope) = self.scopes.last_mut() {
+            scope.define(identifier, symbol);
+            return Ok(())
+        }
+        Err(Error::generic_se(identifier.to_string()))
+    }
+
+    // adds a scope to the stack
+    pub fn push_scope(&mut self) {
+        self.scopes.push(Scope::new());
+    }
+    // removes a scope from the stack
+    pub fn pop_scope(&mut self) {
+        self.scopes.pop();
     }
 }
