@@ -6,13 +6,13 @@ An untitled and unfinished programming language.
 
 
 ```rust
-i32 hello = fn(name: string) {
-  print("hello ");
-  print(name);
-  return 0;
+// readme_example.lang
+
+string min = fn(a: i32, b: i32) {
+  return if (a > b) { "a is bigger" } else { "b is bigger" };
 };
 
-hello("name");
+print(min(1, 2));
 ```
 
 ## Features

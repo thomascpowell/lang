@@ -1,0 +1,7 @@
+// readme_example.lang
+
+string min = fn(a: i32, b: i32) {
+  return if (a > b) { "a is bigger" } else { "b is bigger" };
+};
+
+print(min(1, 2));

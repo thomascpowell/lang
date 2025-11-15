@@ -2,7 +2,7 @@ use lang::lexer::token::*;
 use lang::lexer::tokenize;
 
 #[test]
-fn test_full_parse() {
+fn test_tokenizer() {
     let program = "
         fn main(n: i32) { 
             //some comment

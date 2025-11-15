@@ -59,11 +59,11 @@ impl Interpreter {
         self.scopes.set_symbol(&identifier, symbol)
     }
     fn interpret_expression(&mut self) -> Result<(), Error> {
-        let exp = self.peek().unwrap().expect_assignment()?;
+        let exp = self.peek().unwrap().expect_expression()?;
         todo!()
     }
     fn interpret_return(&mut self) -> Result<(), Error> {
-        let ret = self.peek().unwrap().expect_assignment()?;
+        let ret = self.peek().unwrap().expect_return()?;
         todo!()
     }
     fn handle_expression(&mut self, expression: Expression) -> Result<SymbolValue, Error> {
