@@ -2,14 +2,16 @@
 <program> ::= <statement_list>
 <statement_list> ::= <statement_list> <statement> | epsilon
 
-// A statement is either: assignent, expression, or return
+// A statement is either: assignment, expression, or return
 <statement> ::= <assignment> ";" | <expression> ";" | <return> ";"
 
 // Return
 <return> ::= "return" <expression>
 
-// An assignment consists of: "let", identifier, colon, type, "=", and expression
-<assignment> ::= "let" <identifier> ":" <type> "=" <expression>
+// Assignment
+<assignment> ::=  <value_assignment> | <function_assignment>
+<value_assignment> ::= <type> <identifier> "=" <expression>
+<function_assignment> ::= "def" <identifier> "=" <function>
 <type> ::= "i32" | "bool" | "string" 
 <identifier> ::= [a-zA-Z_][a-zA-Z0-9_]*
 
