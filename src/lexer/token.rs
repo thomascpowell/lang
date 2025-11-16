@@ -87,6 +87,7 @@ pub enum Keyword {
     If,
     Else,
     Fn,
+    Def,
     I32,
     Bool,
     String,

@@ -215,6 +215,7 @@ impl Lexer {
 fn classify_keyword_or_identifier(identifier: &str) -> TokenKind {
     match identifier {
         "fn" => TokenKind::Keyword(Keyword::Fn),
+        "def" => TokenKind::Keyword(Keyword::Def),
         "i32" => TokenKind::Keyword(Keyword::I32),
         "bool" => TokenKind::Keyword(Keyword::Bool),
         "string" => TokenKind::Keyword(Keyword::String),
