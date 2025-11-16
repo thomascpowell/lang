@@ -6,9 +6,7 @@ An untitled and unfinished programming language.
 
 
 ```rust
-// readme_example.lang
-
-string min = fn(a: i32, b: i32) {
+def min = fn(a: i32, b: i32) -> string {
   return if (a > b) { "a is bigger" } else { "b is bigger" };
 };
 

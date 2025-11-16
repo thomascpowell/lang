@@ -1,6 +1,6 @@
-// readme_example.lang
+// used in README.md
 
-string min = fn(a: i32, b: i32) -> string {
+def min = fn(a: i32, b: i32) -> string {
   return if (a > b) { "a is bigger" } else { "b is bigger" };
 };
 
