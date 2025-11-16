@@ -45,7 +45,9 @@ impl Parser {
         let res = match &tok.kind {
             // statement: return
             TokenKind::Keyword(Keyword::Return) => Ok(Statement::Return(self.parse_return()?)),
-            // match assignments (only other valid use of keywords)
+            // function assignment
+            TokenKind::Keyword(Keyword::Def) => Ok(Statement::Assignment(self.parse_function_assignment()?)),
+            // match value assignments (only other valid use of keywords)
             kind if is_type(kind) => Ok(Statement::Assignment(self.parse_assignment()?)),
             // other keyword (not a valid statement)
             TokenKind::Keyword(k) => {
@@ -84,6 +86,24 @@ impl Parser {
         Ok(ret)
     }
 
+    fn parse_function_assignment(&mut self) -> Result<Assignment, Error> {
+        // get def
+        let def = self.advance().ok_or_else(|| Error::generic())?;
+        let pos = Position {
+            start_line: def.line,
+            start_col: def.col,
+        };
+        let identifier = self.parse_identifier()?;
+        self.expect(|k| matches!(k, TokenKind::Operator(Operator::Assign)))?;
+        let function: Function = self.parse_function()?;       
+        Ok(Assignment {
+            position: pos,
+            assignment_type: function.returns.clone(), 
+            identifier: identifier.name,
+            expression: Expression::FunctionExp(function),
+        })
+    }
+
     fn parse_assignment(&mut self) -> Result<Assignment, Error> {
         let type_tok = self.expect(|x| matches!(x, TokenKind::Keyword(_)))?;
         let pos = Position {
@@ -119,6 +139,7 @@ impl Parser {
         })
     }
 
+    // TODO: function exp
     fn parse_expression(&mut self, min_prec: u8) -> Result<Expression, Error> {
         let tok = self
             .peek()
