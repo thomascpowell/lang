@@ -9,8 +9,7 @@ fn test_tokenizer() {
             string x = \"hello\";
             i32 y = 4 / n;
             return 0;
-        }
-        "
+        }"
     .to_string();
 
     let expected = vec![
@@ -76,7 +75,7 @@ fn test_operators_separators() {
 
 #[test]
 fn test_error() {
-    let program = "\"i am not going to terminal this string literal".to_string();
+    let program = "\"i am not going to terminate this string literal".to_string();
     let tokens = tokenize(program);
     assert!(tokens.is_err());
     print_err(&tokens.unwrap_err().display(), false);
