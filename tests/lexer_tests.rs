@@ -4,7 +4,7 @@ use lang::lexer::tokenize;
 #[test]
 fn test_tokenizer() {
     let program = "
-        fn main(n: i32) { 
+        fn main(n: i32) -> i32 { 
             //some comment
             string x = \"hello\";
             i32 y = 4 / n;
@@ -20,6 +20,8 @@ fn test_tokenizer() {
         TokenKind::Separator(Separator::Colon),
         TokenKind::Keyword(Keyword::I32),
         TokenKind::Separator(Separator::RParen),
+        TokenKind::Separator(Separator::Arrow),
+        TokenKind::Keyword(Keyword::I32),
         TokenKind::Separator(Separator::LBrace),
         TokenKind::Comment("some comment".to_string()),
         TokenKind::Keyword(Keyword::String),
@@ -44,7 +46,7 @@ fn test_tokenizer() {
 
 #[test]
 fn test_operators_separators() {
-    let program = "{}(())+ -/ * ==!= <;; > <=>= && || ! =:".to_string();
+    let program = "{}(())+ -/ * ==!= <;; > <=>= && || ! =: - ->".to_string();
     let expected = vec![
         TokenKind::Separator(Separator::LBrace),
         TokenKind::Separator(Separator::RBrace),
@@ -69,6 +71,8 @@ fn test_operators_separators() {
         TokenKind::Operator(Operator::Not),
         TokenKind::Operator(Operator::Assign),
         TokenKind::Separator(Separator::Colon),
+        TokenKind::Operator(Operator::Sub),
+        TokenKind::Separator(Separator::Arrow),
     ];
     compare_output(program, expected, false);
 }
