@@ -101,6 +101,7 @@ pub struct Return {
 pub struct Function {
     pub position: Position,
     pub params: Vec<Param>,
+    pub returns: Type,
     pub body: StatementList,
 }
 

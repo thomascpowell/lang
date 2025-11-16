@@ -1,6 +1,6 @@
 // readme_example.lang
 
-string min = fn(a: i32, b: i32) {
+string min = fn(a: i32, b: i32) -> string {
   return if (a > b) { "a is bigger" } else { "b is bigger" };
 };
 

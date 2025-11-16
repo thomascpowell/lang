@@ -249,6 +249,15 @@ impl Parser {
         };
         // parse param list
         let params = self.parse_params()?;
+        // parse return type
+        self.expect(|x| matches!(x, TokenKind::Separator(Separator::Arrow)))?;
+        let tok = self.expect(is_type)?;
+        let returns = match tok.kind {
+            TokenKind::Keyword(Keyword::Bool) => Type::Bool,
+            TokenKind::Keyword(Keyword::I32) => Type::I32,
+            TokenKind::Keyword(Keyword::String) => Type::String,
+            _ => return Err(Error::generic_utt(tok)),
+        };
 
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
         let mut statement_list: Vec<Statement> = Vec::new();
@@ -277,6 +286,7 @@ impl Parser {
         Ok(Function {
             position: pos,
             params: params,
+            returns: returns,
             body: StatementList {
                 statements: statement_list,
             },
