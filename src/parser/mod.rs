@@ -262,6 +262,7 @@ impl Parser {
     }
 
     fn parse_function(&mut self) -> Result<Function, Error> {
+        println!("parsing function");
         // consume fn (shouldnt be unsafe)
         let fn_keyword = self.advance().unwrap();
         let pos = Position {

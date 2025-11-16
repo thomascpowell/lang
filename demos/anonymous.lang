@@ -1,0 +1,3 @@
+// simple example using an anonymous function
+
+(fn(x: i32) -> i32 { return x * x; });(10);

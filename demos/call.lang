@@ -1,7 +1,0 @@
-i32 hello = fn(name: string) -> i32 {
-  print("hello ");
-  print(name);
-  return 0;
-};
-
-hello("name");
