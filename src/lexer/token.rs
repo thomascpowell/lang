@@ -72,6 +72,7 @@ pub enum Separator {
     Comma,
     Semicolon,
     Colon,
+    Arrow,
 }
 
 #[derive(Debug, Clone, PartialEq)]

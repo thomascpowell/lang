@@ -93,6 +93,11 @@ impl Lexer {
             ',' => self.make_simple_token(TokenKind::Separator(Separator::Comma), ','),
             ';' => self.make_simple_token(TokenKind::Separator(Separator::Semicolon), ';'),
             ':' => self.make_simple_token(TokenKind::Separator(Separator::Colon), ':'),
+            // Separator (Double)
+            '-' if self.peek_next().is_some_and(|c| c == '>') => {
+                self.advance_n(2);
+                (TokenKind::Separator(Separator::Arrow), "->".to_string())
+            }
             // Operators (Double)
             '!' if self.peek_next().is_some_and(|c| c == '=') => {
                 self.advance_n(2);
