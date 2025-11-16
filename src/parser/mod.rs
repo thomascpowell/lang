@@ -49,17 +49,6 @@ impl Parser {
             TokenKind::Keyword(Keyword::Def) => Ok(Statement::Assignment(self.parse_function_assignment()?)),
             // match value assignments (only other valid use of keywords)
             kind if is_type(kind) => Ok(Statement::Assignment(self.parse_assignment()?)),
-            // other keyword (not a valid statement)
-            TokenKind::Keyword(k) => {
-                let found = format!("{:?}", k);
-                Err(Error::new(
-                    ErrorType::UnexpectedTokenType,
-                    tok.line,
-                    tok.col,
-                    found,
-                    Some("unexpected keyword"),
-                ))
-            }
             // everything else is an expression
             // may or may not be valid though
             _ => Ok(Statement::Expression(self.parse_expression(0)?)),

@@ -3,6 +3,7 @@
 <statement_list> ::= <statement_list> <statement> | epsilon
 
 // A statement is either: assignment, expression, or return
+// semicolons are only needed for statements
 <statement> ::= <assignment> ";" | <expression> ";" | <return> ";"
 
 // Return
