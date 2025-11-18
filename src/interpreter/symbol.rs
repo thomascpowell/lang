@@ -1,18 +1,47 @@
-use std::{collections::HashMap};
+use std::{collections::HashMap, rc::Rc};
 
 use crate::{
     error_types::{Error, ErrorType},
-    parser::ast::{Function, Literal, Type},
+    parser::ast::{Function, Type},
 };
 
-// borrows from AST
+pub enum ExecResult {
+    Unit,            // statement produces nothing
+    Value(Value),    // expression result
+    Returned(Value), // function return
+}
+
+impl ExecResult {
+    pub fn expect_unit(&mut self) -> Result<(), Error> {
+        todo!()
+    }
+    pub fn expect_value(&mut self) -> Result<Value, Error> {
+        todo!()
+    }
+    pub fn expect_returned(&mut self) -> Result<Value, Error> {
+        todo!()
+    }
+}
+
+
 pub struct Symbol {
     pub ty: Type,
-    pub val: SymbolValue,
+    pub val: Value,
 }
-pub enum SymbolValue {
-    Literal(Literal),
-    Function(Function),
+
+#[derive(Clone)]
+pub enum Value {
+    Int(i32),
+    Bool(bool),
+    String(String),
+    // a runtime function value
+    Function(Rc<FunctionValue>),
+}
+
+#[derive(Clone)]
+pub struct FunctionValue {
+    pub ast: Function,
+    pub env: usize,
 }
 
 pub struct Scope {
@@ -39,7 +68,9 @@ pub struct ScopeStack {
 
 impl ScopeStack {
     pub fn new() -> Self {
-        Self { scopes: Vec::new() }
+        let mut s = ScopeStack { scopes: Vec::new() };
+        s.push_scope(); // add global scope
+        s
     }
 
     pub fn get_symbol(&self, identifier: &str) -> Result<&Symbol, Error> {
@@ -57,7 +88,7 @@ impl ScopeStack {
             start_line: 0,
             start_col: 0,
             found: identifier.to_string(),
-            message: Some("identifer name not found".to_string()),
+            message: Some("identifier name not found".to_string()),
         })
     }
 
@@ -65,7 +96,7 @@ impl ScopeStack {
     pub fn set_symbol(&mut self, identifier: &str, symbol: Symbol) -> Result<(), Error> {
         if let Some(scope) = self.scopes.last_mut() {
             scope.define(identifier, symbol);
-            return Ok(())
+            return Ok(());
         }
         Err(Error::generic_se(identifier.to_string()))
     }

@@ -19,6 +19,7 @@ struct Interpreter {
     pub ast: StatementList,
     pub pos: usize,
     pub scopes: ScopeStack,
+    pub call_depth: usize,
 }
 
 impl Interpreter {
@@ -27,6 +28,7 @@ impl Interpreter {
             ast: ast,
             pos: 0,
             scopes: ScopeStack::new(),
+            call_depth: 0,
         }
     }
 
@@ -34,7 +36,7 @@ impl Interpreter {
      * Interpreter logic
      * */
 
-    pub fn interpret_statement(&mut self) -> Result<(), Error> {
+    pub fn interpret_statement(&mut self) -> Result<ExecResult, Error> {
         let stmt = self.peek().unwrap();
         return match stmt {
             // cannot pass stmt contents to self.interpret_x()
@@ -45,28 +47,42 @@ impl Interpreter {
         };
     }
 
-    fn interpret_assignment(&mut self) -> Result<(), Error> {
+    fn interpret_assignment(&mut self) -> Result<ExecResult, Error> {
         // get parts of the assignment
         let asn = self.peek().unwrap().expect_assignment()?;
         let assignment_type = asn.assignment_type.clone();
         let identifier = asn.identifier.clone();
-        let symbol_value = self.handle_expression(asn.expression.clone())?;
+
+        let symbol_value = self
+            .handle_expression(asn.expression.clone())?
+            .expect_value()?;
         let symbol = Symbol {
             ty: assignment_type,
             val: symbol_value,
         };
         // push to the scope stack
-        self.scopes.set_symbol(&identifier, symbol)
+        self.scopes.set_symbol(&identifier, symbol)?;
+        Ok(ExecResult::Unit)
     }
-    fn interpret_expression(&mut self) -> Result<(), Error> {
-        let exp = self.peek().unwrap().expect_expression()?;
+
+    fn interpret_expression(&mut self) -> Result<ExecResult, Error> {
+        let exp = self.peek().unwrap().expect_expression()?.clone();
+        self.handle_expression(exp)
+    }
+
+    fn interpret_return(&mut self) -> Result<ExecResult, Error> {
+        // TODO: make the parser catch invalid returns
+        let ret = self.peek().unwrap().expect_return()?.clone();
+        return Ok(ExecResult::Returned(
+            self.handle_expression(ret.expression)?.expect_value()?,
+        ));
+    }
+
+    fn handle_expression(&mut self, expression: Expression) -> Result<ExecResult, Error> {
         todo!()
     }
-    fn interpret_return(&mut self) -> Result<(), Error> {
-        let ret = self.peek().unwrap().expect_return()?;
-        todo!()
-    }
-    fn handle_expression(&mut self, expression: Expression) -> Result<SymbolValue, Error> {
+
+    fn run_function(&mut self, func: Function, args: Vec<Expression>) -> Result<ExecResult, Error> {
         todo!()
     }
 
