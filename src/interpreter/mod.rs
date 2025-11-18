@@ -9,8 +9,15 @@ pub mod symbol;
 pub fn interpret(ast: StatementList) -> Result<(), Error> {
     let mut interpreter = Interpreter::new(ast);
     while interpreter.has_next() {
-        interpreter.interpret_statement()?;
-        interpreter.advance()
+        match interpreter.interpret_statement()? {
+            ExecResult::Returned(_) => {
+                return Err(Error::generic_message(
+                    crate::error_types::ErrorType::InvalidReturnLocation,
+                    "return in invalid location".to_string(),
+                ));
+            }
+            _ => interpreter.advance(),
+        }
     }
     Ok(())
 }

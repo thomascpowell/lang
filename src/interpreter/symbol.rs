@@ -23,7 +23,6 @@ impl ExecResult {
     }
 }
 
-
 pub struct Symbol {
     pub ty: Type,
     pub val: Value,

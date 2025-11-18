@@ -14,6 +14,7 @@ pub enum ErrorType {
     // Interpreter
     InvalidSymbol,
     UnexpectedStatementType,
+    InvalidReturnLocation,
     // Shared
     Default,
 }
@@ -91,6 +92,11 @@ impl Error {
     pub fn generic() -> Self {
         Error::new(ErrorType::Default, 0, 0, "unknown. likely incomplete", None)
     }
+
+    pub fn generic_message(ty: ErrorType, message: String) -> Self {
+        Error::new(ty, 0, 0, message, None)
+    }
+
 
     pub fn display(&self) -> String {
         format!(
