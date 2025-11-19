@@ -13,13 +13,22 @@ pub enum ExecResult {
 
 impl ExecResult {
     pub fn expect_unit(&mut self) -> Result<(), Error> {
-        todo!()
+        if matches!(self, ExecResult::Unit) {
+            return Ok(())
+        }
+        Err(Error::generic_uer()) 
     }
     pub fn expect_value(&mut self) -> Result<Value, Error> {
-        todo!()
+        if let ExecResult::Value(v) = self {
+            return Ok(v.clone());
+        }
+        Err(Error::generic_uer()) 
     }
     pub fn expect_returned(&mut self) -> Result<Value, Error> {
-        todo!()
+        if let ExecResult::Returned(r) = self {
+            return Ok(r.clone());
+        }
+        Err(Error::generic_uer()) 
     }
 }
 

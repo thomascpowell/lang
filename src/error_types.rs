@@ -1,4 +1,7 @@
-use crate::{lexer::token::Token, parser::ast::{Position, Statement}};
+use crate::{
+    lexer::token::Token,
+    parser::ast::{Position, Statement},
+};
 
 #[derive(Debug)]
 pub enum ErrorType {
@@ -15,6 +18,7 @@ pub enum ErrorType {
     InvalidSymbol,
     UnexpectedStatementType,
     InvalidReturnLocation,
+    UnexpectedExecResult,
     // Shared
     Default,
 }
@@ -80,6 +84,16 @@ impl Error {
         )
     }
 
+    pub fn generic_uer() -> Self {
+        Error::new(
+            ErrorType::UnexpectedExecResult,
+            0,
+            0,
+            "unexpected exec result",
+            None,
+        )
+    }
+
     // this happens rather often
     // dont have the location because thats in the token
     // the token that does not exist
@@ -96,7 +110,6 @@ impl Error {
     pub fn generic_message(ty: ErrorType, message: String) -> Self {
         Error::new(ty, 0, 0, message, None)
     }
-
 
     pub fn display(&self) -> String {
         format!(
