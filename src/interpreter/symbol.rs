@@ -1,4 +1,4 @@
-use std::{collections::HashMap, rc::Rc};
+use std::collections::HashMap;
 
 use crate::{
     error_types::{Error, ErrorType},
@@ -12,23 +12,23 @@ pub enum ExecResult {
 }
 
 impl ExecResult {
-    pub fn expect_unit(&mut self) -> Result<(), Error> {
+    pub fn expect_unit(&self) -> Result<(), Error> {
         if matches!(self, ExecResult::Unit) {
-            return Ok(())
+            return Ok(());
         }
-        Err(Error::generic_uer()) 
+        Err(Error::generic_uer())
     }
-    pub fn expect_value(&mut self) -> Result<Value, Error> {
+    pub fn expect_value(&self) -> Result<Value, Error> {
         if let ExecResult::Value(v) = self {
             return Ok(v.clone());
         }
-        Err(Error::generic_uer()) 
+        Err(Error::generic_uer())
     }
-    pub fn expect_returned(&mut self) -> Result<Value, Error> {
+    pub fn expect_returned(&self) -> Result<Value, Error> {
         if let ExecResult::Returned(r) = self {
             return Ok(r.clone());
         }
-        Err(Error::generic_uer()) 
+        Err(Error::generic_uer())
     }
 }
 
@@ -42,14 +42,7 @@ pub enum Value {
     Int(i32),
     Bool(bool),
     String(String),
-    // a runtime function value
-    Function(Rc<FunctionValue>),
-}
-
-#[derive(Clone)]
-pub struct FunctionValue {
-    pub ast: Function,
-    pub env: usize,
+    Function(Function),
 }
 
 pub struct Scope {
