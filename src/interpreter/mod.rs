@@ -2,7 +2,9 @@ use crate::{error_types::Error, interpreter::symbol::*, parser::ast::*};
 pub mod symbol;
 
 /**
-* wip interpreter
+* Interpreter
+* Uses dynamic scoping (unfortunately)
+* 
 * */
 
 // this matches the general structure of the other components
@@ -13,7 +15,7 @@ pub fn interpret(ast: StatementList) -> Result<(), Error> {
             ExecResult::Returned(_) => {
                 return Err(Error::generic_message(
                     crate::error_types::ErrorType::InvalidReturnLocation,
-                    "return in invalid location".to_string(),
+                    "return must be in a function".to_string(),
                 ));
             }
             _ => interpreter.advance(),
@@ -26,7 +28,6 @@ struct Interpreter {
     pub ast: StatementList,
     pub pos: usize,
     pub scopes: ScopeStack,
-    pub call_depth: usize,
 }
 
 impl Interpreter {
@@ -35,7 +36,6 @@ impl Interpreter {
             ast: ast,
             pos: 0,
             scopes: ScopeStack::new(),
-            call_depth: 0,
         }
     }
 
@@ -86,7 +86,15 @@ impl Interpreter {
     }
 
     fn handle_expression(&mut self, expression: Expression) -> Result<ExecResult, Error> {
-        todo!()
+        match expression {
+            Expression::LiteralExp(_) => Ok(ExecResult::Unit),
+            Expression::IdentifierExp(_) => Ok(ExecResult::Unit),
+            Expression::FunctionExp(_) => Ok(ExecResult::Unit),
+            Expression::CallExp(_) => Ok(ExecResult::Unit),
+            Expression::BinaryExp(_) => Ok(ExecResult::Unit),
+            Expression::IfExp(_) => Ok(ExecResult::Unit),
+            Expression::ParenExp(_) => Ok(ExecResult::Unit),
+        }
     }
 
     fn run_function(&mut self, func: Function, args: Vec<Expression>) -> Result<ExecResult, Error> {
