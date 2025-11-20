@@ -89,16 +89,32 @@ impl Interpreter {
         match expression {
             Expression::LiteralExp(_) => Ok(ExecResult::Unit),
             Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
-
-            // is this right?
-            // and should i store it as a Rc
             Expression::FunctionExp(exp) => Ok(ExecResult::Value(Value::Function(exp))),
 
+            // wip
+            Expression::CallExp(exp) => self.handle_call(exp),
+
             // TODO
-            Expression::CallExp(_) => Ok(ExecResult::Unit),
             Expression::BinaryExp(_) => Ok(ExecResult::Unit),
             Expression::IfExp(_) => Ok(ExecResult::Unit),
             Expression::ParenExp(_) => Ok(ExecResult::Unit),
+        }
+    }
+
+    fn handle_call(&mut self, call: Call) -> Result<ExecResult, Error> {
+        let callee = call.callee;
+        match *callee {
+            Expression::FunctionExp(function) => self.run_function(function, call.args),
+            Expression::IdentifierExp(identifier) => {
+                match self.scopes.get_symbol(&identifier.name)?.val.clone() {
+                    // if the corresponding value is a function, run it
+                    Value::Function(x) => self.run_function(x, call.args),
+                    // otherwise, return unit type
+                    _ => Ok(ExecResult::Unit),
+                }
+            }
+            // otherwise, return unit type (result of calling anything else)
+            _ => Ok(ExecResult::Unit),
         }
     }
 
@@ -106,7 +122,7 @@ impl Interpreter {
         Ok(self.scopes.get_symbol(&identifier.name)?.val.clone())
     }
 
-    fn run_function(&mut self, func: Function, args: Vec<Expression>) -> Result<ExecResult, Error> {
+    fn run_function(&mut self, func: Function, args: Vec<Argument>) -> Result<ExecResult, Error> {
         todo!()
     }
 
