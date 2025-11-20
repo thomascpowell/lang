@@ -90,8 +90,11 @@ impl Interpreter {
             Expression::LiteralExp(_) => Ok(ExecResult::Unit),
             Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
 
+            // is this right?
+            // and should i store it as a Rc
+            Expression::FunctionExp(exp) => Ok(ExecResult::Value(Value::Function(exp))),
+
             // TODO
-            Expression::FunctionExp(_) => Ok(ExecResult::Unit),
             Expression::CallExp(_) => Ok(ExecResult::Unit),
             Expression::BinaryExp(_) => Ok(ExecResult::Unit),
             Expression::IfExp(_) => Ok(ExecResult::Unit),
