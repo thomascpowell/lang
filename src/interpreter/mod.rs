@@ -4,7 +4,7 @@ pub mod symbol;
 /**
 * Interpreter
 * Uses dynamic scoping (unfortunately)
-* 
+*
 * */
 
 // this matches the general structure of the other components
@@ -88,13 +88,19 @@ impl Interpreter {
     fn handle_expression(&mut self, expression: Expression) -> Result<ExecResult, Error> {
         match expression {
             Expression::LiteralExp(_) => Ok(ExecResult::Unit),
-            Expression::IdentifierExp(_) => Ok(ExecResult::Unit),
+            Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
+
+            // TODO
             Expression::FunctionExp(_) => Ok(ExecResult::Unit),
             Expression::CallExp(_) => Ok(ExecResult::Unit),
             Expression::BinaryExp(_) => Ok(ExecResult::Unit),
             Expression::IfExp(_) => Ok(ExecResult::Unit),
             Expression::ParenExp(_) => Ok(ExecResult::Unit),
         }
+    }
+
+    fn handle_identifer(&mut self, identifier: Identifier) -> Result<Value, Error> {
+        Ok(self.scopes.get_symbol(&identifier.name)?.val.clone())
     }
 
     fn run_function(&mut self, func: Function, args: Vec<Expression>) -> Result<ExecResult, Error> {
