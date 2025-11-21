@@ -1,6 +1,6 @@
 # "Lang"
 
-An untitled and unfinished programming language. 
+An untitled toy language written in Rust. Currently unfinished.
 
 [![tests](https://github.com/thomascpowell/lang/actions/workflows/rust.yml/badge.svg)](https://github.com/thomascpowell/lang/actions/workflows/rust.yml)
 
