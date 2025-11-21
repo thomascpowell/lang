@@ -15,7 +15,7 @@ print(min(1, 2));
 
 ## Features
 - Helpful error messages with exact token locations
-- Anonymous functions, if expressions, recursion
+- Anonymous functions, if expressions, [recursion](https://github.com/thomascpowell/lang#readme)
 - Strict and explicit type system
 
 ## Details
