@@ -87,18 +87,24 @@ impl Interpreter {
 
     fn handle_expression(&mut self, expression: Expression) -> Result<ExecResult, Error> {
         match expression {
-            Expression::LiteralExp(_) => Ok(ExecResult::Unit),
             Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
             Expression::FunctionExp(exp) => Ok(ExecResult::Value(Value::Function(exp))),
-
-            // wip
             Expression::CallExp(exp) => self.handle_call(exp),
+            Expression::LiteralExp(exp) => self.handle_literal(exp),
 
             // TODO
             Expression::BinaryExp(_) => Ok(ExecResult::Unit),
             Expression::IfExp(_) => Ok(ExecResult::Unit),
             Expression::ParenExp(_) => Ok(ExecResult::Unit),
         }
+    }
+
+    fn handle_literal(&mut self, lit: Literal) -> Result<ExecResult, Error> {
+        Ok(match lit.value {
+            LiteralValue::Int(x) => ExecResult::Value(Value::Int(x)),
+            LiteralValue::String(x) => ExecResult::Value(Value::String(x)),
+            LiteralValue::Bool(x) => ExecResult::Value(Value::Bool(x)),
+        })
     }
 
     fn handle_call(&mut self, call: Call) -> Result<ExecResult, Error> {
