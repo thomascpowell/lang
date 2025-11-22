@@ -99,6 +99,18 @@ impl Interpreter {
         }
     }
 
+    fn handle_binary(&mut self, exp: BinaryExp) -> Result<ExecResult, Error> {
+        todo!();
+    }
+
+    fn handle_if(&mut self, exp: IfExp) -> Result<ExecResult, Error> {
+        todo!();
+    }
+
+    fn handle_paren(&mut self, exp: Box<Expression>) -> Result<ExecResult, Error> {
+        todo!();
+    }
+
     fn handle_literal(&mut self, lit: Literal) -> Result<ExecResult, Error> {
         Ok(match lit.value {
             LiteralValue::Int(x) => ExecResult::Value(Value::Int(x)),

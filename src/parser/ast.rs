@@ -51,9 +51,9 @@ pub enum Expression {
     IdentifierExp(Identifier),
     FunctionExp(Function),
     CallExp(Call),
+    ParenExp(Box<Expression>),
     BinaryExp(BinaryExp),
     IfExp(IfExp),
-    ParenExp(Box<Expression>),
 }
 
 impl Expression {
