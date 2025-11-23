@@ -91,11 +91,10 @@ impl Interpreter {
             Expression::FunctionExp(exp) => Ok(ExecResult::Value(Value::Function(exp))),
             Expression::CallExp(exp) => self.handle_call(exp),
             Expression::LiteralExp(exp) => self.handle_literal(exp),
-
+            Expression::BinaryExp(exp) => self.handle_binary(exp),
             // TODO
-            Expression::BinaryExp(_) => Ok(ExecResult::Unit),
-            Expression::IfExp(_) => Ok(ExecResult::Unit),
-            Expression::ParenExp(_) => Ok(ExecResult::Unit),
+            Expression::IfExp(exp) => self.handle_if(exp),
+            Expression::ParenExp(exp) => self.handle_paren(exp),
         }
     }
 
@@ -105,26 +104,40 @@ impl Interpreter {
         let left_val = self.handle_expression(*left)?.expect_value()?;
         let right_val = self.handle_expression(*right)?.expect_value()?;
 
-        match exp.operator {
-            Operator::Add => todo!(),
-            Operator::Sub => todo!(),
-            Operator::Mul => todo!(),
-            Operator::Div => todo!(),
-            Operator::Eq => todo!(),
-            Operator::Ne => todo!(),
-            Operator::Lt => todo!(),
-            Operator::Le => todo!(),
-            Operator::Gt => todo!(),
-            Operator::Ge => todo!(),
-            Operator::And => todo!(),
-            Operator::Or => todo!(),
-            Operator::Assign => todo!(),
-            Operator::Not => todo!(),
-        }
+        let res: Value = match exp.operator {
+            Operator::Add => Value::Int(left_val.expect_int()? + right_val.expect_int()?),
+            Operator::Sub => Value::Int(left_val.expect_int()? - right_val.expect_int()?),
+            Operator::Mul => Value::Int(left_val.expect_int()? * right_val.expect_int()?),
+            Operator::Div => Value::Int(left_val.expect_int()? / right_val.expect_int()?),
+            Operator::Eq => Value::Bool(left_val.expect_int()? == right_val.expect_int()?),
+            Operator::Ne => Value::Bool(left_val.expect_int()? != right_val.expect_int()?),
+            Operator::Lt => Value::Bool(left_val.expect_int()? < right_val.expect_int()?),
+            Operator::Gt => Value::Bool(left_val.expect_int()? > right_val.expect_int()?),
+            Operator::Le => Value::Bool(left_val.expect_int()? <= right_val.expect_int()?),
+            Operator::Ge => Value::Bool(left_val.expect_int()? >= right_val.expect_int()?),
+            Operator::And => Value::Bool(left_val.expect_bool()? && right_val.expect_bool()?),
+            Operator::Or => Value::Bool(left_val.expect_bool()? || right_val.expect_bool()?),
+
+            // only binary expression operators should reach here?
+            _ => unreachable!(),
+            // Operator::Not => return Ok(ExecResult::Unit),
+            // Operator::Assign => return Ok(ExecResult::Unit),
+        };
+        Ok(ExecResult::Value(res))
     }
 
     fn handle_if(&mut self, exp: IfExp) -> Result<ExecResult, Error> {
-        todo!();
+        let cond = self
+            .handle_expression(*(exp.if_cond))?
+            .expect_value()?
+            .expect_bool()?;
+        if cond {
+            return self.handle_expression(*(exp.then_branch));
+        }
+        match exp.else_branch {
+            Some(exp) => self.handle_expression(*exp),
+            None => Ok(ExecResult::Unit),
+        }
     }
 
     fn handle_paren(&mut self, exp: Box<Expression>) -> Result<ExecResult, Error> {

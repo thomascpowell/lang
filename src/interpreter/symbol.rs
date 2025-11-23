@@ -1,4 +1,4 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 use crate::{
     error_types::{Error, ErrorType},
@@ -46,27 +46,27 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn expect_int(&mut self) -> Result<i32, Error> {
+    pub fn expect_int(&self) -> Result<i32, Error> {
         if let Value::Int(x) = self {
-            return Ok(x.clone())
+            return Ok(*x);
         }
         Err(Error::generic_invalid_operand(self))
     }
-    pub fn expect_bool(&mut self) -> Result<bool, Error> {
+    pub fn expect_bool(&self) -> Result<bool, Error> {
         if let Value::Bool(x) = self {
-            return Ok(x.clone())
+            return Ok(*x);
         }
         Err(Error::generic_invalid_operand(self))
     }
-    pub fn expect_string(&mut self) -> Result<String, Error> {
+    pub fn expect_string(&self) -> Result<String, Error> {
         if let Value::String(x) = self {
-            return Ok(x.clone())
+            return Ok(x.clone());
         }
         Err(Error::generic_invalid_operand(self))
     }
     pub fn expect_function(&mut self) -> Result<Function, Error> {
         if let Value::Function(x) = self {
-            return Ok(x.clone())
+            return Ok(x.clone());
         }
         Err(Error::generic_invalid_operand(self))
     }
