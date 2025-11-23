@@ -1,4 +1,4 @@
-use std::{any::type_name, collections::HashMap};
+use std::{collections::HashMap};
 
 use crate::{
     error_types::{Error, ErrorType},
