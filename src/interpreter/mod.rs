@@ -100,7 +100,27 @@ impl Interpreter {
     }
 
     fn handle_binary(&mut self, exp: BinaryExp) -> Result<ExecResult, Error> {
-        todo!();
+        let left = exp.left;
+        let right = exp.right;
+        let left_val = self.handle_expression(*left)?.expect_value()?;
+        let right_val = self.handle_expression(*right)?.expect_value()?;
+
+        match exp.operator {
+            Operator::Add => todo!(),
+            Operator::Sub => todo!(),
+            Operator::Mul => todo!(),
+            Operator::Div => todo!(),
+            Operator::Eq => todo!(),
+            Operator::Ne => todo!(),
+            Operator::Lt => todo!(),
+            Operator::Le => todo!(),
+            Operator::Gt => todo!(),
+            Operator::Ge => todo!(),
+            Operator::And => todo!(),
+            Operator::Or => todo!(),
+            Operator::Assign => todo!(),
+            Operator::Not => todo!(),
+        }
     }
 
     fn handle_if(&mut self, exp: IfExp) -> Result<ExecResult, Error> {

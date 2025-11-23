@@ -1,4 +1,7 @@
+use std::any::type_name;
+
 use crate::{
+    interpreter::symbol::Value,
     lexer::token::Token,
     parser::ast::{Position, Statement},
 };
@@ -19,6 +22,7 @@ pub enum ErrorType {
     UnexpectedStatementType,
     InvalidReturnLocation,
     UnexpectedExecResult,
+    InvalidOperand,
     // Shared
     Default,
 }
@@ -94,15 +98,26 @@ impl Error {
         )
     }
 
-    // this happens rather often
-    // dont have the location because thats in the token
-    // the token that does not exist
+    pub fn generic_invalid_operand(operand: &Value) -> Self {
+        let operator_type: &str = match operand {
+            Value::Int(_) => "i32",
+            Value::Bool(_) => "bool",
+            Value::String(_) => "string",
+            Value::Function(_) => "function",
+        };
+        return Error::new(
+            ErrorType::InvalidOperand,
+            0,
+            0,
+            operator_type,
+            Some("check operator and operand types"),
+        );
+    }
+
     pub fn generic_eof(expected: &str) -> Self {
         Error::new(ErrorType::UnexpectedEOF, 0, 0, "EOF", Some(expected))
     }
 
-    // this also happens rather often
-    // mainly when im not done
     pub fn generic() -> Self {
         Error::new(ErrorType::Default, 0, 0, "unknown. likely incomplete", None)
     }
