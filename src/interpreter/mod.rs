@@ -1,4 +1,8 @@
-use crate::{error_types::Error, interpreter::symbol::*, parser::ast::*};
+use crate::{
+    error_types::{Error, ErrorType},
+    interpreter::symbol::*,
+    parser::ast::*,
+};
 pub mod symbol;
 
 /**
@@ -174,6 +178,41 @@ impl Interpreter {
     }
 
     fn run_function(&mut self, func: Function, args: Vec<Argument>) -> Result<ExecResult, Error> {
+        // ensure correct number of arguments are passed
+        let num_params = func.params.len();
+        let num_args = args.len();
+        if num_params != num_args {
+            return Err(Error::generic_invalid_params(
+                args.len(),
+                "incorrect number of arguments",
+            ));
+        }
+        // push arguments onto new scope
+        // (with names corresponding with parameters)
+        self.scopes.push_scope();
+        for i in 0..num_args {
+            let param = &func.params[i];
+            let arg = &args[i];
+            let identifier = &param.identifier;
+            let arg_symbol = self
+                .handle_expression(arg.value.clone())?
+                .expect_value()?
+                .into_symbol();
+
+            if arg_symbol.ty != param.param_type {
+                return Err(Error::new(
+                    ErrorType::TypeMismatch,
+                    arg.position.start_line,
+                    arg.position.start_col,
+                    "type mismatch",
+                    Some("check function call"),
+                ));
+            }
+            self.scopes.set_symbol(identifier, arg_symbol)?;
+        }
+
+        // TODO: execute statement list and return
+
         todo!()
     }
 

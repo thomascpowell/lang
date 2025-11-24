@@ -70,7 +70,19 @@ impl Value {
         }
         Err(Error::generic_invalid_operand(self))
     }
-}
+
+    pub fn into_symbol(self) -> Symbol {
+        Symbol {
+            ty: match &self {
+                Value::Int(_) => Type::I32,
+                Value::Bool(_) => Type::Bool,
+                Value::String(_) => Type::String,
+                Value::Function(f) => f.returns.clone(),
+            },
+            val: self,
+        }
+    }
+} 
 
 pub struct Scope {
     symbols: HashMap<String, Symbol>,

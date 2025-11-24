@@ -148,7 +148,7 @@ pub struct IfExp {
 * Keywords & Operators
 * */
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Type {
     I32,
     String,

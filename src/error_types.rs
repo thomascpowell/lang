@@ -23,6 +23,8 @@ pub enum ErrorType {
     InvalidReturnLocation,
     UnexpectedExecResult,
     InvalidOperand,
+    InvalidParams,
+    TypeMismatch,
     // Shared
     Default,
 }
@@ -111,6 +113,16 @@ impl Error {
             0,
             operator_type,
             Some("check operator and operand types"),
+        );
+    }
+
+    pub fn generic_invalid_params(param_count: usize, message: &str) -> Self {
+        return Error::new(
+            ErrorType::InvalidParams,
+            0,
+            0,
+            param_count.to_string() + "parameters",
+            Some(message),
         );
     }
 
