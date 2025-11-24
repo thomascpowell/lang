@@ -141,7 +141,7 @@ impl Interpreter {
     }
 
     fn handle_paren(&mut self, exp: Box<Expression>) -> Result<ExecResult, Error> {
-        todo!();
+        self.handle_expression(*(exp))
     }
 
     fn handle_literal(&mut self, lit: Literal) -> Result<ExecResult, Error> {
