@@ -211,7 +211,27 @@ impl Interpreter {
             self.scopes.set_symbol(identifier, arg_symbol)?;
         }
 
-        // TODO: execute statement list and return
+        match func.body.statements.last() {
+            // case: no statements (invalid)
+            None => {
+                return Err(Error::generic_message(
+                    ErrorType::InvalidFunctionBody,
+                    "functions must have at least one statement".to_string(),
+                ));
+            }
+            // case: ends in a return (valid)
+            Some(stmt) if stmt.expect_return().is_ok() => (),
+            // case: does not end in a return (invalid)
+            _ => {
+                return Err(Error::generic_message(
+                    ErrorType::InvalidFunctionBody,
+                    "functions must end with a return".to_string(),
+                ));
+            }
+        };
+
+        // TODO: Execute each statement
+        for statement in func.body.statements.iter() {}
 
         todo!()
     }

@@ -24,6 +24,7 @@ pub enum ErrorType {
     UnexpectedExecResult,
     InvalidOperand,
     InvalidParams,
+    InvalidFunctionBody,
     TypeMismatch,
     // Shared
     Default,
