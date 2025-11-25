@@ -231,7 +231,10 @@ impl Interpreter {
         };
 
         // TODO: Execute each statement
-        for statement in func.body.statements.iter() {}
+        for _ in func.body.statements.iter() {
+            // will need to refactor older helpers to simply take arguments
+            todo!()
+        }
 
         todo!()
     }
