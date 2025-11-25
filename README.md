@@ -1,11 +1,11 @@
 # "Lang"
 
-An untitled toy language written in Rust. Currently unfinished.
+An unfinished (and untitled) programming language written in Rust.
 
 [![tests](https://github.com/thomascpowell/lang/actions/workflows/rust.yml/badge.svg)](https://github.com/thomascpowell/lang/actions/workflows/rust.yml)
 
-
 ```rust
+
 def min = fn(a: i32, b: i32) -> string {
   return if (a > b) { "a is bigger" } else { "b is bigger" };
 };
@@ -15,7 +15,7 @@ print(min(1, 2));
 
 ## Features
 - Helpful error messages with exact token locations
-- Anonymous functions, if expressions, [recursion](https://github.com/thomascpowell/lang#readme)
+- Anonymous functions, if expressions, and recursion
 - Strict and explicit type system
 
 ## Details

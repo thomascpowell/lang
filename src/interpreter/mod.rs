@@ -1,113 +1,117 @@
 use crate::{
     error_types::{Error, ErrorType},
-    interpreter::symbol::*,
+    interpreter::{exec_result::ExecResult, scopes::Scope, symbol::*},
     parser::ast::*,
 };
+
+pub mod exec_result;
+pub mod scopes;
 pub mod symbol;
 
-/**
-* Interpreter
-* Uses dynamic scoping (unfortunately)
-*
-* */
-
-// this matches the general structure of the other components
 pub fn interpret(ast: StatementList) -> Result<(), Error> {
     let mut interpreter = Interpreter::new(ast);
-    while interpreter.has_next() {
-        match interpreter.interpret_statement()? {
-            ExecResult::Returned(_) => {
-                return Err(Error::generic_message(
-                    crate::error_types::ErrorType::InvalidReturnLocation,
-                    "return must be in a function".to_string(),
-                ));
-            }
-            _ => interpreter.advance(),
-        }
-    }
+    interpreter.run_program()?;
     Ok(())
 }
 
-struct Interpreter {
-    pub ast: StatementList,
-    pub pos: usize,
-    pub scopes: ScopeStack,
+pub struct Interpreter {
+    pub frames: Vec<Frame>,
+    pub scopes: Vec<Scope>,
 }
 
 impl Interpreter {
-    fn new(ast: StatementList) -> Self {
+    pub fn new(ast: StatementList) -> Self {
         Interpreter {
-            ast: ast,
-            pos: 0,
-            scopes: ScopeStack::new(),
+            frames: vec![Frame::new(ast)],
+            scopes: vec![Scope::new()],
         }
     }
 
-    /*
-     * Interpreter logic
-     * */
+    // runs frame 0 (entire program)
+    pub fn run_program(&mut self) -> Result<(), Error> {
+        let result = self.run_frame()?;
+        // frame 0 cannot have a return value
+        if let ExecResult::Returned(_) = result {
+            return Err(Error::generic_message(
+                ErrorType::InvalidReturnLocation,
+                "return must be inside a function".to_string(),
+            ));
+        }
+        Ok(())
+    }
 
-    pub fn interpret_statement(&mut self) -> Result<ExecResult, Error> {
-        let stmt = self.peek().unwrap();
+    pub fn run_frame(&mut self) -> Result<ExecResult, Error> {
+        loop {
+            // get the frame off the stack
+            let mut frame = match self.frames.pop() {
+                Some(f) => f,
+                None => return Ok(ExecResult::Unit),
+            };
+            // case: implicit return
+            if frame.done() {
+                return Ok(ExecResult::Unit);
+            }
+            // execute a statement
+            let stmt = frame.peek().expect("statement");
+            let result = self.exec(stmt)?;
+
+            match result {
+                // case: return
+                ExecResult::Returned(v) => {
+                    return Ok(ExecResult::Returned(v));
+                }
+                // case: continue
+                // (put the frame back)
+                _ => {
+                    frame.advance();
+                    self.frames.push(frame);
+                }
+            }
+        }
+    }
+
+    fn exec(&mut self, stmt: &Statement) -> Result<ExecResult, Error> {
         return match stmt {
-            // cannot pass stmt contents to self.interpret_x()
-            // because it is an interal reference and the methods borrow self
-            Statement::Assignment(_) => self.interpret_assignment(),
-            Statement::Expression(_) => self.interpret_expression(),
-            Statement::Return(_) => self.interpret_return(),
+            Statement::Assignment(a) => self.interpret_assignment(a),
+            Statement::Expression(e) => self.handle_expression(&e),
+            Statement::Return(r) => self.interpret_return(r),
         };
     }
 
-    fn interpret_assignment(&mut self) -> Result<ExecResult, Error> {
-        // get parts of the assignment
-        let asn = self.peek().unwrap().expect_assignment()?;
-        let assignment_type = asn.assignment_type.clone();
-        let identifier = asn.identifier.clone();
-
-        let symbol_value = self
-            .handle_expression(asn.expression.clone())?
-            .expect_value()?;
+    fn interpret_assignment(&mut self, a: &Assignment) -> Result<ExecResult, Error> {
+        let symbol_value = self.handle_expression(&a.expression)?.expect_value()?;
         let symbol = Symbol {
-            ty: assignment_type,
+            ty: a.assignment_type.clone(),
             val: symbol_value,
         };
         // push to the scope stack
-        self.scopes.set_symbol(&identifier, symbol)?;
+        self.set_symbol(&a.identifier, symbol)?;
         Ok(ExecResult::Unit)
     }
 
-    fn interpret_expression(&mut self) -> Result<ExecResult, Error> {
-        let exp = self.peek().unwrap().expect_expression()?.clone();
-        self.handle_expression(exp)
+    fn interpret_return(&mut self, r: &Return) -> Result<ExecResult, Error> {
+        Ok(ExecResult::Returned(
+            self.handle_expression(&r.expression)?.expect_value()?,
+        ))
     }
 
-    fn interpret_return(&mut self) -> Result<ExecResult, Error> {
-        // TODO: make the parser catch invalid returns
-        let ret = self.peek().unwrap().expect_return()?.clone();
-        return Ok(ExecResult::Returned(
-            self.handle_expression(ret.expression)?.expect_value()?,
-        ));
-    }
-
-    fn handle_expression(&mut self, expression: Expression) -> Result<ExecResult, Error> {
+    fn handle_expression(&mut self, expression: &Expression) -> Result<ExecResult, Error> {
         match expression {
             Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
-            Expression::FunctionExp(exp) => Ok(ExecResult::Value(Value::Function(exp))),
-            Expression::CallExp(exp) => self.handle_call(exp),
-            Expression::LiteralExp(exp) => self.handle_literal(exp),
-            Expression::BinaryExp(exp) => self.handle_binary(exp),
-            // TODO
-            Expression::IfExp(exp) => self.handle_if(exp),
-            Expression::ParenExp(exp) => self.handle_paren(exp),
+            Expression::FunctionExp(exp) => Ok(ExecResult::Value(Value::Function(exp.clone()))),
+            Expression::CallExp(exp) => self.handle_call(exp.clone()),
+            Expression::LiteralExp(exp) => self.handle_literal(exp.clone()),
+            Expression::BinaryExp(exp) => self.handle_binary(exp.clone()),
+            Expression::IfExp(exp) => self.handle_if(exp.clone()),
+            Expression::ParenExp(exp) => self.handle_paren(exp.clone()),
         }
     }
 
     fn handle_binary(&mut self, exp: BinaryExp) -> Result<ExecResult, Error> {
         let left = exp.left;
         let right = exp.right;
-        let left_val = self.handle_expression(*left)?.expect_value()?;
-        let right_val = self.handle_expression(*right)?.expect_value()?;
-
+        let left_val = self.handle_expression(&left)?.expect_value()?;
+        let right_val = self.handle_expression(&right)?.expect_value()?;
         let res: Value = match exp.operator {
             Operator::Add => Value::Int(left_val.expect_int()? + right_val.expect_int()?),
             Operator::Sub => Value::Int(left_val.expect_int()? - right_val.expect_int()?),
@@ -121,31 +125,27 @@ impl Interpreter {
             Operator::Ge => Value::Bool(left_val.expect_int()? >= right_val.expect_int()?),
             Operator::And => Value::Bool(left_val.expect_bool()? && right_val.expect_bool()?),
             Operator::Or => Value::Bool(left_val.expect_bool()? || right_val.expect_bool()?),
-
-            // only binary expression operators should reach here?
             _ => unreachable!(),
-            // Operator::Not => return Ok(ExecResult::Unit),
-            // Operator::Assign => return Ok(ExecResult::Unit),
         };
         Ok(ExecResult::Value(res))
     }
 
     fn handle_if(&mut self, exp: IfExp) -> Result<ExecResult, Error> {
         let cond = self
-            .handle_expression(*(exp.if_cond))?
+            .handle_expression(&exp.if_cond)?
             .expect_value()?
             .expect_bool()?;
         if cond {
-            return self.handle_expression(*(exp.then_branch));
+            return self.handle_expression(&exp.then_branch);
         }
         match exp.else_branch {
-            Some(exp) => self.handle_expression(*exp),
+            Some(exp) => self.handle_expression(&exp),
             None => Ok(ExecResult::Unit),
         }
     }
 
     fn handle_paren(&mut self, exp: Box<Expression>) -> Result<ExecResult, Error> {
-        self.handle_expression(*(exp))
+        self.handle_expression(&exp)
     }
 
     fn handle_literal(&mut self, lit: Literal) -> Result<ExecResult, Error> {
@@ -161,7 +161,7 @@ impl Interpreter {
         match *callee {
             Expression::FunctionExp(function) => self.run_function(function, call.args),
             Expression::IdentifierExp(identifier) => {
-                match self.scopes.get_symbol(&identifier.name)?.val.clone() {
+                match self.get_symbol(&identifier.name)?.val.clone() {
                     // if the corresponding value is a function, run it
                     Value::Function(x) => self.run_function(x, call.args),
                     // otherwise, return unit type
@@ -173,32 +173,31 @@ impl Interpreter {
         }
     }
 
-    fn handle_identifer(&mut self, identifier: Identifier) -> Result<Value, Error> {
-        Ok(self.scopes.get_symbol(&identifier.name)?.val.clone())
+    fn handle_identifer(&mut self, identifier: &Identifier) -> Result<Value, Error> {
+        Ok(self.get_symbol(&identifier.name)?.val.clone())
     }
 
     fn run_function(&mut self, func: Function, args: Vec<Argument>) -> Result<ExecResult, Error> {
-        // ensure correct number of arguments are passed
         let num_params = func.params.len();
         let num_args = args.len();
+        // ensure correct number of arguments are passed
         if num_params != num_args {
             return Err(Error::generic_invalid_params(
                 args.len(),
                 "incorrect number of arguments",
             ));
         }
-        // push arguments onto new scope
+        // push arguments on to new scope
         // (with names corresponding with parameters)
-        self.scopes.push_scope();
+        self.push_scope();
         for i in 0..num_args {
             let param = &func.params[i];
             let arg = &args[i];
             let identifier = &param.identifier;
             let arg_symbol = self
-                .handle_expression(arg.value.clone())?
+                .handle_expression(&arg.value)?
                 .expect_value()?
                 .into_symbol();
-
             if arg_symbol.ty != param.param_type {
                 return Err(Error::new(
                     ErrorType::TypeMismatch,
@@ -208,50 +207,76 @@ impl Interpreter {
                     Some("check function call"),
                 ));
             }
-            self.scopes.set_symbol(identifier, arg_symbol)?;
+            self.set_symbol(identifier, arg_symbol)?;
         }
-
-        match func.body.statements.last() {
-            // case: no statements (invalid)
-            None => {
-                return Err(Error::generic_message(
-                    ErrorType::InvalidFunctionBody,
-                    "functions must have at least one statement".to_string(),
-                ));
-            }
-            // case: ends in a return (valid)
-            Some(stmt) if stmt.expect_return().is_ok() => (),
-            // case: does not end in a return (invalid)
-            _ => {
-                return Err(Error::generic_message(
-                    ErrorType::InvalidFunctionBody,
-                    "functions must end with a return".to_string(),
-                ));
-            }
-        };
-
-        // TODO: Execute each statement
-        for _ in func.body.statements.iter() {
-            // will need to refactor older helpers to simply take arguments
-            todo!()
+        self.frames.push(Frame::new(func.body.clone()));
+        let result = self.run_frame()?;
+        self.pop_scope();
+        match result {
+            ExecResult::Returned(v) => Ok(ExecResult::Value(v)),
+            ExecResult::Unit => Ok(ExecResult::Unit),
+            _ => unreachable!(),
         }
-
-        todo!()
     }
 
     /*
      * Utility functions
      * */
 
-    fn has_next(&mut self) -> bool {
-        self.peek().is_some()
+    fn push_scope(&mut self) {
+        self.scopes.push(Scope::new());
     }
+    fn pop_scope(&mut self) {
+        self.scopes.pop();
+    }
+    fn set_symbol(&mut self, name: &str, symbol: Symbol) -> Result<(), Error> {
+        if let Some(scope) = self.scopes.last_mut() {
+            scope.define(name, symbol);
+            Ok(())
+        } else {
+            Err(Error::generic_se(name.to_string()))
+        }
+    }
+    pub fn get_symbol(&self, identifier: &str) -> Result<&Symbol, Error> {
+        // iterate, start with most recent/specific scope
+        for scope in self.scopes.iter().rev() {
+            if let Some(symbol) = scope.get(identifier) {
+                return Ok(symbol);
+            }
+        }
+        // no symbol -> error
+        Err(Error {
+            error_type: ErrorType::InvalidSymbol,
+            start_line: 0,
+            start_col: 0,
+            found: identifier.to_string(),
+            message: Some("identifier name not found".to_string()),
+        })
+    }
+}
+
+#[derive(Clone)]
+pub struct Frame {
+    pub pos: usize,
+    pub ast: StatementList,
+}
+
+impl Frame {
+    fn new(ast: StatementList) -> Self {
+        Frame { ast: ast, pos: 0 }
+    }
+
+    /**
+     * Utility Functions
+     * */
 
     fn peek(&self) -> Option<&Statement> {
         self.ast.statements.get(self.pos)
     }
-
     fn advance(&mut self) {
         self.pos += 1
+    }
+    pub fn done(&self) -> bool {
+        self.pos >= self.ast.statements.len()
     }
 }
