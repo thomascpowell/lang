@@ -23,7 +23,8 @@ print(min(1, 2));
 - Parser: Generates AST, enforces grammar
 - Interpreter: Executes the AST
 
-## Todo
+## Next Steps
 - Expand standard library
 - Bug fixes relating to booleans
 - Rework internal error types and methods
+- Implement REPL and CLI
