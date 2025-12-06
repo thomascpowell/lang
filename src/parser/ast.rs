@@ -153,6 +153,7 @@ pub enum Type {
     I32,
     String,
     Bool,
+    Function,
 }
 
 pub type Operator = crate::lexer::token::Operator;

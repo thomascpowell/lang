@@ -1,6 +1,5 @@
 use crate::{
-    error_types::Error,
-    parser::ast::{Function, Type},
+    error_types::Error, interpreter::exec_result::ExecResult, parser::ast::{Function, Type}
 };
 
 pub struct Symbol {
@@ -8,14 +7,15 @@ pub struct Symbol {
     pub val: Value,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Value {
     Int(i32),
     Bool(bool),
     String(String),
     Function(Function),
     // for stdlib stuff only
-    NativeFunction(fn(Vec<Value>) -> Result<(), Error>),
+    NativeFunction(fn(Vec<Value>) -> Result<ExecResult, Error>,
+),
 }
 
 impl Value {

@@ -21,4 +21,9 @@ print(min(1, 2));
 ## Details
 - Lexer: Simple, supports comments
 - Parser: Generates AST, enforces grammar
-- Interpreter: WIP, supports variable scopes
+- Interpreter: Executes the AST
+
+## Todo
+- Expand standard library
+- Bug fixes relating to booleans
+- Rework internal error types and methods

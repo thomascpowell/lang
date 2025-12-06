@@ -18,7 +18,7 @@ fn parse_demos() {
         let entry = entry.unwrap();
         let path = entry.path();
         let program = fs::read_to_string(&path).unwrap();
-        parse_str(&program).map_err(|e| panic!("parse failed for {:?}: {:?}", path, e));
+        let _ = parse_str(&program).map_err(|e| panic!("parse failed for {:?}: {:?}", path, e));
     }
 }
 

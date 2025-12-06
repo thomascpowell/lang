@@ -1,15 +1,17 @@
 use crate::{
     error_types::{Error, ErrorType},
-    interpreter::{exec_result::ExecResult, scopes::Scope, symbol::*},
+    interpreter::{exec_result::ExecResult, scopes::Scope, stdlib::*, symbol::*},
     parser::ast::*,
 };
 
 pub mod exec_result;
 pub mod scopes;
+pub mod stdlib;
 pub mod symbol;
 
 pub fn interpret(ast: StatementList) -> Result<(), Error> {
     let mut interpreter = Interpreter::new(ast);
+    interpreter.include_stdlib()?;
     interpreter.run_program()?;
     Ok(())
 }
@@ -164,6 +166,15 @@ impl Interpreter {
                 match self.get_symbol(&identifier.name)?.val.clone() {
                     // if the corresponding value is a function, run it
                     Value::Function(x) => self.run_function(x, call.args),
+                    // case of stdlib call
+                    Value::NativeFunction(f) => {
+                        // evaluate arguments first
+                        let mut arg_values = Vec::new();
+                        for arg in call.args {
+                            arg_values.push(self.handle_expression(&arg.value)?.expect_value()?);
+                        }
+                        f(arg_values)
+                    }
                     // otherwise, return unit type
                     _ => Ok(ExecResult::Unit),
                 }
@@ -252,6 +263,31 @@ impl Interpreter {
             found: identifier.to_string(),
             message: Some("identifier name not found".to_string()),
         })
+    }
+
+    fn include_stdlib(&mut self) -> Result<(), Error> {
+        self.set_symbol(
+            "print",
+            Symbol {
+                ty: Type::Function,
+                val: Value::NativeFunction(std_print),
+            },
+        )?;
+        self.set_symbol(
+            "println",
+            Symbol {
+                ty: Type::Function,
+                val: Value::NativeFunction(std_println),
+            },
+        )?;
+        self.set_symbol(
+            "panic",
+            Symbol {
+                ty: Type::Function,
+                val: Value::NativeFunction(std_panic),
+            },
+        )?;
+        Ok(())
     }
 }
 

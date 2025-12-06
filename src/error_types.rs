@@ -1,10 +1,9 @@
-use std::any::type_name;
+use crate::{interpreter::symbol::Value, lexer::token::Token, parser::ast::Statement};
 
-use crate::{
-    interpreter::symbol::Value,
-    lexer::token::Token,
-    parser::ast::{Position, Statement},
-};
+/**
+* Error Types
+* (needs refactor)
+* */
 
 #[derive(Debug)]
 pub enum ErrorType {

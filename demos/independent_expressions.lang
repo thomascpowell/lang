@@ -14,6 +14,9 @@ fn() -> i32 {
 
 7;
 
+// yet another thing that you can do in the language
+7(3);
+
 "a string";
 
 // TODO: this would throw an error, it shouldn't
@@ -26,11 +29,12 @@ string whatever = "hello";
 whatever();
 
 def recursive = fn(param: i32) -> i32 {
-  return if (param < 100) {
+  println("param =", param);
+  return if (param > 100) {
     recursive(param/2)
   } else {
-    param * 3 - 8
+    param
   };
 };
 
-recursive(7);
+recursive(1000);
