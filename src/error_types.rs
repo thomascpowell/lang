@@ -107,6 +107,7 @@ impl Error {
             Value::Bool(_) => "bool",
             Value::String(_) => "string",
             Value::Function(_) => "function",
+            Value::NativeFunction(_) => " native function",
         };
         return Error::new(
             ErrorType::InvalidOperand,

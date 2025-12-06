@@ -1,5 +1,5 @@
 use crate::{
-    error_types::{Error},
+    error_types::Error,
     parser::ast::{Function, Type},
 };
 
@@ -14,6 +14,8 @@ pub enum Value {
     Bool(bool),
     String(String),
     Function(Function),
+    // for stdlib stuff only
+    NativeFunction(fn(Vec<Value>) -> Result<(), Error>),
 }
 
 impl Value {
@@ -49,9 +51,13 @@ impl Value {
                 Value::Bool(_) => Type::Bool,
                 Value::String(_) => Type::String,
                 Value::Function(f) => f.returns.clone(),
+
+                // nativefn does not have a type
+                // so it cannot be a symbol
+                // this is fine afik
+                Value::NativeFunction(_) => panic!(),
             },
             val: self,
         }
     }
-} 
-
+}
