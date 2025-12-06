@@ -1,5 +1,7 @@
 use crate::{
-    error_types::Error, interpreter::exec_result::ExecResult, parser::ast::{Function, Type}
+    error_types::Error,
+    interpreter::exec_result::ExecResult,
+    parser::ast::{Function, Type},
 };
 
 pub struct Symbol {
@@ -14,8 +16,7 @@ pub enum Value {
     String(String),
     Function(Function),
     // for stdlib stuff only
-    NativeFunction(fn(Vec<Value>) -> Result<ExecResult, Error>,
-),
+    NativeFunction(fn(Vec<Value>) -> Result<ExecResult, Error>),
 }
 
 impl Value {
@@ -58,6 +59,16 @@ impl Value {
                 Value::NativeFunction(_) => panic!(),
             },
             val: self,
+        }
+    }
+
+    pub fn display(&self) -> String {
+        match self {
+            Self::Int(i) => i.to_string(),
+            Self::Bool(b) => if *b { "true" } else { "false" }.into(),
+            Self::String(s) => s.clone(),
+            Self::Function(_) => "[function]".to_string(),
+            Self::NativeFunction(_) => "[native function]".to_string(),
         }
     }
 }

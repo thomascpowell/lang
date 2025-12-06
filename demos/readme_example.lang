@@ -1,7 +1,8 @@
 // used in README.md
 
 def min = fn(a: i32, b: i32) -> string {
-  return if (a > b) { "a is bigger" } else { "b is bigger" };
+  return if (a < b) { "a is smaller" } else { "b is smaller" };
 };
 
-print(min(1, 2));
+// prints: "a is smaller than b"
+println(min(1, 100));

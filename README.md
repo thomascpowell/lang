@@ -5,12 +5,14 @@ An unfinished (and untitled) programming language written in Rust.
 [![tests](https://github.com/thomascpowell/lang/actions/workflows/rust.yml/badge.svg)](https://github.com/thomascpowell/lang/actions/workflows/rust.yml)
 
 ```rust
+// simple code example
 
 def min = fn(a: i32, b: i32) -> string {
-  return if (a > b) { "a is bigger" } else { "b is bigger" };
+  return if (a < b) { "a is smaller" } else { "b is smaller" };
 };
 
-print(min(1, 2));
+// prints: "a is smaller"
+println(min(1, 100));
 ```
 
 ## Features
@@ -24,7 +26,7 @@ print(min(1, 2));
 - Interpreter: Executes the AST
 
 ## Next Steps
-- Expand standard library
-- Bug fixes relating to booleans
-- Rework internal error types and methods
 - Implement REPL and CLI
+- Expand standard library
+- General performance optimizations
+- Rework internal error types and methods
