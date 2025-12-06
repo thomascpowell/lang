@@ -1,17 +1,16 @@
 # "Lang"
 
-An unfinished (and untitled) programming language written in Rust.
+Toy programming language written in Rust.
 
 [![tests](https://github.com/thomascpowell/lang/actions/workflows/rust.yml/badge.svg)](https://github.com/thomascpowell/lang/actions/workflows/rust.yml)
 
 ```rust
-// simple code example
+// Basic code example
 
 def min = fn(a: i32, b: i32) -> string {
   return if (a < b) { "a is smaller" } else { "b is smaller" };
 };
 
-// prints: "a is smaller"
 println(min(1, 100));
 ```
 
