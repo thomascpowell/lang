@@ -1,6 +1,8 @@
 test:
-	cargo test
-
-testv:
 	cargo test -- --nocapture
 
+build:
+	cargo build -v 
+
+release:
+	cargo build --release -v
