@@ -3,8 +3,7 @@ use crate::lexer::token::*;
 pub mod token;
 
 /*
-* Strict lexer
-* (With helpful errors)
+* Lexer
 * */
 
 pub fn tokenize(input: String) -> Result<Vec<Token>, Error> {

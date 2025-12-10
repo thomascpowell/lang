@@ -1,4 +1,4 @@
-// used in README.md
+// Code example used in README.md
 
 def min = fn(a: i32, b: i32) -> string {
   return if (a < b) { "a is smaller" } else { "b is smaller" };
