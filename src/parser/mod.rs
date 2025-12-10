@@ -7,13 +7,6 @@ pub mod ast;
 * Parser
 * */
 
-/*
-* design notes:
-* - caller validates tokens (e.g. return statement begins w/ return)
-* - callee consumes the token (self.advance())
-* - callee returns the lowest level possible (e.g. parse_return -> Ok(Return))
-* */
-
 pub fn parse(tokens: Vec<Token>) -> Result<StatementList, Error> {
     let mut res = Vec::new();
     let mut parser = Parser::new(tokens);

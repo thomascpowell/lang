@@ -1,3 +1,3 @@
 fn main() {
-    println!("WIP");
+    // CLI not complete, see Makefile to run tests.
 }

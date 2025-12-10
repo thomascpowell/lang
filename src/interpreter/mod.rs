@@ -1,13 +1,17 @@
 use crate::{
     error_types::{Error, ErrorType},
-    interpreter::{exec_result::ExecResult, scopes::Scope, stdlib::*, symbol::*},
+    interpreter::{exec_result::ExecResult, scope::Scope, stdlib::*, symbol::*},
     parser::ast::*,
 };
 
 pub mod exec_result;
-pub mod scopes;
+pub mod scope;
 pub mod stdlib;
 pub mod symbol;
+
+/**
+* Interpreter
+* */
 
 pub fn interpret(ast: StatementList) -> Result<(), Error> {
     let mut interpreter = Interpreter::new(ast);

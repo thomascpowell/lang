@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 use crate::interpreter::symbol::Symbol;
 
+/**
+* Scope type
+* */
+
 pub struct Scope {
     symbols: HashMap<String, Symbol>,
 }

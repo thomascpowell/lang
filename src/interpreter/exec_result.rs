@@ -1,5 +1,9 @@
 use crate::{error_types::Error, interpreter::symbol::Value};
 
+/**
+* ExecResult type
+* */
+
 pub enum ExecResult {
     Unit,            // statement produces nothing
     Value(Value),    // expression result

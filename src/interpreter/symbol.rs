@@ -4,6 +4,10 @@ use crate::{
     parser::ast::{Function, Type},
 };
 
+/**
+* Symbol type
+* */
+
 pub struct Symbol {
     pub ty: Type,
     pub val: Value,
@@ -15,7 +19,6 @@ pub enum Value {
     Bool(bool),
     String(String),
     Function(Function),
-    // for stdlib stuff only
     NativeFunction(fn(Vec<Value>) -> Result<ExecResult, Error>),
 }
 

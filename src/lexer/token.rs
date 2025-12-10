@@ -1,8 +1,7 @@
 /*
-* Token data
+* Token type
 * */
 
-// metadata
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
     pub kind: TokenKind,
@@ -17,7 +16,6 @@ impl Token {
     }
 }
 
-// meaning
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenKind {
     Identifier(String),
