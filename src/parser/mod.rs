@@ -403,7 +403,7 @@ impl Parser {
     }
 
     /*
-     * utility functions
+     * Utility functions
      * */
 
     fn has_next(&mut self) -> bool {

@@ -168,6 +168,12 @@ pub struct Position {
     pub start_col: usize,
 }
 
+
+/**
+* Printing AST
+* (WIP but functional)
+* */
+
 impl StatementList {
     pub fn print_ast(&self, indent: usize) {
         for stmt in &self.statements {

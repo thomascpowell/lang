@@ -1,14 +1,11 @@
+use lang::{interpreter::interpret, lexer::tokenize, parser::parse};
 use std::{env, fs::File, io::Read};
-
-use lang::lexer::tokenize;
+const HELP: &str = include_str!("../docs/help");
 
 /**
 * Lang CLI
+* (WIP but functional)
 * */
-
-// CLI is a work-in-progress, see Makefile for running tests
-
-const HELP: &str = include_str!("../docs/help");
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -21,6 +18,8 @@ fn main() {
         "help" => print!("{}", HELP),
         "source" => handle_source(get_source_from_path(args.get(2))),
         "lexer" => handle_lexer(get_source_from_path(args.get(2))),
+        "parser" => handle_parser(get_source_from_path(args.get(2))),
+        "run" => handle_run(get_source_from_path(args.get(2))),
         x => print!("\nerror: no such argument \"{}\"\n\n{}", x, HELP),
     }
 }
@@ -28,6 +27,32 @@ fn main() {
 /**
 * Handlers
 * */
+
+fn handle_run(source: String) {
+    let tokens = match tokenize(source) {
+        Err(e) => return println!("{}", e.display()),
+        Ok(t) => t,
+    };
+    let ast = match parse(tokens) {
+        Err(e) => return println!("{}", e.display()),
+        Ok(a) => a,
+    };
+    match interpret(ast) {
+        Err(e) => return println!("{}", e.display()),
+        Ok(()) => (),
+    }
+}
+
+fn handle_parser(source: String) {
+    let tokens = match tokenize(source) {
+        Err(e) => return println!("{}", e.display()),
+        Ok(t) => t,
+    };
+    match parse(tokens) {
+        Err(e) => println!("{}", e.display()),
+        Ok(a) => a.print_ast(0),
+    }
+}
 
 fn handle_source(source: String) {
     println!("source:\n{}", source)
@@ -41,7 +66,7 @@ fn handle_lexer(source: String) {
 }
 
 /**
-* utility functions
+* Utility functions
 * */
 
 fn get_source_from_path(path: Option<&String>) -> String {
