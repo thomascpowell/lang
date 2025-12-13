@@ -19,13 +19,8 @@ println(min(1, 100));
 - Anonymous functions, if expressions, and recursion
 - Strict and explicit type system
 
-## Details
-- Lexer: Simple, supports comments
-- Parser: Generates AST, enforces grammar
-- Interpreter: Executes the AST
-
 ## Next Steps
-- Implement REPL and CLI
+- Implement REPL
 - Expand standard library
 - General performance optimizations
 - Rework internal error types and methods

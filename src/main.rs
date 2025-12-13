@@ -20,6 +20,7 @@ fn main() {
         "lexer" => handle_lexer(get_source_from_path(args.get(2))),
         "parser" => handle_parser(get_source_from_path(args.get(2))),
         "run" => handle_run(get_source_from_path(args.get(2))),
+        "repl" => handle_repl(),
         x => print!("\nerror: no such argument \"{}\"\n\n{}", x, HELP),
     }
 }
@@ -63,6 +64,10 @@ fn handle_lexer(source: String) {
         Err(e) => println!("{}", e.display()),
         Ok(t) => t.iter().for_each(|token| println!("{}", token.display())),
     }
+}
+
+fn handle_repl() {
+    println!("error: REPL not implemented")
 }
 
 /**
