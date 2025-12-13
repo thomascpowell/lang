@@ -20,7 +20,8 @@ fn interpret_demos() {
 
 #[test]
 fn invalid_assignment() {
-    let src = "i32 x = \"an string\";".to_string();
+    // assignment to the wrong type
+    let src = "i32 x = \"a string\";".to_string();
     let tokens = tokenize(src).expect("failed to tokenize");
     let ast = parse(tokens).expect("failed to parse");
     assert!(interpret(ast).is_err());
