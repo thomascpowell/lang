@@ -1,7 +1,0 @@
-// this should fail in interpreter, doesn't yet
-
-def wrong = fn(i: i32) -> string {
-  return i;
-};
-
-wrong(1);

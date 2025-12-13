@@ -50,18 +50,20 @@ impl Value {
 
     pub fn into_symbol(self) -> Symbol {
         Symbol {
-            ty: match &self {
-                Value::Int(_) => Type::I32,
-                Value::Bool(_) => Type::Bool,
-                Value::String(_) => Type::String,
-                Value::Function(f) => f.returns.clone(),
-
-                // nativefn does not have a type
-                // so it cannot be a symbol
-                // this is fine afik
-                Value::NativeFunction(_) => panic!(),
-            },
+            ty: self.get_type(),
             val: self,
+        }
+    }
+
+    pub fn get_type(&self) -> Type {
+        match self {
+            Value::Int(_) => Type::I32,
+            Value::Bool(_) => Type::Bool,
+            Value::String(_) => Type::String,
+            Value::Function(_) => Type::Function,
+            // nativefn does not have a type
+            // so it cannot be a symbol
+            Value::NativeFunction(_) => panic!(),
         }
     }
 

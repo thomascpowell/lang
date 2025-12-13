@@ -90,6 +90,17 @@ impl Interpreter {
             ty: a.assignment_type.clone(),
             val: symbol_value,
         };
+        // make sure symbol matches
+        let ty = symbol.val.get_type();
+        if symbol.ty != ty {
+            return Err(Error::new(
+                ErrorType::TypeMismatch,
+                0,
+                0,
+                format!("{:?}", ty),
+                Some("invalid assignment type"),
+            ));
+        }
         // push to the scope stack
         self.set_symbol(&a.identifier, symbol)?;
         Ok(ExecResult::Unit)
@@ -227,11 +238,23 @@ impl Interpreter {
         self.frames.push(Frame::new(func.body.clone()));
         let result = self.run_frame()?;
         self.pop_scope();
-        match result {
-            ExecResult::Returned(v) => Ok(ExecResult::Value(v)),
-            ExecResult::Unit => Ok(ExecResult::Unit),
+        let res = match result {
+            ExecResult::Returned(v) => ExecResult::Value(v),
             _ => unreachable!(),
+            // unit should be unreachable?
+            // ExecResult::Unit => Ok(ExecResult::Unit),
+        };
+        let function_returned_type = res.expect_value()?.get_type();
+        if function_returned_type != func.returns {
+            return Err(Error::new(
+                ErrorType::TypeMismatch,
+                0,
+                0,
+                format!("{:?}", function_returned_type),
+                Some("invalid assignment type"),
+            ));
         }
+        Ok(res)
     }
 
     /*

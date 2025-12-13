@@ -18,6 +18,23 @@ fn interpret_demos() {
     }
 }
 
+#[test]
+fn invalid_assignment() {
+    let src = "i32 x = \"an string\";".to_string();
+    let tokens = tokenize(src).expect("failed to tokenize");
+    let ast = parse(tokens).expect("failed to parse");
+    assert!(interpret(ast).is_err());
+}
+
+#[test]
+fn invalid_return() {
+    // this function returns the wrong type
+    let src = "def test = fn(i: i32) -> string { return 1; }; test(1);".to_string();
+    let tokens = tokenize(src).expect("failed to tokenize");
+    let ast = parse(tokens).expect("failed to parse");
+    assert!(interpret(ast).is_err());
+}
+
 fn test_exec(src: String) {
     let tokens = tokenize(src).expect("failed to tokenize");
     let ast = parse(tokens).expect("failed to parse");

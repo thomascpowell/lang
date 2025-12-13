@@ -1,0 +1,3 @@
+// contains whatever i'm testing at the moment
+
+def test = fn(i: i32) -> i32 { return 1; }; test(1);
