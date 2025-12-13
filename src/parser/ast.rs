@@ -68,6 +68,21 @@ impl Expression {
             Expression::ParenExp(x) => &x.get_position(),
         }
     }
+
+    // used in parser handle_assignment()
+    // ensures that functions are assigned using def
+    pub fn assert_is_not_function(self) -> Result<Expression, Error> {
+        if matches!(self, Expression::FunctionExp(_)) {
+            return Err(Error::new(
+                crate::error_types::ErrorType::TypeMismatch,
+                0,
+                0,
+                "function exp",
+                Some("functions must be defined using def"),
+            ));
+        }
+        Ok(self)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -167,7 +182,6 @@ pub struct Position {
     pub start_line: usize,
     pub start_col: usize,
 }
-
 
 /**
 * Printing AST

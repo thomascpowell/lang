@@ -39,7 +39,9 @@ impl Parser {
             // statement: return
             TokenKind::Keyword(Keyword::Return) => Ok(Statement::Return(self.parse_return()?)),
             // function assignment
-            TokenKind::Keyword(Keyword::Def) => Ok(Statement::Assignment(self.parse_function_assignment()?)),
+            TokenKind::Keyword(Keyword::Def) => {
+                Ok(Statement::Assignment(self.parse_function_assignment()?))
+            }
             // match value assignments (only other valid use of keywords)
             kind if is_type(kind) => Ok(Statement::Assignment(self.parse_assignment()?)),
             // everything else is an expression
@@ -77,12 +79,12 @@ impl Parser {
         };
         let identifier = self.parse_identifier()?;
         self.expect(|k| matches!(k, TokenKind::Operator(Operator::Assign)))?;
-        let function: Function = self.parse_function()?;       
+        let function: Function = self.parse_function()?;
         Ok(Assignment {
             position: pos,
-            // assignment_type: function.returns.clone(), 
+            // assignment_type: function.returns.clone(),
             // this makes more sense
-            assignment_type: Type::Function, 
+            assignment_type: Type::Function,
             identifier: identifier.name,
             expression: Expression::FunctionExp(function),
         })
@@ -119,7 +121,7 @@ impl Parser {
             position: pos,
             assignment_type: a_type,
             identifier: ident_str,
-            expression: self.parse_expression(0)?,
+            expression: self.parse_expression(0)?.assert_is_not_function()?,
         })
     }
 
