@@ -80,7 +80,9 @@ impl Parser {
         let function: Function = self.parse_function()?;       
         Ok(Assignment {
             position: pos,
-            assignment_type: function.returns.clone(), 
+            // assignment_type: function.returns.clone(), 
+            // this makes more sense
+            assignment_type: Type::Function, 
             identifier: identifier.name,
             expression: Expression::FunctionExp(function),
         })
@@ -121,7 +123,6 @@ impl Parser {
         })
     }
 
-    // TODO: function exp
     fn parse_expression(&mut self, min_prec: u8) -> Result<Expression, Error> {
         let tok = self
             .peek()

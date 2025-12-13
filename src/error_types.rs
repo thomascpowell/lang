@@ -127,7 +127,7 @@ impl Error {
             ErrorType::InvalidParams,
             0,
             0,
-            param_count.to_string() + "parameters",
+            param_count.to_string() + " parameters",
             Some(message),
         );
     }

@@ -1,0 +1,7 @@
+// this should fail, doesn't yet
+
+def wrong = fn(i: i32) -> string {
+  return i;
+};
+
+wrong(1);
