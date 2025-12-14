@@ -1,0 +1,7 @@
+// a classic programming problem
+
+def fizzbuzz = fn(i: i32) -> i32 {
+  return if (i > 0) { fizzbuzz(i-1) } else { 0 };
+};
+
+fizzbuzz(100);

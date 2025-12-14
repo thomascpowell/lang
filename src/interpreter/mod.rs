@@ -132,6 +132,7 @@ impl Interpreter {
             Operator::Add => Value::Int(left_val.expect_int()? + right_val.expect_int()?),
             Operator::Sub => Value::Int(left_val.expect_int()? - right_val.expect_int()?),
             Operator::Mul => Value::Int(left_val.expect_int()? * right_val.expect_int()?),
+            Operator::Mod => Value::Int(left_val.expect_int()? % right_val.expect_int()?),
             Operator::Div => Value::Int(left_val.expect_int()? / right_val.expect_int()?),
             Operator::Eq => Value::Bool(left_val.expect_int()? == right_val.expect_int()?),
             Operator::Ne => Value::Bool(left_val.expect_int()? != right_val.expect_int()?),

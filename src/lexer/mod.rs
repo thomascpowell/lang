@@ -126,6 +126,7 @@ impl Lexer {
             '+' => self.make_simple_token(TokenKind::Operator(Operator::Add), '+'),
             '-' => self.make_simple_token(TokenKind::Operator(Operator::Sub), '-'),
             '*' => self.make_simple_token(TokenKind::Operator(Operator::Mul), '*'),
+            '%' => self.make_simple_token(TokenKind::Operator(Operator::Mod), '%'),
             '/' => self.make_simple_token(TokenKind::Operator(Operator::Div), '/'),
             '<' => self.make_simple_token(TokenKind::Operator(Operator::Lt), '<'),
             '>' => self.make_simple_token(TokenKind::Operator(Operator::Gt), '>'),

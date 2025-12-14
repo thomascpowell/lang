@@ -1,7 +1,3 @@
 // contains whatever i'm testing at the moment
 
-// print("your name: ");
-// string name = read();
-// println("hello, ", name);
-
-1;
+println("test: ", 8 % 2 == 0);

@@ -36,6 +36,7 @@ pub enum Operator {
     Sub,
     Mul,
     Div,
+    Mod,
     Eq,
     Ne,
     Lt,
@@ -55,7 +56,7 @@ impl Operator {
             Operator::Eq | Operator::Ne => 3,
             Operator::Lt | Operator::Le | Operator::Gt | Operator::Ge => 4,
             Operator::Add | Operator::Sub => 5,
-            Operator::Mul | Operator::Div => 6,
+            Operator::Mul | Operator::Div | Operator::Mod => 6,
             _ => 0,
         }
     }
