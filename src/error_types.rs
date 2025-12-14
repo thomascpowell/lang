@@ -24,6 +24,8 @@ pub enum ErrorType {
     InvalidParams,
     InvalidFunctionBody,
     TypeMismatch,
+    // Stdlib
+    StdRead,
     // Shared
     Default,
 }

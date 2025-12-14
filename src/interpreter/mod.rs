@@ -60,7 +60,6 @@ impl Interpreter {
             // execute a statement
             let stmt = frame.peek().expect("statement");
             let result = self.exec(stmt)?;
-
             match result {
                 // case: return
                 ExecResult::Returned(v) => {
@@ -314,6 +313,14 @@ impl Interpreter {
                 val: Value::NativeFunction(std_panic),
             },
         )?;
+        self.set_symbol(
+            "read",
+            Symbol {
+                ty: Type::Function,
+                val: Value::NativeFunction(std_read),
+            },
+        )?;
+
         Ok(())
     }
 }
