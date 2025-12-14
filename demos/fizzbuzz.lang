@@ -1,6 +1,15 @@
 // a classic programming problem
 
 def fizzbuzz = fn(i: i32) -> i32 {
+  i32 c = 100-i;
+  print(c, ": ");
+  if (c % 3 == 0) {
+    print("Fizz")
+  };
+  if (c % 5 == 0) {
+    print("Buzz")
+  };
+  println();
   return if (i > 0) { fizzbuzz(i-1) } else { 0 };
 };
 
