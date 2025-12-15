@@ -24,7 +24,7 @@
 <if_expr> ::= "if" "(" <expression> ")" <expression> ("else" <expression>)?
 
 // Operator
-<operator> ::= "+" | "-" | "*" | "/" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||"
+<operator> ::= "+" | "-" | "*" | "/" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" | "%"
 
 // Literal
 <literal> ::= <integer_literal> | <boolean_literal> | <string_literal>

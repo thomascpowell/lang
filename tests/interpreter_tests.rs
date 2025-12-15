@@ -8,17 +8,6 @@ fn interpret_simple() {
 }
 
 #[test]
-fn interpret_demos() {
-    let demo_dir = Path::new("demos");
-    for entry in fs::read_dir(demo_dir).unwrap() {
-        let entry = entry.unwrap();
-        let path = entry.path();
-        let program = fs::read_to_string(&path).unwrap();
-        test_exec(program);
-    }
-}
-
-#[test]
 fn invalid_assignment() {
     // assignment to the wrong type
     let src = "i32 x = \"a string\";".to_string();
@@ -34,6 +23,17 @@ fn invalid_return() {
     let tokens = tokenize(src).expect("failed to tokenize");
     let ast = parse(tokens).expect("failed to parse");
     assert!(interpret(ast).is_err());
+}
+
+#[test]
+fn run_test_cases() {
+    let cases_dir = Path::new("./tests/cases");
+    for entry in fs::read_dir(cases_dir).unwrap() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+        let program = fs::read_to_string(&path).unwrap();
+        test_exec(program);
+    }
 }
 
 fn test_exec(src: String) {

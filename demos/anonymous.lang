@@ -1,4 +1,0 @@
-// simple example using an anonymous function
-// this behavior is somewhat inconsistent at the moment
-
-(fn(x: i32) -> i32 { return x * x; });(10);
