@@ -1,20 +1,27 @@
-# "Lang"
+# "lang"
 
-Toy programming language written in Rust.
+Programming language.
 
 [![tests](https://github.com/thomascpowell/lang/actions/workflows/rust.yml/badge.svg)](https://github.com/thomascpowell/lang/actions/workflows/rust.yml)
 
 ```rust
 // Code example
 
-def min = fn(a: i32, b: i32) -> string {
-  return if (a < b) { "a is smaller" } else { "b is smaller" };
+def gcd = fn(a: i32, b: i32) -> i32 {
+  return if (b == 0) { a } else { gcd(b, a % b) };
 };
 
-println(min(1, 100));
+i32 a = 1071;
+i32 b = 462;
+println("gcd of ", a, " and ", b, " is: ", gcd(a, b));
 ```
 
-## Features
-- Helpful error messages with exact token locations
-- Strict and explicit type system
-- Simple CLI for executing source code
+## Overview
+- This is a full programming language written from scratch in Rust
+- Currently supports 13 operators, 5 data types, anonymous functions, recursion, and more
+- More code examples can be found in `./programs`
+
+## More Info
+- Requires only the Rust toolchain (`rust`, `cargo`)
+- Documentation (grammar, usage) can be found in `./docs`
+- See `Makefile` for running, building, and testing
