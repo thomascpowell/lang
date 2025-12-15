@@ -133,7 +133,7 @@ impl Interpreter {
             Operator::Sub => Value::Int(left_val.expect_int()? - right_val.expect_int()?),
             Operator::Mul => Value::Int(left_val.expect_int()? * right_val.expect_int()?),
             Operator::Mod => Value::Int(left_val.expect_int()? % right_val.expect_int()?),
-            Operator::Div => Value::Int(left_val.expect_int()? / right_val.expect_int()?),
+            Operator::Div => self.handle_div(left_val, right_val)?,
             Operator::Eq => Value::Bool(left_val.expect_int()? == right_val.expect_int()?),
             Operator::Ne => Value::Bool(left_val.expect_int()? != right_val.expect_int()?),
             Operator::Lt => Value::Bool(left_val.expect_int()? < right_val.expect_int()?),
@@ -145,6 +145,28 @@ impl Interpreter {
             _ => unreachable!(),
         };
         Ok(ExecResult::Value(res))
+    }
+
+    // overloaded, supports i32 and f32
+    fn handle_div(&mut self, left: Value, right: Value) -> Result<Value, Error> {
+        let left_type = left.get_type();
+        let right_type = right.get_type();
+        if left_type != right_type {
+            return Err(Error {
+                error_type: ErrorType::TypeMismatch,
+                start_line: 0,
+                start_col: 0,
+                found: "division by mismatched operators".into(),
+                message: None,
+            });
+        }
+        let res: Value;
+        if left_type == Type::I32 {
+            res = Value::Int(left.expect_int()? / right.expect_int()?);
+        } else {
+            res = Value::Float(left.expect_float()? / right.expect_float()?);
+        }
+        return Ok(res);
     }
 
     fn handle_if(&mut self, exp: IfExp) -> Result<ExecResult, Error> {

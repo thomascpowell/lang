@@ -1,0 +1,6 @@
+// square root calculator
+// unfinished
+
+def sqrt = fn(x: i32) -> f32 {
+  return 0;
+};

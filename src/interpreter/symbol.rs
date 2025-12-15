@@ -31,6 +31,13 @@ impl Value {
         }
         Err(Error::generic_invalid_operand(self))
     }
+    pub fn expect_float(&self) -> Result<f32, Error> {
+        if let Value::Float(x) = self {
+            return Ok(*x);
+        }
+        Err(Error::generic_invalid_operand(self))
+    }
+
     pub fn expect_bool(&self) -> Result<bool, Error> {
         if let Value::Bool(x) = self {
             return Ok(*x);
