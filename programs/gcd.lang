@@ -1,0 +1,15 @@
+// euclid's algorithm
+
+def gcd = fn(a: i32, b: i32) -> i32 {
+  i32 x = b;
+  i32 y = a;
+  return if (b == 0) {
+    a
+  } else {
+    gcd(x, y % x)
+  };
+};
+
+i32 a = 1071;
+i32 b = 462;
+println("gcd of ", a, " and ", b, " is: ", gcd(a, b));

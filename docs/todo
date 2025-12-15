@@ -1,4 +1,6 @@
 planned features:
 - add "function" as a full keyword
+- add float type
 - add lists in some form
+- improve error types
 - add repl

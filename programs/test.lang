@@ -1,3 +1,3 @@
 // contains whatever i'm testing at the moment
 
-println("test: ", 8 % 2 == 0);
+println(80 % 9);
