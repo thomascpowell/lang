@@ -8,6 +8,7 @@ use crate::{
 * Symbol type
 * */
 
+#[derive(Clone)]
 pub struct Symbol {
     pub ty: Type,
     pub val: Value,

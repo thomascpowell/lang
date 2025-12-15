@@ -1,12 +1,10 @@
 // euclid's algorithm
 
 def gcd = fn(a: i32, b: i32) -> i32 {
-  i32 x = b;
-  i32 y = a;
   return if (b == 0) {
     a
   } else {
-    gcd(x, y % x)
+    gcd(b, a % b)
   };
 };
 

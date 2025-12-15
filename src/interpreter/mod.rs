@@ -213,17 +213,23 @@ impl Interpreter {
                 "incorrect number of arguments",
             ));
         }
-        // push arguments on to new scope
-        // (with names corresponding with parameters)
-        self.push_scope();
-        for i in 0..num_args {
-            let param = &func.params[i];
-            let arg = &args[i];
-            let identifier = &param.identifier;
-            let arg_symbol = self
+
+        // expressions are evaluated in caller's scope
+        // evaluate all args in a list BEFORE pushing new scope
+        let mut evaluated_args: Vec<Symbol> = Vec::new();
+        for arg in &args {
+            let value = self
                 .handle_expression(&arg.value)?
                 .expect_value()?
                 .into_symbol();
+            evaluated_args.push(value);
+        }
+
+        self.push_scope();
+        for i in 0..num_args {
+            let param = &func.params[i];
+            let arg_symbol = &evaluated_args[i];
+            let arg = &args[i].clone();
             if arg_symbol.ty != param.param_type {
                 return Err(Error::new(
                     ErrorType::TypeMismatch,
@@ -233,8 +239,9 @@ impl Interpreter {
                     Some("check function call"),
                 ));
             }
-            self.set_symbol(identifier, arg_symbol)?;
+            self.set_symbol(&param.identifier, arg_symbol.clone())?;
         }
+
         self.frames.push(Frame::new(func.body.clone()));
         let result = self.run_frame()?;
         self.pop_scope();
