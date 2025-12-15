@@ -1,6 +1,5 @@
-use std::{fs, path::Path};
-
 use lang::{error_types::Error, interpreter::interpret, lexer::tokenize, parser::parse};
+use std::{fs, path::Path};
 
 #[test]
 fn run_positive_cases() {
@@ -16,13 +15,23 @@ fn run_cases(dir: &Path, should_fail: bool) {
     for entry in fs::read_dir(dir).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
-        let name = entry.file_name().to_str().expect("failed to get file name").to_string();
+        let name = entry
+            .file_name()
+            .to_str()
+            .expect("failed to get file name")
+            .to_string();
         let program = fs::read_to_string(&path).unwrap();
+        let result = test_exec(program);
         if should_fail {
-            assert!(test_exec(program).is_err(), r#"{name} should fail"#);
-        } else {
-            assert!(test_exec(program).is_ok(), r#"{name} should pass"#);
+            assert!(result.is_err(), r#"{name} should fail"#);
+            return;
         }
+        assert!(
+            result.is_ok(),
+            "should pass: {} \nerror message: \n{}",
+            name,
+            result.unwrap_err().display()
+        );
     }
 }
 
