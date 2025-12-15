@@ -16,19 +16,11 @@ fn() -> i32 {
 
 string whatever = "hello";
 
-// this is valid, but is doesn't do anything
 whatever();
 
-// yet another thing that you can do
 7(3);
 
 "a string";
-
-// this would throw an error
-// true;
-// false;
-
-
 
 // simple demonstration of recursion
 def recursive = fn(param: i32) -> i32 {
