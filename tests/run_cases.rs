@@ -22,6 +22,7 @@ fn run_cases(dir: &Path, should_fail: bool) {
             .to_string();
         let program = fs::read_to_string(&path).unwrap();
         let result = test_exec(program);
+
         if should_fail {
             assert!(result.is_err(), r#"{name} should fail"#);
             return;

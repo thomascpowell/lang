@@ -1,7 +1,7 @@
 planned features:
-- add float type
-- add more test cases (positive and negative)
 - add "function" as a full keyword (replacing def syntax)
-- add lists in some form
-- improve error types
-- add repl
+- add lists in some form (design tbd, could be functional)
+
+qol changes:
+- add more test cases (positive and negative)
+- maintain token location information for longer
