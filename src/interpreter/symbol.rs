@@ -17,6 +17,7 @@ pub struct Symbol {
 #[derive(Clone, Debug)]
 pub enum Value {
     Int(i32),
+    Float(f32),
     Bool(bool),
     String(String),
     Function(Function),
@@ -59,6 +60,7 @@ impl Value {
     pub fn get_type(&self) -> Type {
         match self {
             Value::Int(_) => Type::I32,
+            Value::Float(_) => Type::F32,
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
             Value::Function(_) => Type::Function,
@@ -71,6 +73,7 @@ impl Value {
     pub fn display(&self) -> String {
         match self {
             Self::Int(i) => i.to_string(),
+            Self::Float(i) => i.to_string(),
             Self::Bool(b) => if *b { "true" } else { "false" }.into(),
             Self::String(s) => s.clone(),
             Self::Function(_) => "[function]".to_string(),

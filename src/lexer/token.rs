@@ -77,6 +77,7 @@ pub enum Separator {
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
     Int(i32),
+    Float(f32),
     Bool(bool),
     String(String),
 }
@@ -88,6 +89,7 @@ pub enum Keyword {
     Fn,
     Def,
     I32,
+    F32,
     Bool,
     String,
     True,

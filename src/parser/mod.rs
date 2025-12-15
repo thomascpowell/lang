@@ -98,6 +98,7 @@ impl Parser {
         };
         match type_tok.kind {
             TokenKind::Keyword(Keyword::I32) => self.handle_assignment(Type::I32, pos),
+            TokenKind::Keyword(Keyword::F32) => self.handle_assignment(Type::F32, pos),
             TokenKind::Keyword(Keyword::Bool) => self.handle_assignment(Type::Bool, pos),
             TokenKind::Keyword(Keyword::String) => self.handle_assignment(Type::String, pos),
             _ => Err(Error::new(
@@ -261,6 +262,7 @@ impl Parser {
         let returns = match tok.kind {
             TokenKind::Keyword(Keyword::Bool) => Type::Bool,
             TokenKind::Keyword(Keyword::I32) => Type::I32,
+            TokenKind::Keyword(Keyword::F32) => Type::F32,
             TokenKind::Keyword(Keyword::String) => Type::String,
             _ => return Err(Error::generic_utt(tok)),
         };
@@ -480,6 +482,7 @@ impl Parser {
 fn is_type(kind: &TokenKind) -> bool {
     match kind {
         TokenKind::Keyword(Keyword::I32) => true,
+        TokenKind::Keyword(Keyword::F32) => true,
         TokenKind::Keyword(Keyword::String) => true,
         TokenKind::Keyword(Keyword::Bool) => true,
         _ => false,

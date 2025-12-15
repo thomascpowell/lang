@@ -10,6 +10,7 @@ pub enum ErrorType {
     InvalidChar,
     UnterminatedStringLiteral,
     InvalidIntLiteral,
+    InvalidFloatLiteral,
     InvalidOperator,
     UnexpectedEOF,
     // Parser
@@ -111,6 +112,7 @@ impl Error {
     pub fn generic_invalid_operand(operand: &Value) -> Self {
         let operator_type: &str = match operand {
             Value::Int(_) => "i32",
+            Value::Float(_) => "f32",
             Value::Bool(_) => "bool",
             Value::String(_) => "string",
             Value::Function(_) => "function",

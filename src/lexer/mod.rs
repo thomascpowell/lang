@@ -43,19 +43,32 @@ impl Lexer {
         let c = self.peek().unwrap();
         // match every type of character
         let (kind, original) = match c {
-            // Literal (Int)
+            // Literal (Int or Float)
             c if c.is_ascii_digit() => {
-                let digits = self.consume_while(|c| c.is_ascii_digit());
-                let val = digits.parse().map_err(|_| {
-                    Error::new(
-                        ErrorType::InvalidIntLiteral,
-                        start_line,
-                        start_col,
-                        &digits,
-                        Some("probably overflow (i32)"),
-                    )
-                })?;
-                (TokenKind::Literal(Literal::Int(val)), digits)
+                let digits = self.consume_while(|c| c.is_ascii_digit() || c == '.');
+                let int_err = Error::new(
+                    ErrorType::InvalidIntLiteral,
+                    start_line,
+                    start_col,
+                    &digits,
+                    Some("probably overflow (i32)"),
+                );
+                let float_err = Error::new(
+                    ErrorType::InvalidFloatLiteral,
+                    start_line,
+                    start_col,
+                    &digits,
+                    Some("probably overflow (f32)"),
+                );
+
+                if digits.contains('.') {
+                    let val: f32 = digits.parse().map_err(|_| float_err)?;
+                    (TokenKind::Literal(Literal::Float(val)), digits)
+                } else {
+                    let val: i32 = digits.parse().map_err(|_| int_err)?;
+                    (TokenKind::Literal(Literal::Int(val)), digits)
+                }
+
             }
             // Identifier, Keyword
             c if c.is_alphanumeric() => {
@@ -217,6 +230,7 @@ fn classify_keyword_or_identifier(identifier: &str) -> TokenKind {
         "fn" => TokenKind::Keyword(Keyword::Fn),
         "def" => TokenKind::Keyword(Keyword::Def),
         "i32" => TokenKind::Keyword(Keyword::I32),
+        "f32" => TokenKind::Keyword(Keyword::F32),
         "bool" => TokenKind::Keyword(Keyword::Bool),
         "string" => TokenKind::Keyword(Keyword::String),
         "true" => TokenKind::Keyword(Keyword::True),

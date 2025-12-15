@@ -168,6 +168,7 @@ impl Interpreter {
     fn handle_literal(&mut self, lit: Literal) -> Result<ExecResult, Error> {
         Ok(match lit.value {
             LiteralValue::Int(x) => ExecResult::Value(Value::Int(x)),
+            LiteralValue::Float(x) => ExecResult::Value(Value::Float(x)),
             LiteralValue::String(x) => ExecResult::Value(Value::String(x)),
             LiteralValue::Bool(x) => ExecResult::Value(Value::Bool(x)),
         })

@@ -166,6 +166,7 @@ pub struct IfExp {
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
     I32,
+    F32,
     String,
     Bool,
     Function,
