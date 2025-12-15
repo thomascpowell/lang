@@ -1,0 +1,5 @@
+def test = fn(i: i32) -> string { 
+  return 1; 
+}; 
+
+test(1);
