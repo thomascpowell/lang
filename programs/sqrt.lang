@@ -1,6 +1,9 @@
-// square root calculator
-// unfinished
+// square root function
+// i think this is a leetcode problem
 
 def sqrt = fn(x: i32) -> f32 {
+  // TODO
   return 0;
 };
+
+sqrt(8);

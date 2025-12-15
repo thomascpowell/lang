@@ -16,11 +16,5 @@ println(min(1, 100));
 
 ## Features
 - Helpful error messages with exact token locations
-- Anonymous functions, if expressions, and recursion
 - Strict and explicit type system
-
-## Next Steps
-- Implement REPL
-- Expand standard library
-- General performance optimizations
-- Rework internal error types and methods
+- Simple CLI for executing source code
