@@ -1,0 +1,5 @@
+def test = fn(x: f32) -> f32 {
+  return 1.2;
+};
+
+test(1);

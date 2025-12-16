@@ -346,6 +346,7 @@ impl Parser {
         let ty = match type_token.kind {
             TokenKind::Keyword(Keyword::Bool) => Type::Bool,
             TokenKind::Keyword(Keyword::I32) => Type::I32,
+            TokenKind::Keyword(Keyword::F32) => Type::F32,
             TokenKind::Keyword(Keyword::String) => Type::String,
             _ => return Err(Error::generic_utt(type_token)),
         };
