@@ -324,6 +324,13 @@ impl Interpreter {
 
     fn include_stdlib(&mut self) -> Result<(), Error> {
         self.set_symbol(
+            "floor",
+            Symbol {
+                ty: Type::Function,
+                val: Value::NativeFunction(std_floor),
+            },
+        )?;
+        self.set_symbol(
             "print",
             Symbol {
                 ty: Type::Function,

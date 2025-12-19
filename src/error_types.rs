@@ -27,6 +27,7 @@ pub enum ErrorType {
     TypeMismatch,
     // Stdlib
     StdRead,
+    StdMissingArgs,
     // Shared
     Default,
 }
@@ -70,6 +71,7 @@ impl Error {
 
     /**
      * Functions for creating common errors
+     * This is terrible fix ASAP
      * */
 
     pub fn generic_utt(tok: Token) -> Self {
@@ -100,6 +102,17 @@ impl Error {
             None,
         )
     }
+
+    pub fn generic_sma() -> Self {
+        Error::new(
+            ErrorType::StdMissingArgs,
+            0,
+            0,
+            "missing argument to stdlib function",
+            None,
+        )
+    }
+
     pub fn generic_uer() -> Self {
         Error::new(
             ErrorType::UnexpectedExecResult,

@@ -33,6 +33,12 @@ pub fn std_read(_args: Vec<Value>) -> Result<ExecResult, Error> {
     Ok(ExecResult::Value(Value::String(buffer)))
 }
 
+pub fn std_floor(args: Vec<Value>) -> Result<ExecResult, Error> {
+    Ok(ExecResult::Value(Value::Int(
+        args.get(0).ok_or(Error::generic_sma())?.expect_float()? as i32,
+    )))
+}
+
 pub fn std_panic(_args: Vec<Value>) -> Result<ExecResult, Error> {
     panic!("[panic]");
 }

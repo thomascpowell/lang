@@ -1,4 +1,4 @@
 // contains whatever i'm testing at the moment
 
 f32 x = 1.5;
-println(x);
+println(floor(x));
