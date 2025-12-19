@@ -95,8 +95,8 @@ impl Interpreter {
         if symbol.ty != ty {
             return Err(Error::new(
                 ErrorType::TypeMismatch,
-                0,
-                0,
+                symbol.pos.start_line,
+                symbol.pos.start_col,
                 format!("{:?}", ty),
                 Some("invalid assignment type"),
             ));
@@ -125,16 +125,14 @@ impl Interpreter {
     }
 
     fn handle_binary(&mut self, exp: BinaryExp) -> Result<ExecResult, Error> {
-        let left = exp.left;
-        let right = exp.right;
-        let left_val = self.handle_expression(&left)?.expect_value()?;
-        let right_val = self.handle_expression(&right)?.expect_value()?;
+        let left_val = self.handle_expression(&exp.left)?.expect_value()?;
+        let right_val = self.handle_expression(&exp.right)?.expect_value()?;
         let res: Value = match exp.operator {
+            Operator::Div => self.handle_div(exp)?,
             Operator::Add => Value::Int(left_val.expect_int()? + right_val.expect_int()?),
             Operator::Sub => Value::Int(left_val.expect_int()? - right_val.expect_int()?),
             Operator::Mul => Value::Int(left_val.expect_int()? * right_val.expect_int()?),
             Operator::Mod => Value::Int(left_val.expect_int()? % right_val.expect_int()?),
-            Operator::Div => self.handle_div(left_val, right_val)?,
             Operator::Eq => Value::Bool(left_val.expect_int()? == right_val.expect_int()?),
             Operator::Ne => Value::Bool(left_val.expect_int()? != right_val.expect_int()?),
             Operator::Lt => Value::Bool(left_val.expect_int()? < right_val.expect_int()?),
@@ -149,16 +147,19 @@ impl Interpreter {
     }
 
     // overloaded, supports i32 and f32
-    fn handle_div(&mut self, left: Value, right: Value) -> Result<Value, Error> {
+    fn handle_div(&mut self, exp: BinaryExp) -> Result<Value, Error> {
+        let left = self.handle_expression(&exp.left)?.expect_value()?;
+        let right = self.handle_expression(&exp.right)?.expect_value()?;
         let left_type = left.get_type();
         let right_type = right.get_type();
+        let position = exp.position.clone();
         if left_type != right_type {
             return Err(Error {
                 error_type: ErrorType::TypeMismatch,
-                start_line: 0,
-                start_col: 0,
-                found: "division by mismatched operators".into(),
-                message: None,
+                start_line: position.start_line,
+                start_col: position.start_col,
+                found: format!("{:?} / {:?}", left_type, right_type),
+                message: Some("division by mismatched operators".into()),
             });
         }
         let res: Value;
@@ -202,7 +203,11 @@ impl Interpreter {
         match *callee {
             Expression::FunctionExp(function) => self.run_function(function, call.args),
             Expression::IdentifierExp(identifier) => {
-                match self.get_symbol(&identifier.name)?.val.clone() {
+                let symbol = self
+                    .get_symbol(&identifier.name, identifier.position.clone())?
+                    .val
+                    .clone();
+                match symbol {
                     // if the corresponding value is a function, run it
                     Value::Function(x) => self.run_function(x, call.args),
                     // case of stdlib call
@@ -224,12 +229,16 @@ impl Interpreter {
     }
 
     fn handle_identifer(&mut self, identifier: &Identifier) -> Result<Value, Error> {
-        Ok(self.get_symbol(&identifier.name)?.val.clone())
+        Ok(self
+            .get_symbol(&identifier.name, identifier.position.clone())?
+            .val
+            .clone())
     }
 
     fn run_function(&mut self, func: Function, args: Vec<Argument>) -> Result<ExecResult, Error> {
         let num_params = func.params.len();
         let num_args = args.len();
+        let position = func.position;
         // ensure correct number of arguments are passed
         if num_params != num_args {
             return Err(Error::generic_invalid_params(
@@ -245,7 +254,7 @@ impl Interpreter {
             let value = self
                 .handle_expression(&arg.value)?
                 .expect_value()?
-                .into_symbol(func.position.clone());
+                .into_symbol(position.clone());
             evaluated_args.push(value);
         }
 
@@ -279,10 +288,10 @@ impl Interpreter {
         if function_returned_type != func.returns {
             return Err(Error::new(
                 ErrorType::TypeMismatch,
-                0,
-                0,
+                position.start_line,
+                position.start_col,
                 format!("{:?}", function_returned_type),
-                Some("invalid assignment type"),
+                Some("function returns wrong type"),
             ));
         }
         Ok(res)
@@ -306,7 +315,7 @@ impl Interpreter {
             Err(Error::generic_se(name.to_string()))
         }
     }
-    pub fn get_symbol(&self, identifier: &str) -> Result<&Symbol, Error> {
+    pub fn get_symbol(&self, identifier: &str, pos: Position) -> Result<&Symbol, Error> {
         // iterate, start with most recent/specific scope
         for scope in self.scopes.iter().rev() {
             if let Some(symbol) = scope.get(identifier) {
@@ -314,10 +323,11 @@ impl Interpreter {
             }
         }
         // no symbol -> error
+        // position passed by caller
         Err(Error {
             error_type: ErrorType::InvalidSymbol,
-            start_line: 0,
-            start_col: 0,
+            start_line: pos.start_line,
+            start_col: pos.start_col,
             found: identifier.to_string(),
             message: Some("identifier name not found".to_string()),
         })
