@@ -86,6 +86,7 @@ impl Interpreter {
     fn interpret_assignment(&mut self, a: &Assignment) -> Result<ExecResult, Error> {
         let symbol_value = self.handle_expression(&a.expression)?.expect_value()?;
         let symbol = Symbol {
+            pos: a.position.clone(),
             ty: a.assignment_type.clone(),
             val: symbol_value,
         };
@@ -244,7 +245,7 @@ impl Interpreter {
             let value = self
                 .handle_expression(&arg.value)?
                 .expect_value()?
-                .into_symbol();
+                .into_symbol(func.position.clone());
             evaluated_args.push(value);
         }
 
@@ -323,9 +324,14 @@ impl Interpreter {
     }
 
     fn include_stdlib(&mut self) -> Result<(), Error> {
+        let pos = Position {
+            start_col: 0,
+            start_line: 0,
+        };
         self.set_symbol(
             "floor",
             Symbol {
+                pos: pos.clone(),
                 ty: Type::Function,
                 val: Value::NativeFunction(std_floor),
             },
@@ -333,6 +339,7 @@ impl Interpreter {
         self.set_symbol(
             "print",
             Symbol {
+                pos: pos.clone(),
                 ty: Type::Function,
                 val: Value::NativeFunction(std_print),
             },
@@ -340,6 +347,7 @@ impl Interpreter {
         self.set_symbol(
             "println",
             Symbol {
+                pos: pos.clone(),
                 ty: Type::Function,
                 val: Value::NativeFunction(std_println),
             },
@@ -347,6 +355,7 @@ impl Interpreter {
         self.set_symbol(
             "panic",
             Symbol {
+                pos: pos.clone(),
                 ty: Type::Function,
                 val: Value::NativeFunction(std_panic),
             },
@@ -354,11 +363,11 @@ impl Interpreter {
         self.set_symbol(
             "read",
             Symbol {
+                pos: pos.clone(),
                 ty: Type::Function,
                 val: Value::NativeFunction(std_read),
             },
         )?;
-
         Ok(())
     }
 }

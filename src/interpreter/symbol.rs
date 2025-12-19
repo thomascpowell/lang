@@ -1,7 +1,7 @@
 use crate::{
     error_types::Error,
     interpreter::exec_result::ExecResult,
-    parser::ast::{Function, Type},
+    parser::ast::{Function, Position, Type},
 };
 
 /**
@@ -10,6 +10,7 @@ use crate::{
 
 #[derive(Clone)]
 pub struct Symbol {
+    pub pos: Position,
     pub ty: Type,
     pub val: Value,
 }
@@ -57,8 +58,9 @@ impl Value {
         Err(Error::generic_invalid_operand(self))
     }
 
-    pub fn into_symbol(self) -> Symbol {
+    pub fn into_symbol(self, pos: Position) -> Symbol {
         Symbol {
+            pos: pos,
             ty: self.get_type(),
             val: self,
         }
