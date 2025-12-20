@@ -1,3 +1,5 @@
+use std::iter::zip;
+
 use crate::{
     error_types::{Error, ErrorType},
     interpreter::{exec_result::ExecResult, scope::Scope, stdlib::*, symbol::*},
@@ -338,46 +340,16 @@ impl Interpreter {
             start_col: 0,
             start_line: 0,
         };
-        self.set_symbol(
-            "floor",
-            Symbol {
+        let names = vec!["floor", "print", "println", "panic", "read"];
+        let functions = vec![std_floor, std_print, std_println, std_panic, std_read];
+        for (name, function) in zip(names, functions) {
+            let symbol = Symbol {
                 pos: pos.clone(),
                 ty: Type::Function,
-                val: Value::NativeFunction(std_floor),
-            },
-        )?;
-        self.set_symbol(
-            "print",
-            Symbol {
-                pos: pos.clone(),
-                ty: Type::Function,
-                val: Value::NativeFunction(std_print),
-            },
-        )?;
-        self.set_symbol(
-            "println",
-            Symbol {
-                pos: pos.clone(),
-                ty: Type::Function,
-                val: Value::NativeFunction(std_println),
-            },
-        )?;
-        self.set_symbol(
-            "panic",
-            Symbol {
-                pos: pos.clone(),
-                ty: Type::Function,
-                val: Value::NativeFunction(std_panic),
-            },
-        )?;
-        self.set_symbol(
-            "read",
-            Symbol {
-                pos: pos.clone(),
-                ty: Type::Function,
-                val: Value::NativeFunction(std_read),
-            },
-        )?;
+                val: Value::NativeFunction(function),
+            };
+            self.set_symbol(name, symbol)?;
+        }
         Ok(())
     }
 }
