@@ -15,9 +15,11 @@ impl Scope {
             symbols: HashMap::new(),
         }
     }
+
     pub fn define(&mut self, name: &str, value: Symbol) {
         self.symbols.insert(name.to_string(), value);
     }
+
     pub fn get(&self, name: &str) -> Option<&Symbol> {
         self.symbols.get(name)
     }

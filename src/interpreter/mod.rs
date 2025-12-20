@@ -2,11 +2,12 @@ use std::iter::zip;
 
 use crate::{
     error_types::{Error, ErrorType},
-    interpreter::{exec_result::ExecResult, scope::Scope, stdlib::*, symbol::*},
+    interpreter::{exec_result::ExecResult, frame::Frame, scope::Scope, stdlib::*, symbol::*},
     parser::ast::*,
 };
 
 pub mod exec_result;
+pub mod frame;
 pub mod scope;
 pub mod stdlib;
 pub mod symbol;
@@ -351,31 +352,5 @@ impl Interpreter {
             self.set_symbol(name, symbol)?;
         }
         Ok(())
-    }
-}
-
-#[derive(Clone)]
-pub struct Frame {
-    pub pos: usize,
-    pub ast: StatementList,
-}
-
-impl Frame {
-    fn new(ast: StatementList) -> Self {
-        Frame { ast: ast, pos: 0 }
-    }
-
-    /**
-     * Utility Functions
-     * */
-
-    fn peek(&self) -> Option<&Statement> {
-        self.ast.statements.get(self.pos)
-    }
-    fn advance(&mut self) {
-        self.pos += 1
-    }
-    pub fn done(&self) -> bool {
-        self.pos >= self.ast.statements.len()
     }
 }
