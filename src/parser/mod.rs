@@ -12,6 +12,9 @@ pub fn parse(tokens: Vec<Token>) -> Result<StatementList, Error> {
     let mut parser = Parser::new(tokens);
     while parser.has_next() {
         parser.skip_comments();
+        if !parser.has_next() {
+            break
+        }
         let statement = parser.parse_statement()?;
         res.push(statement);
     }

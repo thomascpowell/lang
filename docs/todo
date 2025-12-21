@@ -1,6 +1,14 @@
 planned features:
-- add "function" as a full keyword (replacing def syntax)
-- add lists in some form (design tbd, could be functional)
+- lists, functional style
 
 qol changes:
 - add more test cases (positive and negative)
+- allow underscore (why was this excluded to begin with)
+- make semi-colons optional for returns (good for small anonymous functions)
+
+bugs:
+- parser will crash if the function ends in a comment
+- currying does not work
+
+chore:
+- update grammar (changed function definition)
