@@ -7,7 +7,6 @@ qol changes:
 - make semi-colons optional for returns (good for small anonymous functions)
 
 bugs:
-- parser will crash if the function ends in a comment
 - currying does not work
 
 chore:

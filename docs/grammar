@@ -12,10 +12,8 @@
 <return> ::= "return" <expression>
 
 // Assignment
-<assignment> ::=  <value_assignment> | <function_assignment>
-<value_assignment> ::= <type> <identifier> "=" <expression>
-<function_assignment> ::= "def" <identifier> "=" <function>
-<type> ::= "i32" | "f32" | "bool" | "string" 
+<assignment> ::= <type> <identifier> "=" <expression>
+<type> ::= "i32" | "f32" | "bool" | "string" | "function"
 <identifier> ::= [a-zA-Z_][a-zA-Z0-9_]*
 
 // Expression 
@@ -32,7 +30,7 @@
 <boolean_literal> ::= "true" | "false"
 <string_literal>  ::= '"' [^"]* '"'
 
-// Function (anonymous)
+// Function
 <function> ::= "fn" "(" <parameter_list> ")" "->" <type> "{"  <statement_list> "}"
 <parameter_list> ::= <parameter> ("," <parameter>)*
 <parameter> ::= <identifier> ":" <type>
