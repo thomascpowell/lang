@@ -39,7 +39,7 @@ impl Parser {
             // statement: return
             TokenKind::Keyword(Keyword::Return) => Ok(Statement::Return(self.parse_return()?)),
             // function assignment
-            TokenKind::Keyword(Keyword::Def) => {
+            TokenKind::Keyword(Keyword::Function) => {
                 Ok(Statement::Assignment(self.parse_function_assignment()?))
             }
             // match value assignments (only other valid use of keywords)

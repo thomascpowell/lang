@@ -1,4 +1,4 @@
-def test = fn(x: f32) -> f32 {
+function test = fn(x: f32) -> f32 {
   return 1.2;
 };
 

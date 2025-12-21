@@ -23,7 +23,7 @@ whatever();
 "a string";
 
 // simple demonstration of recursion
-def recursive = fn(param: i32) -> i32 {
+function recursive = fn(param: i32) -> i32 {
   println("param = ", param);
   return if (param > 100) {
     recursive(param/2)

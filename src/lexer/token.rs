@@ -87,7 +87,6 @@ pub enum Keyword {
     If,
     Else,
     Fn,
-    Def,
     I32,
     F32,
     Bool,
@@ -95,4 +94,5 @@ pub enum Keyword {
     True,
     False,
     Return,
+    Function,
 }

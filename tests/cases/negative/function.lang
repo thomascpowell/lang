@@ -1,4 +1,4 @@
-def test = fn(i: i32) -> string { 
+function test = fn(i: i32) -> string { 
   return 1; 
 }; 
 

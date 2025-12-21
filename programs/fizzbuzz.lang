@@ -1,6 +1,6 @@
 // a classic programming problem
 
-def fizzbuzz = fn(i: i32) -> i32 {
+function fizzbuzz = fn(i: i32) -> i32 {
   i32 c = 100-i;
   print(c, ": ");
   if (c % 3 == 0) {

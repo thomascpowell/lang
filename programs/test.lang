@@ -1,7 +1,7 @@
 // contains whatever i'm testing at the moment
 
-def x = fn(i: i32) -> i32 {
-  return 23.0;
+function x = fn(i: f32) -> i32 {
+  return floor(i);
 };
 
-x(1);
+println(x(15.2));
