@@ -1,0 +1,13 @@
+// currying example
+
+function makeadder = fn(numbertoadd: i32) -> function {
+  
+  function newadder = fn(n: i32) -> i32 {
+    return numbertoadd + n; 
+  };
+  return newadder;
+};
+
+// TODO: figure out why this does not work
+// function myadder = makeadder(10);
+
