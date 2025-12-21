@@ -72,10 +72,7 @@ impl Value {
             Value::Float(_) => Type::F32,
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
-            Value::Function(_) => Type::Function,
-            // nativefn does not have a type
-            // so it cannot be a symbol
-            Value::NativeFunction(_) => panic!(),
+            Value::NativeFunction(_) | Value::Function(_) => Type::Function,
         }
     }
 

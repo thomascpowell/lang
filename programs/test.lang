@@ -1,7 +1,9 @@
 // contains whatever i'm testing at the moment
 
-function x = fn(i: f32) -> i32 {
-  return floor(i);
+function x = fn(apply: function) -> i32 {
+  f32 test = 100.2;
+  return apply(test);
+
 };
 
-println(x(15.2));
+println(x(floor));

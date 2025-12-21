@@ -264,6 +264,7 @@ impl Parser {
             TokenKind::Keyword(Keyword::I32) => Type::I32,
             TokenKind::Keyword(Keyword::F32) => Type::F32,
             TokenKind::Keyword(Keyword::String) => Type::String,
+            TokenKind::Keyword(Keyword::Function) => Type::Function,
             _ => return Err(Error::generic_utt(tok)),
         };
 
@@ -348,6 +349,7 @@ impl Parser {
             TokenKind::Keyword(Keyword::I32) => Type::I32,
             TokenKind::Keyword(Keyword::F32) => Type::F32,
             TokenKind::Keyword(Keyword::String) => Type::String,
+            TokenKind::Keyword(Keyword::Function) => Type::Function,
             _ => return Err(Error::generic_utt(type_token)),
         };
         let pos = Position {
@@ -486,6 +488,7 @@ fn is_type(kind: &TokenKind) -> bool {
         TokenKind::Keyword(Keyword::F32) => true,
         TokenKind::Keyword(Keyword::String) => true,
         TokenKind::Keyword(Keyword::Bool) => true,
+        TokenKind::Keyword(Keyword::Function) => true,
         _ => false,
     }
 }
