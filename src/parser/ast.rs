@@ -31,12 +31,14 @@ impl Statement {
         }
         Err(Error::generic_ust(self))
     }
+
     pub fn expect_expression(&self) -> Result<&Expression, Error> {
         if let Statement::Expression(r) = self {
             return Ok(r);
         }
         Err(Error::generic_ust(self))
     }
+
     pub fn expect_return(&self) -> Result<&Return, Error> {
         if let Statement::Return(r) = self {
             return Ok(r);

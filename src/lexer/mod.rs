@@ -36,7 +36,7 @@ impl Lexer {
 
     fn next_token(&mut self) -> Result<Token, Error> {
         // need to report the line the token starts on
-        // this stuff will useful for error reporting later on probably
+        // useful for error reporting
         let start_line = self.line;
         let start_col = self.col;
         // get the start character
@@ -68,7 +68,6 @@ impl Lexer {
                     let val: i32 = digits.parse().map_err(|_| int_err)?;
                     (TokenKind::Literal(Literal::Int(val)), digits)
                 }
-
             }
             // Identifier, Keyword
             c if c.is_alphanumeric() => {
@@ -229,7 +228,6 @@ fn classify_keyword_or_identifier(identifier: &str) -> TokenKind {
     match identifier {
         "fn" => TokenKind::Keyword(Keyword::Fn),
         "function" => TokenKind::Keyword(Keyword::Function),
-
         "i32" => TokenKind::Keyword(Keyword::I32),
         "f32" => TokenKind::Keyword(Keyword::F32),
         "bool" => TokenKind::Keyword(Keyword::Bool),
