@@ -1,8 +1,8 @@
+use crate::error_types::Error;
+
 /*
 * Nonterminal types
 * */
-
-use crate::error_types::Error;
 
 #[derive(Debug, Clone)]
 pub struct StatementList {

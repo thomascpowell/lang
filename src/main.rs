@@ -4,7 +4,6 @@ const HELP: &str = include_str!("../docs/help");
 
 /**
 * Lang CLI
-* (WIP but functional)
 * */
 
 fn main() {

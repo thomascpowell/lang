@@ -1,6 +1,9 @@
-planned features:
-- lists, functional style
-- closures
+lists:
+- plans tbd
+- functional style
+
+closures: 
+- Value::Closure, runtime computed with a frozen Scope
 
 qol changes:
 - make semi-colons optional for returns (good for small anonymous functions)
