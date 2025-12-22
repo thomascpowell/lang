@@ -1,13 +1,13 @@
 // currying example
 
-function makeadder = fn(numbertoadd: i32) -> function {
-  
-  function newadder = fn(n: i32) -> i32 {
-    return numbertoadd + n; 
+function adder = fn(num: i32) -> function {
+  return fn(n: i32) -> i32 {
+    return num + n; 
   };
-  return newadder;
 };
 
-// TODO: figure out why this does not work
-// function myadder = makeadder(10);
+function myadder = adder(100);
 
+// the langauge does not support closures yet
+// so this particular example will not be able to access num
+println(myadder(1));

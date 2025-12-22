@@ -1,10 +1,7 @@
 planned features:
 - lists, functional style
+- closures
 
 qol changes:
-- allow underscore (why was this excluded to begin with)
 - make semi-colons optional for returns (good for small anonymous functions)
 - ast printing could be cleaner
-
-bugs:
-- currying does not work

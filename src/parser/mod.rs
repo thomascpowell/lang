@@ -41,11 +41,7 @@ impl Parser {
         let res = match &tok.kind {
             // statement: return
             TokenKind::Keyword(Keyword::Return) => Ok(Statement::Return(self.parse_return()?)),
-            // function assignment
-            TokenKind::Keyword(Keyword::Function) => {
-                Ok(Statement::Assignment(self.parse_function_assignment()?))
-            }
-            // match value assignments (only other valid use of keywords)
+            // match assignments (only other valid use of keywords)
             kind if is_type(kind) => Ok(Statement::Assignment(self.parse_assignment()?)),
             // everything else is an expression
             // may or may not be valid though
@@ -73,26 +69,6 @@ impl Parser {
         Ok(ret)
     }
 
-    fn parse_function_assignment(&mut self) -> Result<Assignment, Error> {
-        // get def
-        let def = self.advance().ok_or_else(|| Error::generic())?;
-        let pos = Position {
-            start_line: def.line,
-            start_col: def.col,
-        };
-        let identifier = self.parse_identifier()?;
-        self.expect(|k| matches!(k, TokenKind::Operator(Operator::Assign)))?;
-        let function: Function = self.parse_function()?;
-        Ok(Assignment {
-            position: pos,
-            // assignment_type: function.returns.clone(),
-            // this makes more sense
-            assignment_type: Type::Function,
-            identifier: identifier.name,
-            expression: Expression::FunctionExp(function),
-        })
-    }
-
     fn parse_assignment(&mut self) -> Result<Assignment, Error> {
         let type_tok = self.expect(|x| matches!(x, TokenKind::Keyword(_)))?;
         let pos = Position {
@@ -104,12 +80,13 @@ impl Parser {
             TokenKind::Keyword(Keyword::F32) => self.handle_assignment(Type::F32, pos),
             TokenKind::Keyword(Keyword::Bool) => self.handle_assignment(Type::Bool, pos),
             TokenKind::Keyword(Keyword::String) => self.handle_assignment(Type::String, pos),
+            TokenKind::Keyword(Keyword::Function) => self.handle_assignment(Type::Function, pos),
             _ => Err(Error::new(
                 ErrorType::UnexpectedTokenType,
                 type_tok.line,
                 type_tok.col,
                 type_tok.original,
-                Some("expected: i32, bool, or string"),
+                Some("expected: type"),
             )),
         }
     }
@@ -125,7 +102,7 @@ impl Parser {
             position: pos,
             assignment_type: a_type,
             identifier: ident_str,
-            expression: self.parse_expression(0)?.assert_is_not_function()?,
+            expression: self.parse_expression(0)?,
         })
     }
 

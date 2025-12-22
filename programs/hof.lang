@@ -1,7 +1,0 @@
-// very simple hof example
-
-function thing = fn(x: function) -> i32 {
-  return x(1);
-};
-
-println(thing(fn(x: i32) -> i32 { return x + 1; }));
