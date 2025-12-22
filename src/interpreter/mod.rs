@@ -1,3 +1,4 @@
+use crate::interpreter::value::Value;
 use std::iter::zip;
 
 use crate::{
@@ -9,6 +10,7 @@ use crate::{
 pub mod exec_result;
 pub mod frame;
 pub mod scope;
+pub mod value;
 pub mod stdlib;
 pub mod symbol;
 

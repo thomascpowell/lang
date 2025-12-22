@@ -1,4 +1,4 @@
-use crate::{interpreter::symbol::Value, lexer::token::Token, parser::ast::Statement};
+use crate::{interpreter::value::Value, lexer::token::Token, parser::ast::Statement};
 
 /**
 * Error Types

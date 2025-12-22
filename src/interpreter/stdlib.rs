@@ -2,7 +2,7 @@ use std::io::{self, Write};
 
 use crate::{
     error_types::{Error, ErrorType},
-    interpreter::{exec_result::ExecResult, symbol::Value},
+    interpreter::{exec_result::ExecResult, value::Value},
 };
 
 /**

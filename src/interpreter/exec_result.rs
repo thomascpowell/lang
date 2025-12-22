@@ -1,4 +1,4 @@
-use crate::{error_types::Error, interpreter::symbol::Value};
+use crate::{error_types::Error, interpreter::value::Value};
 
 /**
 * ExecResult type
