@@ -83,15 +83,7 @@ impl Error {
             None,
         )
     }
-    pub fn generic_se(identifier: String) -> Self {
-        Error::new(
-            ErrorType::UnexpectedTokenType,
-            0,
-            0,
-            identifier,
-            Some("unexpected error setting identifier"),
-        )
-    }
+
     pub fn generic_ust(stmt: &Statement) -> Self {
         let pos = stmt.get_position();
         Error::new(

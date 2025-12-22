@@ -1,5 +1,5 @@
 use crate::interpreter::value::Value;
-use std::iter::zip;
+use std::{collections::HashMap, iter::zip, rc::Rc};
 
 use crate::{
     error_types::{Error, ErrorType},
@@ -7,12 +7,13 @@ use crate::{
     parser::ast::*,
 };
 
+pub mod closure;
 pub mod exec_result;
 pub mod frame;
 pub mod scope;
-pub mod value;
 pub mod stdlib;
 pub mod symbol;
+pub mod value;
 
 /**
 * Interpreter
@@ -27,14 +28,14 @@ pub fn interpret(ast: StatementList) -> Result<(), Error> {
 
 pub struct Interpreter {
     pub frames: Vec<Frame>,
-    pub scopes: Vec<Scope>,
+    pub scope: Rc<Scope>,
 }
 
 impl Interpreter {
     pub fn new(ast: StatementList) -> Self {
         Interpreter {
             frames: vec![Frame::new(ast)],
-            scopes: vec![Scope::new()],
+            scope: Rc::new(Scope::new()),
         }
     }
 
@@ -107,7 +108,8 @@ impl Interpreter {
             ));
         }
         // push to the scope stack
-        self.set_symbol(&a.identifier, symbol)?;
+        self.scope = self.scope.extend(a.identifier.clone(), symbol);
+        // self.set_symbol(&a.identifier, symbol)?;
         Ok(ExecResult::Unit)
     }
 
@@ -208,7 +210,7 @@ impl Interpreter {
         match *callee {
             Expression::FunctionExp(function) => self.run_function(function, call.args),
             Expression::IdentifierExp(identifier) => {
-                let symbol = self
+                let symbol = self.scope
                     .get_symbol(&identifier.name, identifier.position.clone())?
                     .val
                     .clone();
@@ -235,6 +237,7 @@ impl Interpreter {
 
     fn handle_identifer(&mut self, identifier: &Identifier) -> Result<Value, Error> {
         Ok(self
+            .scope
             .get_symbol(&identifier.name, identifier.position.clone())?
             .val
             .clone())
@@ -277,7 +280,10 @@ impl Interpreter {
                     Some("check function call"),
                 ));
             }
-            self.set_symbol(&param.identifier, arg_symbol.clone())?;
+            self.scope = self
+                .scope
+                .extend(param.identifier.clone(), arg_symbol.clone());
+            // self.set_symbol(&param.identifier, arg_symbol.clone())?;
         }
 
         self.frames.push(Frame::new(func.body.clone()));
@@ -307,35 +313,16 @@ impl Interpreter {
      * */
 
     fn push_scope(&mut self) {
-        self.scopes.push(Scope::new());
+        let parent = self.scope.clone();
+        self.scope = Rc::new(Scope {
+            symbols: HashMap::new(),
+            parent: Some(parent),
+        });
     }
+
     fn pop_scope(&mut self) {
-        self.scopes.pop();
-    }
-    fn set_symbol(&mut self, name: &str, symbol: Symbol) -> Result<(), Error> {
-        if let Some(scope) = self.scopes.last_mut() {
-            scope.define(name, symbol);
-            Ok(())
-        } else {
-            Err(Error::generic_se(name.to_string()))
-        }
-    }
-    pub fn get_symbol(&self, identifier: &str, pos: Position) -> Result<&Symbol, Error> {
-        // iterate, start with most recent/specific scope
-        for scope in self.scopes.iter().rev() {
-            if let Some(symbol) = scope.get(identifier) {
-                return Ok(symbol);
-            }
-        }
-        // no symbol -> error
-        // position passed by caller
-        Err(Error {
-            error_type: ErrorType::InvalidSymbol,
-            start_line: pos.start_line,
-            start_col: pos.start_col,
-            found: identifier.to_string(),
-            message: Some("identifier name not found".to_string()),
-        })
+        let parent = self.scope.parent.clone().expect("expected scope");
+        self.scope = parent;
     }
 
     fn include_stdlib(&mut self) -> Result<(), Error> {
@@ -351,7 +338,7 @@ impl Interpreter {
                 ty: Type::Function,
                 val: Value::NativeFunction(function),
             };
-            self.set_symbol(name, symbol)?;
+            self.scope = self.scope.extend(name.into(), symbol);
         }
         Ok(())
     }
