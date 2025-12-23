@@ -1,0 +1,5 @@
+function x = fn(i: i32) -> i32 {
+  return 0;
+};
+
+x(1.1);
