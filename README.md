@@ -7,7 +7,7 @@ Programming language.
 ```rust
 // Code example
 
-def gcd = fn(a: i32, b: i32) -> i32 {
+function gcd = fn(a: i32, b: i32) -> i32 {
   return if (b == 0) { a } else { gcd(b, a % b) };
 };
 
