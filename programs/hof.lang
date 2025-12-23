@@ -1,14 +1,3 @@
-// return a function
-function adder = fn(num: i32) -> function {
-  return fn(n: i32) -> i32 {
-    // closures wip
-    return num + n; 
-  };
-};
-
-function myadder = adder(100);
-// println(myadder(1));
-
 // anonymous function as an argument
 function demo = fn(f: function) -> i32 {
   return f(100)
