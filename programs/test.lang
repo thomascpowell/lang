@@ -1,9 +1,2 @@
 // contains whatever i'm testing at the moment
 
-function x = fn(apply: function) -> i32 {
-  f32 test = 100.2;
-  return apply(test);
-
-};
-
-println(x(floor));

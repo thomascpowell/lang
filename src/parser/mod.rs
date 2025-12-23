@@ -13,7 +13,7 @@ pub fn parse(tokens: Vec<Token>) -> Result<StatementList, Error> {
     while parser.has_next() {
         parser.skip_comments();
         if !parser.has_next() {
-            break
+            break;
         }
         let statement = parser.parse_statement()?;
         res.push(statement);
@@ -47,7 +47,7 @@ impl Parser {
             // may or may not be valid though
             _ => Ok(Statement::Expression(self.parse_expression(0)?)),
         };
-        self.expect(|x| matches!(x, TokenKind::Separator(Separator::Semicolon)))?;
+        self.optional(|x| matches!(x, TokenKind::Separator(Separator::Semicolon)));
         res
     }
 
@@ -434,6 +434,19 @@ impl Parser {
                 None,
             )),
             None => Err(Error::generic_eof("unknown")),
+        }
+    }
+
+    // consumes matching character if it exists or does nothing
+    fn optional<F>(&mut self, cond: F)
+    where
+        F: Fn(&TokenKind) -> bool,
+    {
+        match self.peek() {
+            Some(tok) if cond(&tok.kind) => {
+                self.pos += 1;
+            }
+            _ => (),
         }
     }
 
