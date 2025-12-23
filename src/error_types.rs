@@ -71,7 +71,6 @@ impl Error {
 
     /**
      * Functions for creating common errors
-     * This is terrible fix ASAP
      * */
 
     pub fn generic_utt(tok: Token) -> Self {
@@ -95,16 +94,7 @@ impl Error {
         )
     }
 
-    pub fn generic_sma() -> Self {
-        Error::new(
-            ErrorType::StdMissingArgs,
-            0,
-            0,
-            "missing argument to stdlib function",
-            None,
-        )
-    }
-
+    // not sure how this error type could actually occur
     pub fn generic_uer() -> Self {
         Error::new(
             ErrorType::UnexpectedExecResult,
@@ -131,20 +121,11 @@ impl Error {
             Some("check operator and operand types"),
         );
     }
-    pub fn generic_invalid_params(param_count: usize, message: &str) -> Self {
-        return Error::new(
-            ErrorType::InvalidParams,
-            0,
-            0,
-            param_count.to_string() + " parameters",
-            Some(message),
-        );
-    }
     pub fn generic_eof(expected: &str) -> Self {
         Error::new(ErrorType::UnexpectedEOF, 0, 0, "EOF", Some(expected))
     }
     pub fn generic() -> Self {
-        Error::new(ErrorType::Default, 0, 0, "unknown. likely incomplete", None)
+        Error::new(ErrorType::Default, 0, 0, "unknown", None)
     }
     pub fn generic_message(ty: ErrorType, message: String) -> Self {
         Error::new(ty, 0, 0, message, None)

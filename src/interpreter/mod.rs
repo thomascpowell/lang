@@ -249,9 +249,12 @@ impl Interpreter {
         let position = func.position;
         // ensure correct number of arguments are passed
         if num_params != num_args {
-            return Err(Error::generic_invalid_params(
-                args.len(),
-                "incorrect number of arguments",
+            return Err(Error::new(
+                ErrorType::InvalidParams,
+                position.start_line,
+                position.start_col,
+                format!("{:?}", args.len()),
+                Some("incorrect number of arguments"),
             ));
         }
         let mut binds: Vec<(String, Symbol)> = Vec::new();

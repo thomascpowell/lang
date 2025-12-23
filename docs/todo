@@ -6,5 +6,7 @@ closures:
 - Value::Closure, runtime computed with a frozen Scope
 
 qol changes:
-- make semi-colons optional for returns (good for small anonymous functions)
 - ast printing could be cleaner
+
+code improvements:
+- errors should use standard Position type

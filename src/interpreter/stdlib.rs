@@ -35,7 +35,15 @@ pub fn std_read(_args: Vec<Value>) -> Result<ExecResult, Error> {
 
 pub fn std_floor(args: Vec<Value>) -> Result<ExecResult, Error> {
     Ok(ExecResult::Value(Value::Int(
-        args.get(0).ok_or(Error::generic_sma())?.expect_float()? as i32,
+        args.get(0)
+            .ok_or(Error::new(
+                ErrorType::StdMissingArgs,
+                0,
+                0,
+                "missing argument to stdlib function",
+                None,
+            ))?
+            .expect_float()? as i32,
     )))
 }
 
