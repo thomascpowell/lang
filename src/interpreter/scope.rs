@@ -1,9 +1,9 @@
 use crate::{
     error_types::{Error, ErrorType},
-    interpreter::symbol::Symbol,
-    parser::ast::Position,
+    interpreter::{stdlib::*, symbol::Symbol, value::Value},
+    parser::ast::{Position, Type},
 };
-use std::{collections::HashMap, rc::Rc};
+use std::{collections::HashMap, iter::zip, rc::Rc};
 
 /**
 * Scope type
@@ -15,6 +15,28 @@ pub struct Scope {
     pub parent: Option<Rc<Scope>>,
 }
 
+pub fn get_stdlib_scope() -> Rc<Scope> {
+    let mut new_scope = Scope {
+        symbols: HashMap::new(),
+        parent: None,
+    };
+    let pos = Position {
+        start_col: 0,
+        start_line: 0,
+    };
+    let names = vec!["floor", "print", "println", "panic", "read"];
+    let functions = vec![std_floor, std_print, std_println, std_panic, std_read];
+    for (name, function) in zip(names, functions) {
+        let symbol = Symbol {
+            pos: pos.clone(),
+            ty: Type::Function,
+            val: Value::NativeFunction(function),
+        };
+        new_scope.symbols.insert(name.into(), symbol);
+    }
+    return Rc::new(new_scope);
+}
+
 impl Scope {
     pub fn new() -> Self {
         Self {
@@ -24,13 +46,23 @@ impl Scope {
     }
 
     // creates a new scope with itself as the parent
-    // TODO: multiple bindings at once
     pub fn extend(self: &Rc<Scope>, name: String, symbol: Symbol) -> Rc<Scope> {
         let mut new_scope = Scope {
             symbols: HashMap::new(),
             parent: Some(Rc::clone(self)),
         };
         new_scope.symbols.insert(name, symbol);
+        Rc::new(new_scope)
+    }
+
+    pub fn extend_many(self: &Rc<Scope>, binds: Vec<(String, Symbol)>) -> Rc<Scope> {
+        let mut new_scope = Scope {
+            symbols: HashMap::new(),
+            parent: Some(Rc::clone(self)),
+        };
+        for (name, symbol) in binds.iter() {
+            new_scope.symbols.insert(name.clone(), symbol.clone());
+        }
         Rc::new(new_scope)
     }
 

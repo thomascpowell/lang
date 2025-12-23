@@ -1,4 +1,4 @@
-use crate::interpreter::value::Value;
+use crate::interpreter::{scope::get_stdlib_scope, value::Value};
 use std::{collections::HashMap, iter::zip, rc::Rc};
 
 use crate::{
@@ -21,7 +21,6 @@ pub mod value;
 
 pub fn interpret(ast: StatementList) -> Result<(), Error> {
     let mut interpreter = Interpreter::new(ast);
-    interpreter.include_stdlib()?;
     interpreter.run_program()?;
     Ok(())
 }
@@ -35,7 +34,7 @@ impl Interpreter {
     pub fn new(ast: StatementList) -> Self {
         Interpreter {
             frames: vec![Frame::new(ast)],
-            scope: Rc::new(Scope::new()),
+            scope: get_stdlib_scope(),
         }
     }
 
@@ -210,7 +209,8 @@ impl Interpreter {
         match *callee {
             Expression::FunctionExp(function) => self.run_function(function, call.args),
             Expression::IdentifierExp(identifier) => {
-                let symbol = self.scope
+                let symbol = self
+                    .scope
                     .get_symbol(&identifier.name, identifier.position.clone())?
                     .val
                     .clone();
@@ -254,46 +254,32 @@ impl Interpreter {
                 "incorrect number of arguments",
             ));
         }
-
-        // expressions are evaluated in caller's scope
-        // evaluate all args in a list BEFORE pushing new scope
-        let mut evaluated_args: Vec<Symbol> = Vec::new();
-        for arg in &args {
-            let value = self
-                .handle_expression(&arg.value)?
-                .expect_value()?
-                .into_symbol(position.clone());
-            evaluated_args.push(value);
-        }
-
-        self.push_scope();
-        for i in 0..num_args {
-            let param = &func.params[i];
-            let arg_symbol = &evaluated_args[i];
-            let arg = &args[i].clone();
-            if arg_symbol.ty != param.param_type {
-                return Err(Error::new(
-                    ErrorType::TypeMismatch,
-                    arg.position.start_line,
-                    arg.position.start_col,
-                    "type mismatch",
-                    Some("check function call"),
-                ));
-            }
-            self.scope = self
-                .scope
-                .extend(param.identifier.clone(), arg_symbol.clone());
-            // self.set_symbol(&param.identifier, arg_symbol.clone())?;
-        }
-
+        // evaluate symbols in current scope
+        let symbols: Vec<Symbol> = args
+            .into_iter()
+            .map(|arg| {
+                Ok(self
+                    .handle_expression(&arg.value)?
+                    .expect_value()?
+                    .into_symbol(position.clone()))
+            })
+            .collect::<Result<_, Error>>()?;
+        // get param names
+        let names: Vec<String> = func
+            .params
+            .iter()
+            .map(|param| param.identifier.clone())
+            .collect();
+        // use extend_many to create a new scope
+        let binds: Vec<(String, Symbol)> = names.into_iter().zip(symbols.into_iter()).collect();
+        self.scope = self.scope.extend_many(binds);
+        // push a new frame
         self.frames.push(Frame::new(func.body.clone()));
         let result = self.run_frame()?;
         self.pop_scope();
         let res = match result {
             ExecResult::Returned(v) => ExecResult::Value(v),
             _ => unreachable!(),
-            // unit should be unreachable?
-            // ExecResult::Unit => Ok(ExecResult::Unit),
         };
         let function_returned_type = res.expect_value()?.get_type();
         if function_returned_type != func.returns {
@@ -323,23 +309,5 @@ impl Interpreter {
     fn pop_scope(&mut self) {
         let parent = self.scope.parent.clone().expect("expected scope");
         self.scope = parent;
-    }
-
-    fn include_stdlib(&mut self) -> Result<(), Error> {
-        let pos = Position {
-            start_col: 0,
-            start_line: 0,
-        };
-        let names = vec!["floor", "print", "println", "panic", "read"];
-        let functions = vec![std_floor, std_print, std_println, std_panic, std_read];
-        for (name, function) in zip(names, functions) {
-            let symbol = Symbol {
-                pos: pos.clone(),
-                ty: Type::Function,
-                val: Value::NativeFunction(function),
-            };
-            self.scope = self.scope.extend(name.into(), symbol);
-        }
-        Ok(())
     }
 }
