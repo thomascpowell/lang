@@ -254,24 +254,30 @@ impl Interpreter {
                 "incorrect number of arguments",
             ));
         }
-        // evaluate symbols in current scope
-        let symbols: Vec<Symbol> = args
-            .into_iter()
-            .map(|arg| {
-                Ok(self
-                    .handle_expression(&arg.value)?
-                    .expect_value()?
-                    .into_symbol(position.clone()))
-            })
-            .collect::<Result<_, Error>>()?;
-        // get param names
-        let names: Vec<String> = func
-            .params
-            .iter()
-            .map(|param| param.identifier.clone())
-            .collect();
-        // use extend_many to create a new scope
-        let binds: Vec<(String, Symbol)> = names.into_iter().zip(symbols.into_iter()).collect();
+        let mut binds: Vec<(String, Symbol)> = Vec::new();
+        let mut evaluated_args: Vec<Symbol> = Vec::new();
+        for arg in &args {
+            let value = self
+                .handle_expression(&arg.value)?
+                .expect_value()?
+                .into_symbol(position.clone());
+            evaluated_args.push(value);
+        }
+        for i in 0..num_args {
+            let param = &func.params[i];
+            let arg_symbol = &evaluated_args[i];
+            let arg = &args[i].clone();
+            if arg_symbol.ty != param.param_type {
+                return Err(Error::new(
+                    ErrorType::TypeMismatch,
+                    arg.position.start_line,
+                    arg.position.start_col,
+                    "type mismatch",
+                    Some("check function call"),
+                ));
+            }
+            binds.push((param.identifier.clone(), arg_symbol.clone()));
+        }
         self.scope = self.scope.extend_many(binds);
         // push a new frame
         self.frames.push(Frame::new(func.body.clone()));
