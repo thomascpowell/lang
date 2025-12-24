@@ -28,6 +28,7 @@ pub enum ErrorType {
     // Stdlib
     StdRead,
     StdMissingArgs,
+    StdAssertionFailure,
     // Shared
     Default,
 }

@@ -47,6 +47,35 @@ pub fn std_floor(args: Vec<Value>) -> Result<ExecResult, Error> {
     )))
 }
 
+pub fn std_assert(args: Vec<Value>) -> Result<ExecResult, Error> {
+    let optional_msg = args
+        .get(1)
+        .and_then(|r| return Some(r.expect_string().unwrap()));
+
+    let cond = args
+        .get(0)
+        .ok_or(Error::new(
+            ErrorType::StdMissingArgs,
+            0,
+            0,
+            "missing argument to stdlib function",
+            None,
+        ))?
+        .expect_bool()?;
+
+    if !cond {
+        return Err(Error::new(
+            ErrorType::StdAssertionFailure,
+            0,
+            0,
+            "assertion failure",
+            optional_msg.as_deref(),
+        ));
+    };
+
+    Ok(ExecResult::Unit)
+}
+
 pub fn std_panic(_args: Vec<Value>) -> Result<ExecResult, Error> {
     panic!("[panic]");
 }

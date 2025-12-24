@@ -22,8 +22,8 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
         parent: None,
     };
     let pos = Position { col: 0, line: 0 };
-    let names = vec!["floor", "print", "println", "panic", "read"];
-    let functions = vec![std_floor, std_print, std_println, std_panic, std_read];
+    let names = vec!["floor", "print", "println", "panic", "read", "assert"];
+    let functions = vec![std_floor, std_print, std_println, std_panic, std_read, std_assert];
     for (name, function) in zip(names, functions) {
         let symbol = Symbol {
             pos: pos.clone(),
