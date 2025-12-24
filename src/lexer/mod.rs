@@ -53,13 +53,13 @@ impl Lexer {
                     ErrorType::InvalidIntLiteral,
                     position.clone(),
                     &digits,
-                    Some("probably overflow (i32)"),
+                    None,
                 );
                 let float_err = Error::new(
                     ErrorType::InvalidFloatLiteral,
                     position.clone(),
                     &digits,
-                    Some("probably overflow (f32)"),
+                    None,
                 );
 
                 if digits.contains('.') {
@@ -72,7 +72,7 @@ impl Lexer {
             }
             // Identifier, Keyword
             c if c.is_alphanumeric() => {
-                let t = self.consume_while(|c| c.is_alphanumeric());
+                let t = self.consume_while(|c| c.is_alphanumeric() || c == '_');
                 (classify_keyword_or_identifier(&t), t)
             }
             // Literal (String)
@@ -146,7 +146,12 @@ impl Lexer {
             '=' => self.make_simple_token(TokenKind::Operator(Operator::Assign), '='),
             // Unknown
             _ => {
-                return Err(Error::new(ErrorType::InvalidChar, position.clone(), c, None));
+                return Err(Error::new(
+                    ErrorType::InvalidChar,
+                    position.clone(),
+                    c,
+                    None,
+                ));
             }
         };
         let token = Token {
