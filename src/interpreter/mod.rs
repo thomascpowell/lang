@@ -1,5 +1,7 @@
-use crate::interpreter::{scope::get_stdlib_scope, value::Value};
-use std::{collections::HashMap, rc::Rc};
+use crate::{
+    interpreter::{scope::get_stdlib_scope, value::Value},
+};
+use std::rc::Rc;
 
 use crate::{
     error_types::{Error, ErrorType},
@@ -100,8 +102,7 @@ impl Interpreter {
         if symbol.ty != ty {
             return Err(Error::new(
                 ErrorType::TypeMismatch,
-                symbol.pos.line,
-                symbol.pos.col,
+                symbol.pos,
                 format!("{:?}", ty),
                 Some("invalid assignment type"),
             ));
@@ -160,13 +161,12 @@ impl Interpreter {
         let right_type = right.get_type();
         let position = exp.position.clone();
         if left_type != right_type {
-            return Err(Error {
-                error_type: ErrorType::TypeMismatch,
-                start_line: position.line,
-                start_col: position.col,
-                found: format!("{:?} / {:?}", left_type, right_type),
-                message: Some("division by mismatched operators".into()),
-            });
+            return Err(Error::new(
+                ErrorType::TypeMismatch,
+                position,
+                format!("{:?} / {:?}", left_type, right_type),
+                None,
+            ));
         }
         let res: Value;
         if left_type == Type::I32 {
@@ -251,8 +251,7 @@ impl Interpreter {
         if num_params != num_args {
             return Err(Error::new(
                 ErrorType::InvalidParams,
-                position.line,
-                position.col,
+                position,
                 format!("{:?}", args.len()),
                 Some("incorrect number of arguments"),
             ));
@@ -272,8 +271,7 @@ impl Interpreter {
             if arg_symbol.ty != param.param_type {
                 return Err(Error::new(
                     ErrorType::TypeMismatch,
-                    position.line,
-                    position.col,
+                    position,
                     "type mismatch",
                     Some("check function call"),
                 ));
@@ -293,8 +291,7 @@ impl Interpreter {
         if function_returned_type != func.returns {
             return Err(Error::new(
                 ErrorType::TypeMismatch,
-                position.line,
-                position.col,
+                position,
                 format!("{:?}", function_returned_type),
                 Some("function returns wrong type"),
             ));

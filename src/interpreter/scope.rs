@@ -23,7 +23,14 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
     };
     let pos = Position { col: 0, line: 0 };
     let names = vec!["floor", "print", "println", "panic", "read", "assert"];
-    let functions = vec![std_floor, std_print, std_println, std_panic, std_read, std_assert];
+    let functions = vec![
+        std_floor,
+        std_print,
+        std_println,
+        std_panic,
+        std_read,
+        std_assert,
+    ];
     for (name, function) in zip(names, functions) {
         let symbol = Symbol {
             pos: pos.clone(),
@@ -71,12 +78,6 @@ impl Scope {
         if let Some(parent) = &self.parent {
             return parent.get_symbol(identifier, pos);
         }
-        Err(Error {
-            error_type: ErrorType::InvalidSymbol,
-            start_line: pos.line,
-            start_col: pos.col,
-            found: identifier.to_string(),
-            message: Some("identifier name not found".to_string()),
-        })
+        Err(Error::new(ErrorType::InvalidSymbol, pos, identifier, None))
     }
 }

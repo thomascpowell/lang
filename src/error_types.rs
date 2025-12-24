@@ -1,4 +1,6 @@
-use crate::{interpreter::value::Value, lexer::token::Token, parser::ast::Statement};
+use crate::{
+    interpreter::value::Value, lexer::token::Token, parser::ast::Statement, position::Position,
+};
 
 /**
 * Error Types
@@ -36,8 +38,7 @@ pub enum ErrorType {
 #[derive(Debug)]
 pub struct Error {
     pub error_type: ErrorType,
-    pub start_line: usize,
-    pub start_col: usize,
+    pub position: Position,
     pub found: String,
     pub message: Option<String>,
 }
@@ -45,15 +46,13 @@ pub struct Error {
 impl Error {
     pub fn new(
         error_type: ErrorType,
-        start_line: usize,
-        start_col: usize,
+        position: Position,
         found: impl Into<String>,
         message: Option<&str>,
     ) -> Self {
         Self {
             error_type,
-            start_line,
-            start_col,
+            position,
             found: found.into(),
             message: message.map(|m| m.into()),
         }
@@ -63,8 +62,8 @@ impl Error {
         format!(
             "---\nerror: {:?} at line {}, col {}\nfound: '{}'\ninfo: {}\n---",
             self.error_type,
-            self.start_line,
-            self.start_col,
+            self.position.line,
+            self.position.col,
             self.found,
             self.message.as_deref().unwrap_or("none"),
         )
@@ -77,8 +76,7 @@ impl Error {
     pub fn generic_utt(tok: Token) -> Self {
         Error::new(
             ErrorType::UnexpectedTokenType,
-            tok.position.line,
-            tok.position.col,
+            tok.position,
             "unexpected token",
             None,
         )
@@ -88,8 +86,7 @@ impl Error {
         let pos = stmt.get_position();
         Error::new(
             ErrorType::UnexpectedStatementType,
-            pos.line,
-            pos.col,
+            pos.clone(),
             "unexpected statement type",
             None,
         )
@@ -99,8 +96,7 @@ impl Error {
     pub fn generic_uer() -> Self {
         Error::new(
             ErrorType::UnexpectedExecResult,
-            0,
-            0,
+            Position { line: 0, col: 0 },
             "unexpected exec result",
             None,
         )
@@ -116,19 +112,28 @@ impl Error {
         };
         return Error::new(
             ErrorType::InvalidOperand,
-            0,
-            0,
+            Position { line: 0, col: 0 },
             operator_type,
             Some("check operator and operand types"),
         );
     }
     pub fn generic_eof(expected: &str) -> Self {
-        Error::new(ErrorType::UnexpectedEOF, 0, 0, "EOF", Some(expected))
+        Error::new(
+            ErrorType::UnexpectedEOF,
+            Position { line: 0, col: 0 },
+            "EOF",
+            Some(expected),
+        )
     }
     pub fn generic() -> Self {
-        Error::new(ErrorType::Default, 0, 0, "unknown", None)
+        Error::new(
+            ErrorType::Default,
+            Position { line: 0, col: 0 },
+            "unknown",
+            None,
+        )
     }
     pub fn generic_message(ty: ErrorType, message: String) -> Self {
-        Error::new(ty, 0, 0, message, None)
+        Error::new(ty, Position { line: 0, col: 0 }, message, None)
     }
 }

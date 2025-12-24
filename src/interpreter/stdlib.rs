@@ -3,11 +3,14 @@ use std::io::{self, Write};
 use crate::{
     error_types::{Error, ErrorType},
     interpreter::{exec_result::ExecResult, value::Value},
+    position::Position,
 };
 
 /**
 * Standard library functions
 * */
+
+const POSITION: Position = Position { line: 0, col: 0 };
 
 pub fn std_print(args: Vec<Value>) -> Result<ExecResult, Error> {
     for a in &args {
@@ -29,7 +32,7 @@ pub fn std_read(_args: Vec<Value>) -> Result<ExecResult, Error> {
     let mut buffer = String::new();
     io::stdin()
         .read_line(&mut buffer)
-        .map_err(|_| Error::new(ErrorType::StdRead, 0, 0, "", None))?;
+        .map_err(|_| Error::new(ErrorType::StdRead, POSITION, "", None))?;
     Ok(ExecResult::Value(Value::String(buffer)))
 }
 
@@ -38,8 +41,7 @@ pub fn std_floor(args: Vec<Value>) -> Result<ExecResult, Error> {
         args.get(0)
             .ok_or(Error::new(
                 ErrorType::StdMissingArgs,
-                0,
-                0,
+                POSITION,
                 "missing argument to stdlib function",
                 None,
             ))?
@@ -56,8 +58,7 @@ pub fn std_assert(args: Vec<Value>) -> Result<ExecResult, Error> {
         .get(0)
         .ok_or(Error::new(
             ErrorType::StdMissingArgs,
-            0,
-            0,
+            POSITION,
             "missing argument to stdlib function",
             None,
         ))?
@@ -66,8 +67,7 @@ pub fn std_assert(args: Vec<Value>) -> Result<ExecResult, Error> {
     if !cond {
         return Err(Error::new(
             ErrorType::StdAssertionFailure,
-            0,
-            0,
+            POSITION,
             "assertion failure",
             optional_msg.as_deref(),
         ));

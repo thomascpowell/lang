@@ -1,6 +1,6 @@
 use crate::parser::ast::Literal;
-use crate::position::Position;
 use crate::parser::ast::Operator;
+use crate::position::Position;
 use crate::{error_types::*, lexer::token::*, parser::ast::*};
 pub mod ast;
 
@@ -76,8 +76,7 @@ impl Parser {
             TokenKind::Keyword(Keyword::Function) => self.handle_assignment(Type::Function, pos),
             _ => Err(Error::new(
                 ErrorType::UnexpectedTokenType,
-                type_tok.position.line,
-                type_tok.position.col,
+                pos,
                 type_tok.original,
                 Some("expected: type"),
             )),
@@ -118,13 +117,12 @@ impl Parser {
             TokenKind::Literal(_) => Expression::LiteralExp(self.parse_literal()?),
             TokenKind::Identifier(_) => Expression::IdentifierExp(self.parse_identifier()?),
             _ => {
-                return Err(Error {
-                    error_type: ErrorType::UnexpectedTokenType,
-                    start_line: pos.line,
-                    start_col: pos.col,
-                    found: tok.original,
-                    message: Some("expected literal or identifier".to_string()),
-                });
+                return Err(Error::new(
+                    ErrorType::UnexpectedTokenType,
+                    pos,
+                    tok.original,
+                    Some("expected literal or identifier"),
+                ));
             }
         };
         // right-recursive descent (if operator is present)
@@ -242,13 +240,12 @@ impl Parser {
         // confirm last statement is return
         let last = statement_list.last();
         if last.is_none() || !matches!(last.unwrap(), &Statement::Return(_)) {
-            return Err(Error {
-                start_line: pos.line,
-                start_col: pos.col,
-                error_type: ErrorType::FunctionShouldEndWithReturn,
-                message: Some("expected function body to end with a return".to_string()),
-                found: "no return statement".to_string(),
-            });
+            return Err(Error::new(
+                ErrorType::FunctionShouldEndWithReturn,
+                pos,
+                "function with no return statement",
+                None,
+            ));
         }
         Ok(Function {
             position: pos,
@@ -286,10 +283,10 @@ impl Parser {
             let tok = self
                 .peek()
                 .ok_or_else(|| Error::generic_eof("incomplete params list"))?;
+
             return Err(Error::new(
                 ErrorType::UnexpectedTokenType,
-                tok.position.line,
-                tok.position.col,
+                tok.position,
                 tok.original,
                 Some("expected valid params"),
             ));
@@ -400,8 +397,7 @@ impl Parser {
             Some(tok) if cond(&tok.kind) => Ok(tok),
             Some(tok) => Err(Error::new(
                 ErrorType::UnexpectedTokenType,
-                tok.position.line,
-                tok.position.col,
+                tok.position,
                 format!("{:?}", tok.kind),
                 None,
             )),

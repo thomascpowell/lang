@@ -38,8 +38,10 @@ impl Lexer {
     fn next_token(&mut self) -> Result<Token, Error> {
         // need to report the line the token starts on
         // useful for error reporting
-        let start_line = self.line;
-        let start_col = self.col;
+        let position = Position {
+            line: self.line,
+            col: self.col,
+        };
         // get the start character
         let c = self.peek().unwrap();
         // match every type of character
@@ -49,15 +51,13 @@ impl Lexer {
                 let digits = self.consume_while(|c| c.is_ascii_digit() || c == '.');
                 let int_err = Error::new(
                     ErrorType::InvalidIntLiteral,
-                    start_line,
-                    start_col,
+                    position.clone(),
                     &digits,
                     Some("probably overflow (i32)"),
                 );
                 let float_err = Error::new(
                     ErrorType::InvalidFloatLiteral,
-                    start_line,
-                    start_col,
+                    position.clone(),
                     &digits,
                     Some("probably overflow (f32)"),
                 );
@@ -82,8 +82,7 @@ impl Lexer {
                 if !self.has_next() {
                     return Err(Error::new(
                         ErrorType::UnterminatedStringLiteral,
-                        start_line,
-                        start_col,
+                        position,
                         s,
                         Some("you dropped this: \""),
                     ));
@@ -147,22 +146,13 @@ impl Lexer {
             '=' => self.make_simple_token(TokenKind::Operator(Operator::Assign), '='),
             // Unknown
             _ => {
-                return Err(Error::new(
-                    ErrorType::InvalidChar,
-                    start_line,
-                    start_col,
-                    c,
-                    None,
-                ));
+                return Err(Error::new(ErrorType::InvalidChar, position.clone(), c, None));
             }
         };
         let token = Token {
             kind,
             original,
-            position: Position {
-                line: start_line,
-                col: start_col,
-            },
+            position: position.clone(),
         };
         Ok(token)
     }
