@@ -136,16 +136,19 @@ impl Interpreter {
         let right_val = self.handle_expression(&exp.right)?.expect_value()?;
         let res: Value = match exp.operator {
             Operator::Div => self.handle_div(exp)?,
+
+            // TODO: overload these
+            Operator::Mul => Value::Int(left_val.expect_int()? * right_val.expect_int()?),
+            Operator::Le => Value::Bool(left_val.expect_int()? <= right_val.expect_int()?),
+            Operator::Ge => Value::Bool(left_val.expect_int()? >= right_val.expect_int()?),
             Operator::Add => Value::Int(left_val.expect_int()? + right_val.expect_int()?),
             Operator::Sub => Value::Int(left_val.expect_int()? - right_val.expect_int()?),
-            Operator::Mul => Value::Int(left_val.expect_int()? * right_val.expect_int()?),
+            Operator::Lt => Value::Bool(left_val.expect_int()? < right_val.expect_int()?),
+            Operator::Gt => Value::Bool(left_val.expect_int()? > right_val.expect_int()?),
+
             Operator::Mod => Value::Int(left_val.expect_int()? % right_val.expect_int()?),
             Operator::Eq => Value::Bool(left_val.expect_int()? == right_val.expect_int()?),
             Operator::Ne => Value::Bool(left_val.expect_int()? != right_val.expect_int()?),
-            Operator::Lt => Value::Bool(left_val.expect_int()? < right_val.expect_int()?),
-            Operator::Gt => Value::Bool(left_val.expect_int()? > right_val.expect_int()?),
-            Operator::Le => Value::Bool(left_val.expect_int()? <= right_val.expect_int()?),
-            Operator::Ge => Value::Bool(left_val.expect_int()? >= right_val.expect_int()?),
             Operator::And => Value::Bool(left_val.expect_bool()? && right_val.expect_bool()?),
             Operator::Or => Value::Bool(left_val.expect_bool()? || right_val.expect_bool()?),
             _ => unreachable!(),

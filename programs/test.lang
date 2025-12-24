@@ -1,3 +1,9 @@
 // contains whatever i'm testing at the moment
 
-assert("hi")
+function thing_doer = fn(do: function, thing: f32) -> f32 {
+  return do(thing)
+};
+
+f32 thing = 3.14159263
+
+println(thing_doer( fn(x: f32) -> f32 { return x / 2.0 }, thing))
