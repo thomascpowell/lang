@@ -76,8 +76,8 @@ impl Error {
     pub fn generic_utt(tok: Token) -> Self {
         Error::new(
             ErrorType::UnexpectedTokenType,
-            tok.line,
-            tok.col,
+            tok.position.line,
+            tok.position.col,
             "unexpected token",
             None,
         )
@@ -87,8 +87,8 @@ impl Error {
         let pos = stmt.get_position();
         Error::new(
             ErrorType::UnexpectedStatementType,
-            pos.start_line,
-            pos.start_col,
+            pos.line,
+            pos.col,
             "unexpected statement type",
             None,
         )

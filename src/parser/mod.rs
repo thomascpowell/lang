@@ -1,4 +1,5 @@
 use crate::parser::ast::Literal;
+use crate::position::Position;
 use crate::parser::ast::Operator;
 use crate::{error_types::*, lexer::token::*, parser::ast::*};
 pub mod ast;
@@ -55,15 +56,10 @@ impl Parser {
         // get the return token
         // or generic error because this should be impossible (caller validated)
         let tok = self.advance().ok_or_else(|| Error::generic())?;
-        // store the start position
-        let pos = Position {
-            start_line: tok.line,
-            start_col: tok.col,
-        };
         // parse the expression that follows
         let expr = self.parse_expression(0)?;
         let ret = Return {
-            position: pos,
+            position: tok.position,
             expression: expr,
         };
         Ok(ret)
@@ -71,10 +67,7 @@ impl Parser {
 
     fn parse_assignment(&mut self) -> Result<Assignment, Error> {
         let type_tok = self.expect(|x| matches!(x, TokenKind::Keyword(_)))?;
-        let pos = Position {
-            start_line: type_tok.line,
-            start_col: type_tok.col,
-        };
+        let pos = type_tok.position.clone();
         match type_tok.kind {
             TokenKind::Keyword(Keyword::I32) => self.handle_assignment(Type::I32, pos),
             TokenKind::Keyword(Keyword::F32) => self.handle_assignment(Type::F32, pos),
@@ -83,8 +76,8 @@ impl Parser {
             TokenKind::Keyword(Keyword::Function) => self.handle_assignment(Type::Function, pos),
             _ => Err(Error::new(
                 ErrorType::UnexpectedTokenType,
-                type_tok.line,
-                type_tok.col,
+                type_tok.position.line,
+                type_tok.position.col,
                 type_tok.original,
                 Some("expected: type"),
             )),
@@ -110,10 +103,7 @@ impl Parser {
         let tok = self
             .peek()
             .ok_or_else(|| Error::generic_eof("expected an expression"))?;
-        let pos = Position {
-            start_line: tok.line,
-            start_col: tok.col,
-        };
+        let pos = tok.position.clone();
         // prefix (starter) expressions
         match &tok.kind {
             TokenKind::Keyword(Keyword::Fn) => {
@@ -130,8 +120,8 @@ impl Parser {
             _ => {
                 return Err(Error {
                     error_type: ErrorType::UnexpectedTokenType,
-                    start_line: tok.line,
-                    start_col: tok.col,
+                    start_line: pos.line,
+                    start_col: pos.col,
                     found: tok.original,
                     message: Some("expected literal or identifier".to_string()),
                 });
@@ -165,10 +155,7 @@ impl Parser {
 
     fn parse_call(&mut self, callee: Expression) -> Result<Call, Error> {
         let tok = self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
-        let pos = Position {
-            start_line: tok.line,
-            start_col: tok.col,
-        };
+        let pos = tok.position.clone();
         // no args
         let mut args = Vec::new();
         if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
@@ -202,10 +189,7 @@ impl Parser {
 
     fn parse_literal(&mut self) -> Result<Literal, Error> {
         let tok = self.expect(|x| matches!(x, TokenKind::Literal(_)))?;
-        let pos = Position {
-            start_line: tok.line,
-            start_col: tok.col,
-        };
+        let pos = tok.position.clone();
         if let TokenKind::Literal(val) = tok.kind {
             return Ok(Literal {
                 position: pos,
@@ -217,10 +201,7 @@ impl Parser {
 
     fn parse_identifier(&mut self) -> Result<Identifier, Error> {
         let tok = self.expect(|x| matches!(x, TokenKind::Identifier(_)))?;
-        let pos = Position {
-            start_line: tok.line,
-            start_col: tok.col,
-        };
+        let pos = tok.position.clone();
         Ok(Identifier {
             position: pos,
             name: tok.original,
@@ -230,10 +211,7 @@ impl Parser {
     fn parse_function(&mut self) -> Result<Function, Error> {
         // consume fn (shouldnt be unsafe)
         let fn_keyword = self.advance().unwrap();
-        let pos = Position {
-            start_col: fn_keyword.col,
-            start_line: fn_keyword.line,
-        };
+        let pos = fn_keyword.position.clone();
         // parse param list
         let params = self.parse_params()?;
         // parse return type
@@ -265,8 +243,8 @@ impl Parser {
         let last = statement_list.last();
         if last.is_none() || !matches!(last.unwrap(), &Statement::Return(_)) {
             return Err(Error {
-                start_line: fn_keyword.line,
-                start_col: fn_keyword.col,
+                start_line: pos.line,
+                start_col: pos.col,
                 error_type: ErrorType::FunctionShouldEndWithReturn,
                 message: Some("expected function body to end with a return".to_string()),
                 found: "no return statement".to_string(),
@@ -310,8 +288,8 @@ impl Parser {
                 .ok_or_else(|| Error::generic_eof("incomplete params list"))?;
             return Err(Error::new(
                 ErrorType::UnexpectedTokenType,
-                tok.line,
-                tok.col,
+                tok.position.line,
+                tok.position.col,
                 tok.original,
                 Some("expected valid params"),
             ));
@@ -332,10 +310,7 @@ impl Parser {
             TokenKind::Keyword(Keyword::Function) => Type::Function,
             _ => return Err(Error::generic_utt(type_token)),
         };
-        let pos = Position {
-            start_line: id.line,
-            start_col: id.col,
-        };
+        let pos = id.position.clone();
         let ident_str = if let TokenKind::Identifier(ref s) = id.kind {
             s.clone()
         } else {
@@ -352,10 +327,7 @@ impl Parser {
         // match if
         let if_tok = self.expect(|x| matches!(x, TokenKind::Keyword(Keyword::If)))?;
         // get the position
-        let pos = Position {
-            start_col: if_tok.col,
-            start_line: if_tok.line,
-        };
+        let pos = if_tok.position.clone();
         // parse condition
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
         let cond = self.parse_expression(0)?;
@@ -428,8 +400,8 @@ impl Parser {
             Some(tok) if cond(&tok.kind) => Ok(tok),
             Some(tok) => Err(Error::new(
                 ErrorType::UnexpectedTokenType,
-                tok.line,
-                tok.col,
+                tok.position.line,
+                tok.position.col,
                 format!("{:?}", tok.kind),
                 None,
             )),

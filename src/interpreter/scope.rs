@@ -1,7 +1,8 @@
 use crate::{
     error_types::{Error, ErrorType},
     interpreter::{stdlib::*, symbol::Symbol, value::Value},
-    parser::ast::{Position, Type},
+    parser::ast::Type,
+    position::Position,
 };
 use std::{collections::HashMap, iter::zip, rc::Rc};
 
@@ -20,10 +21,7 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
         symbols: HashMap::new(),
         parent: None,
     };
-    let pos = Position {
-        start_col: 0,
-        start_line: 0,
-    };
+    let pos = Position { col: 0, line: 0 };
     let names = vec!["floor", "print", "println", "panic", "read"];
     let functions = vec![std_floor, std_print, std_println, std_panic, std_read];
     for (name, function) in zip(names, functions) {
@@ -75,8 +73,8 @@ impl Scope {
         }
         Err(Error {
             error_type: ErrorType::InvalidSymbol,
-            start_line: pos.start_line,
-            start_col: pos.start_col,
+            start_line: pos.line,
+            start_col: pos.col,
             found: identifier.to_string(),
             message: Some("identifier name not found".to_string()),
         })

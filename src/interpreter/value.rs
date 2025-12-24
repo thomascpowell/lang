@@ -1,7 +1,7 @@
 use crate::{
     error_types::Error,
     interpreter::{exec_result::ExecResult, symbol::Symbol},
-    parser::ast::{Function, Position, Type},
+    parser::ast::{Function, Type}, position::Position,
 };
 
 /**

@@ -23,16 +23,16 @@ fn run_cases(dir: &Path, should_fail: bool) {
         let program = fs::read_to_string(&path).unwrap();
         let result = test_exec(program);
 
-        if should_fail {
-            assert!(result.is_err(), r#"{name} should fail"#);
-            return;
+        match result {
+            Ok(_) => {
+                assert!(!should_fail, r#"{name} should fail"#)
+            }
+
+            Err(res) => {
+                assert!(should_fail, r#"{name} should succeed"#);
+                println!("\n\n{} has failed (expected):\n{}\n\n", name, res.display())
+            }
         }
-        assert!(
-            result.is_ok(),
-            "should pass: {} \nerror message: \n{}",
-            name,
-            result.unwrap_err().display()
-        );
     }
 }
 

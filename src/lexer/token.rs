@@ -1,3 +1,5 @@
+use crate::position::Position;
+
 /*
 * Token type
 * */
@@ -6,8 +8,7 @@
 pub struct Token {
     pub kind: TokenKind,
     pub original: String,
-    pub line: usize,
-    pub col: usize,
+    pub position: Position,
 }
 
 impl Token {

@@ -1,9 +1,9 @@
 use crate::interpreter::{scope::get_stdlib_scope, value::Value};
-use std::{collections::HashMap, iter::zip, rc::Rc};
+use std::{collections::HashMap, rc::Rc};
 
 use crate::{
     error_types::{Error, ErrorType},
-    interpreter::{exec_result::ExecResult, frame::Frame, scope::Scope, stdlib::*, symbol::*},
+    interpreter::{exec_result::ExecResult, frame::Frame, scope::Scope, symbol::*},
     parser::ast::*,
 };
 
@@ -100,8 +100,8 @@ impl Interpreter {
         if symbol.ty != ty {
             return Err(Error::new(
                 ErrorType::TypeMismatch,
-                symbol.pos.start_line,
-                symbol.pos.start_col,
+                symbol.pos.line,
+                symbol.pos.col,
                 format!("{:?}", ty),
                 Some("invalid assignment type"),
             ));
@@ -162,8 +162,8 @@ impl Interpreter {
         if left_type != right_type {
             return Err(Error {
                 error_type: ErrorType::TypeMismatch,
-                start_line: position.start_line,
-                start_col: position.start_col,
+                start_line: position.line,
+                start_col: position.col,
                 found: format!("{:?} / {:?}", left_type, right_type),
                 message: Some("division by mismatched operators".into()),
             });
@@ -251,8 +251,8 @@ impl Interpreter {
         if num_params != num_args {
             return Err(Error::new(
                 ErrorType::InvalidParams,
-                position.start_line,
-                position.start_col,
+                position.line,
+                position.col,
                 format!("{:?}", args.len()),
                 Some("incorrect number of arguments"),
             ));
@@ -269,12 +269,11 @@ impl Interpreter {
         for i in 0..num_args {
             let param = &func.params[i];
             let arg_symbol = &evaluated_args[i];
-            let arg = &args[i].clone();
             if arg_symbol.ty != param.param_type {
                 return Err(Error::new(
                     ErrorType::TypeMismatch,
-                    arg.position.start_line,
-                    arg.position.start_col,
+                    position.line,
+                    position.col,
                     "type mismatch",
                     Some("check function call"),
                 ));
@@ -294,8 +293,8 @@ impl Interpreter {
         if function_returned_type != func.returns {
             return Err(Error::new(
                 ErrorType::TypeMismatch,
-                position.start_line,
-                position.start_col,
+                position.line,
+                position.col,
                 format!("{:?}", function_returned_type),
                 Some("function returns wrong type"),
             ));
@@ -306,14 +305,6 @@ impl Interpreter {
     /*
      * Utility functions
      * */
-
-    fn push_scope(&mut self) {
-        let parent = self.scope.clone();
-        self.scope = Rc::new(Scope {
-            symbols: HashMap::new(),
-            parent: Some(parent),
-        });
-    }
 
     fn pop_scope(&mut self) {
         let parent = self.scope.parent.clone().expect("expected scope");

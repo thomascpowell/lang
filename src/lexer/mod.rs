@@ -1,5 +1,6 @@
 use crate::error_types::*;
 use crate::lexer::token::*;
+use crate::position::Position;
 pub mod token;
 
 /*
@@ -158,8 +159,10 @@ impl Lexer {
         let token = Token {
             kind,
             original,
-            line: start_line,
-            col: start_col,
+            position: Position {
+                line: start_line,
+                col: start_col,
+            },
         };
         Ok(token)
     }

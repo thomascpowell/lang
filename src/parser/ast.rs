@@ -1,4 +1,4 @@
-use crate::error_types::Error;
+use crate::{error_types::Error, position::Position};
 
 /*
 * Nonterminal types
@@ -165,11 +165,11 @@ pub type Operator = crate::lexer::token::Operator;
 * Metadata
 * */
 
-#[derive(Clone, Debug)]
-pub struct Position {
-    pub start_line: usize,
-    pub start_col: usize,
-}
+// #[derive(Clone, Debug)]
+// pub struct Position {
+//     pub start_line: usize,
+//     pub start_col: usize,
+// }
 
 /**
 * Printing AST

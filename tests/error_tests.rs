@@ -6,4 +6,3 @@ fn test_parser_error() {
     assert!(res.is_err());
     println!("{}", res.unwrap_err().display())
 }
-
