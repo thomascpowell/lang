@@ -1,7 +1,5 @@
-use crate::{
-    interpreter::{scope::get_stdlib_scope, value::Value},
-};
-use std::rc::Rc;
+use crate::interpreter::{scope::get_stdlib_scope, value::Value};
+use std::{ops, rc::Rc};
 
 use crate::{
     error_types::{Error, ErrorType},
@@ -134,50 +132,38 @@ impl Interpreter {
     fn handle_binary(&mut self, exp: BinaryExp) -> Result<ExecResult, Error> {
         let left_val = self.handle_expression(&exp.left)?.expect_value()?;
         let right_val = self.handle_expression(&exp.right)?.expect_value()?;
-        let res: Value = match exp.operator {
-            Operator::Div => self.handle_div(exp)?,
+        let left_type = left_val.get_type();
+        let right_type = right_val.get_type();
+        let position = exp.position;
 
-            // TODO: overload these
-            Operator::Mul => Value::Int(left_val.expect_int()? * right_val.expect_int()?),
+        let overload_err = Error::new(
+            ErrorType::InvalidOperand,
+            position,
+            format!("{:?} {:?} {:?}", left_type, exp.operator, right_type),
+            Some("operand types must match"),
+        );
+
+        let res: Value = match exp.operator {
+            Operator::Mul => (left_val * right_val).ok_or_else(|| overload_err)?,
+            Operator::Div => (left_val / right_val).ok_or_else(|| overload_err)?,
+            Operator::Add => (left_val + right_val).ok_or_else(|| overload_err)?,
+            Operator::Sub => (left_val - right_val).ok_or_else(|| overload_err)?,
+
+            // TODO: refactor these like above
             Operator::Le => Value::Bool(left_val.expect_int()? <= right_val.expect_int()?),
             Operator::Ge => Value::Bool(left_val.expect_int()? >= right_val.expect_int()?),
-            Operator::Add => Value::Int(left_val.expect_int()? + right_val.expect_int()?),
-            Operator::Sub => Value::Int(left_val.expect_int()? - right_val.expect_int()?),
             Operator::Lt => Value::Bool(left_val.expect_int()? < right_val.expect_int()?),
             Operator::Gt => Value::Bool(left_val.expect_int()? > right_val.expect_int()?),
-
-            Operator::Mod => Value::Int(left_val.expect_int()? % right_val.expect_int()?),
             Operator::Eq => Value::Bool(left_val.expect_int()? == right_val.expect_int()?),
             Operator::Ne => Value::Bool(left_val.expect_int()? != right_val.expect_int()?),
+
+            // These are fine
+            Operator::Mod => Value::Int(left_val.expect_int()? % right_val.expect_int()?),
             Operator::And => Value::Bool(left_val.expect_bool()? && right_val.expect_bool()?),
             Operator::Or => Value::Bool(left_val.expect_bool()? || right_val.expect_bool()?),
             _ => unreachable!(),
         };
         Ok(ExecResult::Value(res))
-    }
-
-    // overloaded, supports i32 and f32
-    fn handle_div(&mut self, exp: BinaryExp) -> Result<Value, Error> {
-        let left = self.handle_expression(&exp.left)?.expect_value()?;
-        let right = self.handle_expression(&exp.right)?.expect_value()?;
-        let left_type = left.get_type();
-        let right_type = right.get_type();
-        let position = exp.position.clone();
-        if left_type != right_type {
-            return Err(Error::new(
-                ErrorType::TypeMismatch,
-                position,
-                format!("{:?} / {:?}", left_type, right_type),
-                None,
-            ));
-        }
-        let res: Value;
-        if left_type == Type::I32 {
-            res = Value::Int(left.expect_int()? / right.expect_int()?);
-        } else {
-            res = Value::Float(left.expect_float()? / right.expect_float()?);
-        }
-        return Ok(res);
     }
 
     fn handle_if(&mut self, exp: IfExp) -> Result<ExecResult, Error> {

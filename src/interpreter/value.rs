@@ -1,7 +1,10 @@
+use std::ops::{Add, Div, Mul, Sub};
+
 use crate::{
     error_types::Error,
     interpreter::{exec_result::ExecResult, symbol::Symbol},
-    parser::ast::{Function, Type}, position::Position,
+    parser::ast::{Function, Type},
+    position::Position,
 };
 
 /**
@@ -80,3 +83,52 @@ impl Value {
         }
     }
 }
+
+/**
+* Operator implementations
+* */
+
+impl Mul for Value {
+    type Output = Option<Value>;
+    fn mul(self, rhs: Value) -> Option<Value> {
+        match (self, rhs) {
+            (Value::Int(a), Value::Int(b)) => Some(Value::Int(a * b)),
+            (Value::Float(a), Value::Float(b)) => Some(Value::Float(a * b)),
+            _ => None,
+        }
+    }
+}
+
+impl Div for Value {
+    type Output = Option<Value>;
+    fn div(self, rhs: Value) -> Option<Value> {
+        match (self, rhs) {
+            (Value::Int(a), Value::Int(b)) => Some(Value::Int(a / b)),
+            (Value::Float(a), Value::Float(b)) => Some(Value::Float(a / b)),
+            _ => None,
+        }
+    }
+}
+
+impl Add for Value {
+    type Output = Option<Value>;
+    fn add(self, rhs: Value) -> Option<Value> {
+        match (self, rhs) {
+            (Value::Int(a), Value::Int(b)) => Some(Value::Int(a + b)),
+            (Value::Float(a), Value::Float(b)) => Some(Value::Float(a + b)),
+            _ => None,
+        }
+    }
+}
+
+impl Sub for Value {
+    type Output = Option<Value>;
+    fn sub(self, rhs: Value) -> Option<Value> {
+        match (self, rhs) {
+            (Value::Int(a), Value::Int(b)) => Some(Value::Int(a - b)),
+            (Value::Float(a), Value::Float(b)) => Some(Value::Float(a - b)),
+            _ => None,
+        }
+    }
+}
+
