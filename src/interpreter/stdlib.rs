@@ -72,7 +72,6 @@ pub fn std_assert(args: Vec<Value>) -> Result<ExecResult, Error> {
             optional_msg.as_deref(),
         ));
     };
-
     Ok(ExecResult::Unit)
 }
 

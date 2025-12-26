@@ -144,19 +144,18 @@ impl Interpreter {
         );
 
         let res: Value = match exp.operator {
+            // operand types must match
             Operator::Mul => (left_val * right_val).ok_or_else(|| overload_err)?,
             Operator::Div => (left_val / right_val).ok_or_else(|| overload_err)?,
             Operator::Add => (left_val + right_val).ok_or_else(|| overload_err)?,
             Operator::Sub => (left_val - right_val).ok_or_else(|| overload_err)?,
-
-            // TODO: refactor these like above
-            Operator::Le => Value::Bool(left_val.expect_int()? <= right_val.expect_int()?),
-            Operator::Ge => Value::Bool(left_val.expect_int()? >= right_val.expect_int()?),
-            Operator::Lt => Value::Bool(left_val.expect_int()? < right_val.expect_int()?),
-            Operator::Gt => Value::Bool(left_val.expect_int()? > right_val.expect_int()?),
-            Operator::Eq => Value::Bool(left_val.expect_int()? == right_val.expect_int()?),
-            Operator::Ne => Value::Bool(left_val.expect_int()? != right_val.expect_int()?),
-
+            // any numeric type is valid here
+            Operator::Le => Value::Bool(left_val.expect_numeric()? <= right_val.expect_numeric()?),
+            Operator::Ge => Value::Bool(left_val.expect_numeric()? >= right_val.expect_numeric()?),
+            Operator::Lt => Value::Bool(left_val.expect_numeric()? < right_val.expect_numeric()?),
+            Operator::Gt => Value::Bool(left_val.expect_numeric()? > right_val.expect_numeric()?),
+            Operator::Eq => Value::Bool(left_val.expect_numeric()? == right_val.expect_numeric()?),
+            Operator::Ne => Value::Bool(left_val.expect_numeric()? != right_val.expect_numeric()?),
             // These are fine
             Operator::Mod => Value::Int(left_val.expect_int()? % right_val.expect_int()?),
             Operator::And => Value::Bool(left_val.expect_bool()? && right_val.expect_bool()?),

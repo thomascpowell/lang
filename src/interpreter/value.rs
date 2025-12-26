@@ -35,6 +35,14 @@ impl Value {
         Err(Error::generic_invalid_operand(self))
     }
 
+    pub fn expect_numeric(&self) -> Result<f32, Error> {
+        match self {
+            Value::Float(x) => Ok(*x),
+            Value::Int(x) => Ok(*x as f32),
+            _ => Err(Error::generic_invalid_operand(self)),
+        }
+    }
+
     pub fn expect_bool(&self) -> Result<bool, Error> {
         if let Value::Bool(x) = self {
             return Ok(*x);
@@ -131,4 +139,3 @@ impl Sub for Value {
         }
     }
 }
-
