@@ -6,7 +6,6 @@ closures:
 - Value::Closure, runtime computed with a frozen Scope
 
 qol changes:
-- make overloads for more operators
 - ast printing could be cleaner
 
 code improvements:

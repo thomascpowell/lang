@@ -136,7 +136,7 @@ impl Interpreter {
         let right_type = right_val.get_type();
         let position = exp.position;
 
-        let overload_err = Error::new(
+        let arithmetic_operand_error = Error::new(
             ErrorType::InvalidOperand,
             position,
             format!("{:?} {:?} {:?}", left_type, exp.operator, right_type),
@@ -144,20 +144,29 @@ impl Interpreter {
         );
 
         let res: Value = match exp.operator {
-            // operand types must match
-            Operator::Mul => (left_val * right_val).ok_or_else(|| overload_err)?,
-            Operator::Div => (left_val / right_val).ok_or_else(|| overload_err)?,
-            Operator::Add => (left_val + right_val).ok_or_else(|| overload_err)?,
-            Operator::Sub => (left_val - right_val).ok_or_else(|| overload_err)?,
-            // any numeric type is valid here
+            // modulo operator:
+            // - operands: i32
+            // - returns: i32
+            Operator::Mod => Value::Int(left_val.expect_int()? % right_val.expect_int()?),
+            // arithmetic operators: 
+            // - operands: numeric types, must match
+            // - returns: same type
+            Operator::Mul => (left_val * right_val).ok_or_else(|| arithmetic_operand_error)?,
+            Operator::Div => (left_val / right_val).ok_or_else(|| arithmetic_operand_error)?,
+            Operator::Add => (left_val + right_val).ok_or_else(|| arithmetic_operand_error)?,
+            Operator::Sub => (left_val - right_val).ok_or_else(|| arithmetic_operand_error)?,
+            // comparison operators
+            // - operands: numeric types
+            // - returns: bool
             Operator::Le => Value::Bool(left_val.expect_numeric()? <= right_val.expect_numeric()?),
             Operator::Ge => Value::Bool(left_val.expect_numeric()? >= right_val.expect_numeric()?),
             Operator::Lt => Value::Bool(left_val.expect_numeric()? < right_val.expect_numeric()?),
             Operator::Gt => Value::Bool(left_val.expect_numeric()? > right_val.expect_numeric()?),
             Operator::Eq => Value::Bool(left_val.expect_numeric()? == right_val.expect_numeric()?),
             Operator::Ne => Value::Bool(left_val.expect_numeric()? != right_val.expect_numeric()?),
-            // These are fine
-            Operator::Mod => Value::Int(left_val.expect_int()? % right_val.expect_int()?),
+            // boolean operators
+            // - operands: bool
+            // - returns: bool
             Operator::And => Value::Bool(left_val.expect_bool()? && right_val.expect_bool()?),
             Operator::Or => Value::Bool(left_val.expect_bool()? || right_val.expect_bool()?),
             _ => unreachable!(),
