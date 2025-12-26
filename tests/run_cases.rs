@@ -20,6 +20,7 @@ fn run_cases(dir: &Path, should_fail: bool) {
             .to_str()
             .expect("failed to get file name")
             .to_string();
+        println!("\n\nrunning {}", name);
         let program = fs::read_to_string(&path).unwrap();
         let result = test_exec(program);
         match result {
@@ -28,7 +29,7 @@ fn run_cases(dir: &Path, should_fail: bool) {
             }
             Err(res) => {
                 assert!(should_fail, r#"{name} should succeed"#);
-                println!("\n\n{} has failed (expected):\n{}\n\n", name, res.display())
+                println!("\n\n{} has failed (expected):\n{}", name, res.display())
             }
         }
     }
