@@ -109,6 +109,7 @@ impl Error {
             Value::String(_) => "string",
             Value::Function(_) => "function",
             Value::NativeFunction(_) => " native function",
+            Value::Uninitialized => unreachable!(),
         };
         return Error::new(
             ErrorType::InvalidOperand,

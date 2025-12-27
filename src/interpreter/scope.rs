@@ -4,15 +4,15 @@ use crate::{
     parser::ast::Type,
     position::Position,
 };
-use std::{collections::HashMap, iter::zip, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, iter::zip, rc::Rc};
 
 /**
 * Scope type
 * */
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Scope {
-    pub symbols: HashMap<String, Symbol>,
+    pub symbols: HashMap<String, Rc<RefCell<Symbol>>>,
     pub parent: Option<Rc<Scope>>,
 }
 
@@ -37,7 +37,9 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
             ty: Type::Function,
             val: Value::NativeFunction(function),
         };
-        new_scope.symbols.insert(name.into(), symbol);
+        new_scope
+            .symbols
+            .insert(name.into(), Rc::new(RefCell::new(symbol)));
     }
     return Rc::new(new_scope);
 }
@@ -51,12 +53,14 @@ impl Scope {
     }
 
     // creates a new scope with itself as the parent
-    pub fn extend(self: &Rc<Scope>, name: String, symbol: Symbol) -> Rc<Scope> {
+    pub fn extend(self: &Rc<Scope>, name: String, symbol: Rc<RefCell<Symbol>>) -> Rc<Scope> {
         let mut new_scope = Scope {
             symbols: HashMap::new(),
             parent: Some(Rc::clone(self)),
         };
-        new_scope.symbols.insert(name, symbol);
+        new_scope
+            .symbols
+            .insert(name, symbol);
         Rc::new(new_scope)
     }
 
@@ -66,17 +70,35 @@ impl Scope {
             parent: Some(Rc::clone(self)),
         };
         for (name, symbol) in binds.iter() {
-            new_scope.symbols.insert(name.clone(), symbol.clone());
+            new_scope
+                .symbols
+                .insert(name.clone(), Rc::new(RefCell::new(symbol.clone())));
         }
         Rc::new(new_scope)
     }
 
+    // gets the requested symbol (read only)
     pub fn get_symbol(&self, identifier: &str, pos: Position) -> Result<Symbol, Error> {
         if let Some(symbol) = self.symbols.get(identifier) {
-            return Ok(symbol.clone());
+            return Ok(symbol.borrow().clone());
         }
         if let Some(parent) = &self.parent {
             return parent.get_symbol(identifier, pos);
+        }
+        Err(Error::new(ErrorType::InvalidSymbol, pos, identifier, None))
+    }
+
+    // gets the RefCell corresponding to the identifier
+    pub fn get_symbol_cell(
+        &self,
+        identifier: &str,
+        pos: Position,
+    ) -> Result<Rc<RefCell<Symbol>>, Error> {
+        if let Some(cell) = self.symbols.get(identifier) {
+            return Ok(Rc::clone(cell));
+        }
+        if let Some(parent) = &self.parent {
+            return parent.get_symbol_cell(identifier, pos);
         }
         Err(Error::new(ErrorType::InvalidSymbol, pos, identifier, None))
     }

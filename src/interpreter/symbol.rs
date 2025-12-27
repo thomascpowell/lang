@@ -6,7 +6,7 @@ use crate::position::Position;
 * Symbol type
 * */
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Symbol {
     pub pos: Position,
     pub ty: Type,

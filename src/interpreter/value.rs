@@ -2,8 +2,8 @@ use std::ops::{Add, Div, Mul, Sub};
 
 use crate::{
     error_types::Error,
-    interpreter::{exec_result::ExecResult, symbol::Symbol},
-    parser::ast::{Function, Type},
+    interpreter::{closure::Closure, exec_result::ExecResult, symbol::Symbol},
+    parser::ast::{Type},
     position::Position,
 };
 
@@ -17,8 +17,9 @@ pub enum Value {
     Float(f32),
     Bool(bool),
     String(String),
-    Function(Function),
+    Function(Closure),
     NativeFunction(fn(Vec<Value>) -> Result<ExecResult, Error>),
+    Uninitialized,
 }
 
 impl Value {
@@ -55,7 +56,7 @@ impl Value {
         }
         Err(Error::generic_invalid_operand(self))
     }
-    pub fn expect_function(&mut self) -> Result<Function, Error> {
+    pub fn expect_function(&mut self) -> Result<Closure, Error> {
         if let Value::Function(x) = self {
             return Ok(x.clone());
         }
@@ -77,6 +78,7 @@ impl Value {
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
             Value::NativeFunction(_) | Value::Function(_) => Type::Function,
+            Value::Uninitialized => unreachable!(),
         }
     }
 
@@ -88,6 +90,7 @@ impl Value {
             Self::String(s) => s.clone(),
             Self::Function(_) => "[function]".to_string(),
             Self::NativeFunction(_) => "[native function]".to_string(),
+            Value::Uninitialized => unreachable!(),
         }
     }
 }

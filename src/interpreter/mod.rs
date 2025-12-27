@@ -1,5 +1,5 @@
-use crate::interpreter::{scope::get_stdlib_scope, value::Value};
-use std::{rc::Rc};
+use crate::interpreter::{closure::Closure, scope::get_stdlib_scope, value::Value};
+use std::{cell::RefCell, rc::Rc};
 
 use crate::{
     error_types::{Error, ErrorType},
@@ -88,25 +88,51 @@ impl Interpreter {
     }
 
     fn interpret_assignment(&mut self, a: &Assignment) -> Result<ExecResult, Error> {
-        let symbol_value = self.handle_expression(&a.expression)?.expect_value()?;
+        // need to create a closure in this case
+        if a.assignment_type == Type::Function {
+            return self.handle_closure(a);
+        }
+        // otherwise bind as usual
+        let rhs = self.handle_expression(&a.expression)?.expect_value()?;
         let symbol = Symbol {
             pos: a.position.clone(),
             ty: a.assignment_type.clone(),
-            val: symbol_value,
+            val: rhs,
         };
-        // make sure symbol matches
-        let ty = symbol.val.get_type();
-        if symbol.ty != ty {
+        // make sure types match
+        if a.assignment_type != symbol.val.get_type() {
             return Err(Error::new(
                 ErrorType::TypeMismatch,
-                symbol.pos,
-                format!("{:?}", ty),
+                a.position.clone(),
+                format!("{:?}", symbol.ty),
                 Some("invalid assignment type"),
             ));
         }
         // push to the scope stack
-        self.scope = self.scope.extend(a.identifier.clone(), symbol);
-        // self.set_symbol(&a.identifier, symbol)?;
+        self.scope = self
+            .scope
+            .extend(a.identifier.clone(), Rc::new(RefCell::new(symbol)));
+        Ok(ExecResult::Unit)
+    }
+
+    fn handle_closure(&mut self, a: &Assignment) -> Result<ExecResult, Error> {
+        let name = a.identifier.clone();
+        let symbol = Symbol {
+            pos: a.position.clone(),
+            ty: Type::Function,
+            val: Value::Uninitialized,
+        };
+        let cell = Rc::new(RefCell::new(symbol));
+        // bind name to cell
+        self.scope = self.scope.extend(name, cell.clone());
+        // evaluate rhs
+        let rhs = self.handle_expression(&a.expression)?.expect_value()?;
+        // update/patch the cell (enables recursion)
+        *cell.borrow_mut() = Symbol {
+            pos: a.position.clone(),
+            ty: Type::Function,
+            val: rhs,
+        };
         Ok(ExecResult::Unit)
     }
 
@@ -119,12 +145,17 @@ impl Interpreter {
     fn handle_expression(&mut self, expression: &Expression) -> Result<ExecResult, Error> {
         match expression {
             Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
-            Expression::FunctionExp(exp) => Ok(ExecResult::Value(Value::Function(exp.clone()))),
             Expression::CallExp(exp) => self.handle_call(exp.clone()),
             Expression::LiteralExp(exp) => self.handle_literal(exp.clone()),
             Expression::BinaryExp(exp) => self.handle_binary(exp.clone()),
             Expression::IfExp(exp) => self.handle_if(exp.clone()),
             Expression::ParenExp(exp) => self.handle_paren(exp.clone()),
+
+            // expression is a function by itself
+            Expression::FunctionExp(exp) => Ok(ExecResult::Value(Value::Function(Closure {
+                node: exp.clone(),
+                env: Rc::clone(&self.scope),
+            }))),
         }
     }
 
@@ -195,7 +226,6 @@ impl Interpreter {
     fn handle_call(&mut self, call: Call) -> Result<ExecResult, Error> {
         let callee = call.callee.clone();
         match *callee {
-            Expression::FunctionExp(function) => self.run_function(function, call.args),
             Expression::IdentifierExp(identifier) => {
                 let value = self
                     .scope
@@ -209,8 +239,8 @@ impl Interpreter {
 
     fn handle_call_function(&mut self, value: Value, call: Call) -> Result<ExecResult, Error> {
         match value {
-            // if the corresponding value is a function, run it
-            Value::Function(x) => self.run_function(x, call.args),
+            // if the corresponding value is a function, run the closure
+            Value::Function(x) => self.run_closure(x, call.args),
             // case of stdlib call
             Value::NativeFunction(f) => {
                 // evaluate arguments first
@@ -233,10 +263,13 @@ impl Interpreter {
             .clone())
     }
 
-    fn run_function(&mut self, func: Function, args: Vec<Argument>) -> Result<ExecResult, Error> {
-        let num_params = func.params.len();
+    fn run_closure(&mut self, closure: Closure, args: Vec<Argument>) -> Result<ExecResult, Error> {
+        let num_params = closure.node.params.len();
         let num_args = args.len();
+        let func = closure.node;
         let position = func.position;
+
+        let closure_scope = closure.env;
         // ensure correct number of arguments are passed
         if num_params != num_args {
             return Err(Error::new(
@@ -268,11 +301,14 @@ impl Interpreter {
             }
             binds.push((param.identifier.clone(), arg_symbol.clone()));
         }
-        self.scope = self.scope.extend_many(binds);
+        let old_scope = self.scope.clone();
+        // switch to the closure scope
+        // closure scope = enviroment it was defined + args
+        self.scope = closure_scope.extend_many(binds);
         // push a new frame
         self.frames.push(Frame::new(func.body.clone()));
         let result = self.run_frame()?;
-        self.pop_scope();
+        self.scope = old_scope;
         let res = match result {
             ExecResult::Returned(v) => ExecResult::Value(v),
             _ => unreachable!(),
@@ -287,14 +323,5 @@ impl Interpreter {
             ));
         }
         Ok(res)
-    }
-
-    /*
-     * Utility functions
-     * */
-
-    fn pop_scope(&mut self) {
-        let parent = self.scope.parent.clone().expect("expected scope");
-        self.scope = parent;
     }
 }
