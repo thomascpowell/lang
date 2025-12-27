@@ -58,7 +58,7 @@ impl Interpreter {
                 Some(f) => f,
                 None => return Ok(ExecResult::Unit),
             };
-            // case: implicit return
+            // case: EOF
             if frame.done() {
                 return Ok(ExecResult::Unit);
             }
@@ -70,8 +70,7 @@ impl Interpreter {
                 ExecResult::Returned(v) => {
                     return Ok(ExecResult::Returned(v));
                 }
-                // case: continue
-                // (put the frame back)
+                // case: continue (put the frame back)
                 _ => {
                     frame.advance();
                     self.frames.push(frame);
@@ -144,29 +143,21 @@ impl Interpreter {
         );
 
         let res: Value = match exp.operator {
-            // modulo operator:
-            // - operands: i32
-            // - returns: i32
+            // modulo operator: (operands: i32; returns: i32)
             Operator::Mod => Value::Int(left_val.expect_int()? % right_val.expect_int()?),
-            // arithmetic operators: 
-            // - operands: numeric types, must match
-            // - returns: same type
+            // arithmetic operators: (operands: numeric types, must match; returns: same type)
             Operator::Mul => (left_val * right_val).ok_or_else(|| arithmetic_operand_error)?,
             Operator::Div => (left_val / right_val).ok_or_else(|| arithmetic_operand_error)?,
             Operator::Add => (left_val + right_val).ok_or_else(|| arithmetic_operand_error)?,
             Operator::Sub => (left_val - right_val).ok_or_else(|| arithmetic_operand_error)?,
-            // comparison operators
-            // - operands: numeric types
-            // - returns: bool
+            // comparison operators: (operands: numeric types; returns: bool)
             Operator::Le => Value::Bool(left_val.expect_numeric()? <= right_val.expect_numeric()?),
             Operator::Ge => Value::Bool(left_val.expect_numeric()? >= right_val.expect_numeric()?),
             Operator::Lt => Value::Bool(left_val.expect_numeric()? < right_val.expect_numeric()?),
             Operator::Gt => Value::Bool(left_val.expect_numeric()? > right_val.expect_numeric()?),
             Operator::Eq => Value::Bool(left_val.expect_numeric()? == right_val.expect_numeric()?),
             Operator::Ne => Value::Bool(left_val.expect_numeric()? != right_val.expect_numeric()?),
-            // boolean operators
-            // - operands: bool
-            // - returns: bool
+            // boolean operators (operands: bool; returns: bool)
             Operator::And => Value::Bool(left_val.expect_bool()? && right_val.expect_bool()?),
             Operator::Or => Value::Bool(left_val.expect_bool()? || right_val.expect_bool()?),
             _ => unreachable!(),
@@ -202,32 +193,34 @@ impl Interpreter {
     }
 
     fn handle_call(&mut self, call: Call) -> Result<ExecResult, Error> {
-        let callee = call.callee;
+        let callee = call.callee.clone();
         match *callee {
             Expression::FunctionExp(function) => self.run_function(function, call.args),
             Expression::IdentifierExp(identifier) => {
-                let symbol = self
+                let value = self
                     .scope
                     .get_symbol(&identifier.name, identifier.position.clone())?
-                    .val
-                    .clone();
-                match symbol {
-                    // if the corresponding value is a function, run it
-                    Value::Function(x) => self.run_function(x, call.args),
-                    // case of stdlib call
-                    Value::NativeFunction(f) => {
-                        // evaluate arguments first
-                        let mut arg_values = Vec::new();
-                        for arg in call.args {
-                            arg_values.push(self.handle_expression(&arg.value)?.expect_value()?);
-                        }
-                        f(arg_values)
-                    }
-                    // otherwise, return unit type
-                    _ => Ok(ExecResult::Unit),
-                }
+                    .val;
+                self.handle_call_function(value, call)
             }
-            // otherwise, return unit type (result of calling anything else)
+            _ => Ok(ExecResult::Unit),
+        }
+    }
+
+    fn handle_call_function(&mut self, value: Value, call: Call) -> Result<ExecResult, Error> {
+        match value {
+            // if the corresponding value is a function, run it
+            Value::Function(x) => self.run_function(x, call.args),
+            // case of stdlib call
+            Value::NativeFunction(f) => {
+                // evaluate arguments first
+                let mut arg_values = Vec::new();
+                for arg in call.args {
+                    arg_values.push(self.handle_expression(&arg.value)?.expect_value()?);
+                }
+                f(arg_values)
+            }
+            // otherwise, return unit type (calling any other value, e.g. 7())
             _ => Ok(ExecResult::Unit),
         }
     }

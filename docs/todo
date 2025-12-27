@@ -1,12 +1,9 @@
-lists:
-- plans tbd
-- functional style
-
 closures: 
 - Value::Closure, runtime computed with a frozen Scope
 
 qol changes:
 - ast printing could be cleaner
 
-code improvements:
-- errors should use standard Position type
+lists:
+- plans tbd
+- functional style
