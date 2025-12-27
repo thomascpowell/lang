@@ -1,4 +1,4 @@
-use crate::interpreter::{closure::Closure, scope::get_stdlib_scope, value::Value};
+use crate::interpreter::{closure::Closure, scope::*, value::Value};
 use std::{cell::RefCell, rc::Rc};
 
 use crate::{
@@ -80,11 +80,11 @@ impl Interpreter {
     }
 
     fn exec(&mut self, stmt: &Statement) -> Result<ExecResult, Error> {
-        return match stmt {
+        match stmt {
             Statement::Assignment(a) => self.interpret_assignment(a),
             Statement::Expression(e) => self.handle_expression(&e),
             Statement::Return(r) => self.interpret_return(r),
-        };
+        }
     }
 
     fn interpret_assignment(&mut self, a: &Assignment) -> Result<ExecResult, Error> {
@@ -92,14 +92,13 @@ impl Interpreter {
         if a.assignment_type == Type::Function {
             return self.handle_closure(a);
         }
-        // otherwise bind as usual
         let rhs = self.handle_expression(&a.expression)?.expect_value()?;
         let symbol = Symbol {
             pos: a.position.clone(),
             ty: a.assignment_type.clone(),
             val: rhs,
         };
-        // make sure types match
+        // validate types
         if a.assignment_type != symbol.val.get_type() {
             return Err(Error::new(
                 ErrorType::TypeMismatch,
@@ -108,10 +107,10 @@ impl Interpreter {
                 Some("invalid assignment type"),
             ));
         }
-        // push to the scope stack
-        self.scope = self
-            .scope
-            .extend(a.identifier.clone(), Rc::new(RefCell::new(symbol)));
+        // bind
+        let name = a.identifier.clone();
+        let cell = Rc::new(RefCell::new(symbol));
+        self.scope = self.scope.extend(name, cell);
         Ok(ExecResult::Unit)
     }
 
@@ -122,8 +121,8 @@ impl Interpreter {
             ty: Type::Function,
             val: Value::Uninitialized,
         };
-        let cell = Rc::new(RefCell::new(symbol));
         // bind name to cell
+        let cell = Rc::new(RefCell::new(symbol));
         self.scope = self.scope.extend(name, cell.clone());
         // evaluate rhs
         let rhs = self.handle_expression(&a.expression)?.expect_value()?;
@@ -150,8 +149,6 @@ impl Interpreter {
             Expression::BinaryExp(exp) => self.handle_binary(exp.clone()),
             Expression::IfExp(exp) => self.handle_if(exp.clone()),
             Expression::ParenExp(exp) => self.handle_paren(exp.clone()),
-
-            // expression is a function by itself
             Expression::FunctionExp(exp) => Ok(ExecResult::Value(Value::Function(Closure {
                 node: exp.clone(),
                 env: Rc::clone(&self.scope),
@@ -268,7 +265,6 @@ impl Interpreter {
         let num_args = args.len();
         let func = closure.node;
         let position = func.position;
-
         let closure_scope = closure.env;
         // ensure correct number of arguments are passed
         if num_params != num_args {

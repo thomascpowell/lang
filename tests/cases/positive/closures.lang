@@ -1,0 +1,7 @@
+function mult = fn(arg: i32) -> function {
+  function res = fn(x: i32) -> i32 { return x * arg }
+  return res;
+}
+function triple = mult(3)
+
+assert(triple(3) == 9)

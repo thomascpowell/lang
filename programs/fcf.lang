@@ -1,0 +1,9 @@
+// first-class functions
+
+function mult = fn(arg: i32) -> function {
+  function res = fn(x: i32) -> i32 { return x * arg }
+  return res;
+}
+function triple = mult(3)
+
+println(triple(10)) // prints 30
