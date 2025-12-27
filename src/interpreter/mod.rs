@@ -1,5 +1,5 @@
 use crate::interpreter::{scope::get_stdlib_scope, value::Value};
-use std::{ops, rc::Rc};
+use std::{rc::Rc};
 
 use crate::{
     error_types::{Error, ErrorType},
