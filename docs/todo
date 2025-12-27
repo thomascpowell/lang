@@ -1,9 +1,0 @@
-closures: 
-- Value::Closure, runtime computed with a frozen Scope
-
-qol changes:
-- ast printing could be cleaner
-
-lists:
-- plans tbd
-- functional style
