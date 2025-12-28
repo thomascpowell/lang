@@ -1,9 +1,0 @@
-// square root function
-// i think this is a leetcode problem
-
-function sqrt = fn(x: i32) -> f32 {
-  // TODO
-  return 0;
-};
-
-sqrt(8);

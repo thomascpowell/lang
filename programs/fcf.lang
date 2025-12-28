@@ -5,7 +5,6 @@ function mult = fn(arg: i32) -> function {
   return res;
 }
 
-
 function triple = mult(3)
 
 println(triple(10)) // prints 30
