@@ -1,0 +1,11 @@
+function apply_twice = fn(f: function, x: i32) -> i32 {
+  return f(f(x));
+}
+
+function add = fn(n: i32) -> function {
+  return fn(x: i32) -> i32 { return x + n };
+}
+
+function add10 = add(10);
+
+println(apply_twice(add10, 10)); // prints 30
