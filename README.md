@@ -18,7 +18,6 @@ function add = fn(n: i32) -> function {
 function add10 = add(10);
 
 println(apply_twice(add10, 10)); // prints 30
-
 ```
 
 ## Overview
