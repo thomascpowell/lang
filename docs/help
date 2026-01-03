@@ -5,6 +5,5 @@ arguments:
     lexer <path>  prints tokens
     parser <path> prints the AST
     help          prints this message
-    repl          starts the REPL
 
 note: <path> refers to a .lang source file

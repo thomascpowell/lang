@@ -92,7 +92,6 @@ impl Error {
         )
     }
 
-    // not sure how this error type could actually occur
     pub fn generic_uer() -> Self {
         Error::new(
             ErrorType::UnexpectedExecResult,

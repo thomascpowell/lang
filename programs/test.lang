@@ -1,9 +1,0 @@
-// contains whatever i'm testing at the moment
-
-fn() -> i32 {
-  return 1
-}
-
-i32 x = 23
-
-println(x)
