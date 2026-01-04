@@ -58,9 +58,7 @@ impl Scope {
             symbols: HashMap::new(),
             parent: Some(Rc::clone(self)),
         };
-        new_scope
-            .symbols
-            .insert(name, symbol);
+        new_scope.symbols.insert(name, symbol);
         Rc::new(new_scope)
     }
 

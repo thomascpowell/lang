@@ -114,7 +114,9 @@ impl Parser {
         }
         // pratt parsing
         let mut lhs = match tok.kind {
-            TokenKind::Literal(_) => Expression::LiteralExp(self.parse_literal()?),
+            TokenKind::Literal(_) | TokenKind::Keyword(Keyword::True | Keyword::False) => {
+                Expression::LiteralExp(self.parse_literal()?)
+            }
             TokenKind::Identifier(_) => Expression::IdentifierExp(self.parse_identifier()?),
             _ => {
                 return Err(Error::new(
@@ -186,12 +188,25 @@ impl Parser {
     }
 
     fn parse_literal(&mut self) -> Result<Literal, Error> {
-        let tok = self.expect(|x| matches!(x, TokenKind::Literal(_)))?;
+        let tok = self.advance().unwrap();
         let pos = tok.position.clone();
         if let TokenKind::Literal(val) = tok.kind {
             return Ok(Literal {
                 position: pos,
                 value: val,
+            });
+        }
+        // booleans are keywords in the grammar
+        if tok.kind == TokenKind::Keyword(Keyword::True) {
+            return Ok(Literal {
+                position: pos,
+                value: LiteralValue::Bool(true),
+            });
+        }
+        if tok.kind == TokenKind::Keyword(Keyword::False) {
+            return Ok(Literal {
+                position: pos,
+                value: LiteralValue::Bool(false),
             });
         }
         Err(Error::generic_utt(tok))
