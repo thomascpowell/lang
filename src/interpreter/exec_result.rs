@@ -4,6 +4,7 @@ use crate::{error_types::Error, interpreter::value::Value};
 * ExecResult type
 * */
 
+#[derive(Debug)]
 pub enum ExecResult {
     Unit,            // statement produces nothing
     Value(Value),    // expression result
@@ -15,18 +16,18 @@ impl ExecResult {
         if matches!(self, ExecResult::Unit) {
             return Ok(());
         }
-        Err(Error::generic_uer())
+        Err(Error::generic_uer(self, "ExecResult::Unit"))
     }
     pub fn expect_value(&self) -> Result<Value, Error> {
         if let ExecResult::Value(v) = self {
             return Ok(v.clone());
         }
-        Err(Error::generic_uer())
+        Err(Error::generic_uer(self, "ExecResult::Value"))
     }
     pub fn expect_returned(&self) -> Result<Value, Error> {
         if let ExecResult::Returned(r) = self {
             return Ok(r.clone());
         }
-        Err(Error::generic_uer())
+        Err(Error::generic_uer(self, "ExecResult::Returned"))
     }
 }

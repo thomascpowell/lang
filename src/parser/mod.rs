@@ -103,12 +103,8 @@ impl Parser {
             .peek()
             .ok_or_else(|| Error::generic_eof("expected an expression"))?;
         let pos = tok.position.clone();
-        // prefix (starter) expressions
+        // prefix (starter) expressions (are there none?)
         match &tok.kind {
-            TokenKind::Keyword(Keyword::Fn) => {
-                return Ok(Expression::FunctionExp(self.parse_function()?));
-            }
-            TokenKind::Keyword(Keyword::If) => return Ok(Expression::IfExp(self.parse_if_expr()?)),
             _ => {}
         }
         // pratt parsing
@@ -118,8 +114,11 @@ impl Parser {
             }
             TokenKind::Identifier(_) => Expression::IdentifierExp(self.parse_identifier()?),
             TokenKind::Separator(Separator::LParen) => self.parse_paren_expr()?,
+
+            // new
+            TokenKind::Keyword(Keyword::Fn) => Expression::FunctionExp(self.parse_function()?),
+            TokenKind::Keyword(Keyword::If) => Expression::IfExp(self.parse_if_expr()?),
             _ => {
-                // this is the unexpected error
                 return Err(Error::new(
                     ErrorType::UnexpectedTokenType,
                     pos,
