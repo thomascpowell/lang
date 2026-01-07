@@ -109,7 +109,6 @@ impl Parser {
                 return Ok(Expression::FunctionExp(self.parse_function()?));
             }
             TokenKind::Keyword(Keyword::If) => return Ok(Expression::IfExp(self.parse_if_expr()?)),
-            TokenKind::Separator(Separator::LParen) => return self.parse_paren_expr(),
             _ => {}
         }
         // pratt parsing
@@ -118,7 +117,9 @@ impl Parser {
                 Expression::LiteralExp(self.parse_literal()?)
             }
             TokenKind::Identifier(_) => Expression::IdentifierExp(self.parse_identifier()?),
+            TokenKind::Separator(Separator::LParen) => self.parse_paren_expr()?,
             _ => {
+                // this is the unexpected error
                 return Err(Error::new(
                     ErrorType::UnexpectedTokenType,
                     pos,
