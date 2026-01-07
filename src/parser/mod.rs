@@ -103,19 +103,12 @@ impl Parser {
             .peek()
             .ok_or_else(|| Error::generic_eof("expected an expression"))?;
         let pos = tok.position.clone();
-        // prefix (starter) expressions (are there none?)
-        match &tok.kind {
-            _ => {}
-        }
-        // pratt parsing
         let mut lhs = match tok.kind {
             TokenKind::Literal(_) | TokenKind::Keyword(Keyword::True | Keyword::False) => {
                 Expression::LiteralExp(self.parse_literal()?)
             }
             TokenKind::Identifier(_) => Expression::IdentifierExp(self.parse_identifier()?),
             TokenKind::Separator(Separator::LParen) => self.parse_paren_expr()?,
-
-            // new
             TokenKind::Keyword(Keyword::Fn) => Expression::FunctionExp(self.parse_function()?),
             TokenKind::Keyword(Keyword::If) => Expression::IfExp(self.parse_if_expr()?),
             _ => {

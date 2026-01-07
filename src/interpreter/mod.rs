@@ -183,6 +183,7 @@ impl Interpreter {
             Operator::Ge => Value::Bool(left_val.expect_numeric()? >= right_val.expect_numeric()?),
             Operator::Lt => Value::Bool(left_val.expect_numeric()? < right_val.expect_numeric()?),
             Operator::Gt => Value::Bool(left_val.expect_numeric()? > right_val.expect_numeric()?),
+            // TODO: make these also valid for boolean?
             Operator::Eq => Value::Bool(left_val.expect_numeric()? == right_val.expect_numeric()?),
             Operator::Ne => Value::Bool(left_val.expect_numeric()? != right_val.expect_numeric()?),
             // boolean operators (operands: bool; returns: bool)
