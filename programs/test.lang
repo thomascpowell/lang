@@ -1,3 +1,5 @@
-if ((1 < 2) && true) {
-  println("hello")
+function ok = fn() -> i32 {
+  100
 }
+
+assert(ok() == 100)

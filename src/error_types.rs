@@ -1,5 +1,8 @@
 use crate::{
-    interpreter::{exec_result::ExecResult, value::Value}, lexer::token::Token, parser::ast::Statement, position::Position,
+    interpreter::{exec_result::ExecResult, value::Value},
+    lexer::token::Token,
+    parser::ast::Statement,
+    position::Position,
 };
 
 /**
@@ -93,12 +96,12 @@ impl Error {
     }
 
     pub fn generic_uer(found: &ExecResult, expected: &str) -> Self {
-        Error::new(
-            ErrorType::UnexpectedExecResult,
-            Position { line: 0, col: 0 },
-            format!("{:?}", found),
-            Some(expected),
-        )
+        Error {
+            error_type: ErrorType::UnexpectedExecResult,
+            position: Position { line: 0, col: 0 },
+            found: format!("{:?}", found),
+            message: Some(format!("expected {}", expected)),
+        }
     }
     pub fn generic_invalid_operand(operand: &Value) -> Self {
         let operator_type: &str = match operand {

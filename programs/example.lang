@@ -1,3 +1,5 @@
+// example used in README.md
+
 function apply_twice = fn(f: function, x: i32) -> i32 {
   return f(f(x));
 }

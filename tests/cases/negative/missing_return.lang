@@ -1,3 +1,8 @@
-fn() -> i32 {
-  1
-}
+// this is valid
+fn() -> i32 { return 1 }
+
+// this is also valid (implicit return)
+fn() -> i32 { 1 }
+
+// this is invalid (must end with a return)
+fn() -> i32 { }

@@ -215,7 +215,7 @@ impl Parser {
     }
 
     fn parse_function(&mut self) -> Result<Function, Error> {
-        // consume fn (shouldnt be unsafe)
+        // consume fn
         let fn_keyword = self.advance().unwrap();
         let pos = fn_keyword.position.clone();
         // parse param list
@@ -245,16 +245,31 @@ impl Parser {
             }
             statement_list.push(self.parse_statement()?);
         }
-        // confirm last statement is return
+
+        // if last statement is an expression, make it an implicit return
         let last = statement_list.last();
-        if last.is_none() || !matches!(last.unwrap(), &Statement::Return(_)) {
+
+        // confirm last statement exists
+        if last.is_none() {
             return Err(Error::new(
                 ErrorType::FunctionShouldEndWithReturn,
                 pos,
-                "function with no return statement",
-                None,
+                "",
+                Some("function must return"),
             ));
         }
+        let last = last.unwrap();
+
+        // if the last statment is an expression
+        // we convert it to an implicit return
+        if let Statement::Expression(_) = last.clone() {
+            let exp = statement_list.pop().unwrap().expect_expression()?.clone();
+            statement_list.push(Statement::Return(Return {
+                position: exp.get_position().clone(),
+                expression: exp.clone(),
+            }));
+        }
+
         Ok(Function {
             position: pos,
             params: params,
