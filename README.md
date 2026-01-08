@@ -12,7 +12,7 @@ function apply_twice = fn(f: function, x: i32) -> i32 {
 }
 
 function add = fn(n: i32) -> function {
-  return fn(x: i32) -> i32 { return x + n };
+  return fn(x: i32) -> i32 { x + n };
 }
 
 function add10 = add(10);
