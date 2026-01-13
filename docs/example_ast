@@ -1,0 +1,39 @@
+// AST for programs/example.lang
+
+Assignment: Function apply_twice
+|  Function
+|  |  Return
+|  |  |  CallExp
+|  |  |  Callee:
+|  |  |  |  Identifier: f
+|  |  |  Args:
+|  |  |  |  CallExp
+|  |  |  |  Callee:
+|  |  |  |  |  Identifier: f
+|  |  |  |  Args:
+|  |  |  |  |  Identifier: x
+Assignment: Function add
+|  Function
+|  |  Return
+|  |  |  Function
+|  |  |  |  Return
+|  |  |  |  |  BinaryExp: Add
+|  |  |  |  |  |  Identifier: x
+|  |  |  |  |  |  Identifier: n
+Assignment: Function add10
+|  CallExp
+|  Callee:
+|  |  Identifier: add
+|  Args:
+|  |  Literal: Int(10)
+Expression
+|  CallExp
+|  Callee:
+|  |  Identifier: println
+|  Args:
+|  |  CallExp
+|  |  Callee:
+|  |  |  Identifier: apply_twice
+|  |  Args:
+|  |  |  Identifier: add10
+|  |  |  Literal: Int(10)
