@@ -176,21 +176,21 @@ impl StatementList {
 }
 impl Statement {
     pub fn print_ast(&self, indent: usize) {
-        let padding = "   ".repeat(indent);
+        let padding = "|  ".repeat(indent);
         match self {
             Statement::Return(rst) => {
-                println!("{}|_ Return", padding);
+                println!("{}Return", padding);
                 rst.expression.print_ast(indent + 1);
             }
             Statement::Assignment(ast) => {
                 println!(
-                    "{}|_ Assignment: {:?} {}",
+                    "{}Assignment: {:?} {}",
                     padding, ast.assignment_type, ast.identifier
                 );
                 ast.expression.print_ast(indent + 1);
             }
             Statement::Expression(expr) => {
-                println!("{}|_ Expression", padding);
+                println!("{}Expression", padding);
                 expr.print_ast(indent + 1);
             }
         }
@@ -198,42 +198,42 @@ impl Statement {
 }
 impl Expression {
     pub fn print_ast(&self, indent: usize) {
-        let padding = "   ".repeat(indent);
+        let padding = "|  ".repeat(indent);
         match self {
-            Expression::IdentifierExp(i) => println!("{} |_ Identifier: {}", padding, i.name),
-            Expression::LiteralExp(lexp) => println!("{} |_ Literal: {:?}", padding, lexp.value),
+            Expression::IdentifierExp(i) => println!("{}Identifier: {}", padding, i.name),
+            Expression::LiteralExp(lexp) => println!("{}Literal: {:?}", padding, lexp.value),
             Expression::BinaryExp(bexp) => {
-                println!("{} |_ BinaryExp: {:?}", padding, bexp.operator);
+                println!("{}BinaryExp: {:?}", padding, bexp.operator);
                 bexp.left.print_ast(indent + 1);
                 bexp.right.print_ast(indent + 1);
             }
             Expression::FunctionExp(fexp) => {
-                println!("{} |_ Function", padding);
+                println!("{}Function", padding);
                 fexp.body.print_ast(indent + 1);
             }
             Expression::IfExp(iexp) => {
-                println!("{}|_ IfExp", padding);
-                println!("{}|_ Condition", padding);
+                println!("{}IfExp", padding);
+                println!("{}Condition", padding);
                 iexp.if_cond.as_ref().print_ast(indent + 1);
-                println!("{}|_ Then", padding);
+                println!("{}Then", padding);
                 iexp.then_branch.as_ref().print_ast(indent + 1);
                 if let Some(else_branch) = iexp.else_branch.as_ref() {
-                    println!("{}|_ Else", padding);
+                    println!("{}Else", padding);
                     else_branch.print_ast(indent + 1);
                 }
             }
             Expression::ParenExp(inner) => {
-                println!("{}|_ ParenExp", padding);
+                println!("{}ParenExp", padding);
                 inner.print_ast(indent + 1);
             }
             Expression::CallExp(cexp) => {
-                println!("{}|_ CallExp", padding);
-                println!("{}|_ Callee:", padding);
+                println!("{}CallExp", padding);
+                println!("{}Callee:", padding);
                 cexp.callee.print_ast(indent + 1);
                 if cexp.args.is_empty() {
-                    println!("{}|_ Args: ()", padding);
+                    println!("{}Args: ()", padding);
                 } else {
-                    println!("{}|_ Args:", padding);
+                    println!("{}Args:", padding);
                     for arg in &cexp.args {
                         arg.value.print_ast(indent + 1);
                     }
