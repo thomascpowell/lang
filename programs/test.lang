@@ -1,5 +1,5 @@
-function ok = fn() -> i32 {
+i32 x = fn() -> i32 {
   100
-}
+}()
 
-assert(ok() == 100)
+println(x)

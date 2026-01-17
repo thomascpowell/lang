@@ -88,7 +88,6 @@ impl Interpreter {
     }
 
     fn interpret_assignment(&mut self, a: &Assignment) -> Result<ExecResult, Error> {
-        // need to create a closure in this case
         if a.assignment_type == Type::Function {
             return self.handle_closure(a);
         }
@@ -144,6 +143,7 @@ impl Interpreter {
     fn handle_expression(&mut self, expression: &Expression) -> Result<ExecResult, Error> {
         match expression {
             Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
+            // goes to here
             Expression::CallExp(exp) => self.handle_call(exp.clone()),
             Expression::LiteralExp(exp) => self.handle_literal(exp.clone()),
             Expression::BinaryExp(exp) => self.handle_binary(exp.clone()),
@@ -224,6 +224,7 @@ impl Interpreter {
     fn handle_call(&mut self, call: Call) -> Result<ExecResult, Error> {
         let callee = call.callee.clone();
         match *callee {
+            // call on a variable
             Expression::IdentifierExp(identifier) => {
                 let value = self
                     .scope
@@ -231,6 +232,13 @@ impl Interpreter {
                     .val;
                 self.handle_call_function(value, call)
             }
+            // immediately invoked function
+            Expression::FunctionExp(func) => {
+                self.frames.push(Frame::new(func.body.clone()));
+                let value = self.run_frame()?.expect_returned()?;
+                return Ok(ExecResult::Value(value));
+            }
+            // call on anything else
             _ => Ok(ExecResult::Unit),
         }
     }
