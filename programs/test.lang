@@ -1,5 +1,1 @@
-i32 x = fn() -> i32 {
-  100
-}()
-
-println(x)
+println(1 + 1)

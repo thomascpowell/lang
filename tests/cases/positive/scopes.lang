@@ -1,0 +1,12 @@
+// define x
+i32 x = 0
+
+// change it in a scope
+fn() -> i32 {
+  i32 x = 1
+  assert(x == 1)
+  return 0
+}()
+
+// it should revert to 0
+assert(x == 0)

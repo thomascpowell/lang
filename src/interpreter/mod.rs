@@ -52,6 +52,7 @@ impl Interpreter {
     }
 
     pub fn run_frame(&mut self) -> Result<ExecResult, Error> {
+        // TODO: refactor 
         loop {
             // get the frame off the stack
             let mut frame = match self.frames.pop() {
@@ -60,6 +61,7 @@ impl Interpreter {
             };
             // case: EOF
             if frame.done() {
+                assert!(self.frames.is_empty());
                 return Ok(ExecResult::Unit);
             }
             // execute a statement
@@ -68,6 +70,8 @@ impl Interpreter {
             match result {
                 // case: return
                 ExecResult::Returned(v) => {
+                    // restore the scope if the function returns
+                    self.scope = self.scope.parent.clone().unwrap();
                     return Ok(ExecResult::Returned(v));
                 }
                 // case: continue (put the frame back)
@@ -143,7 +147,6 @@ impl Interpreter {
     fn handle_expression(&mut self, expression: &Expression) -> Result<ExecResult, Error> {
         match expression {
             Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
-            // goes to here
             Expression::CallExp(exp) => self.handle_call(exp.clone()),
             Expression::LiteralExp(exp) => self.handle_literal(exp.clone()),
             Expression::BinaryExp(exp) => self.handle_binary(exp.clone()),
