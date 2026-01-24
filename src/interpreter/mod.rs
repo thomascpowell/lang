@@ -53,6 +53,7 @@ impl Interpreter {
 
     pub fn run_frame(&mut self) -> Result<ExecResult, Error> {
         // TODO: refactor 
+        let initial_scope = self.scope.clone();
         loop {
             // get the frame off the stack
             let mut frame = match self.frames.pop() {
@@ -71,7 +72,9 @@ impl Interpreter {
                 // case: return
                 ExecResult::Returned(v) => {
                     // restore the scope if the function returns
-                    self.scope = self.scope.parent.clone().unwrap();
+                    // this is wrong because the scope is nested
+                    // self.scope = self.scope.parent.clone().unwrap();
+                    self.scope = initial_scope;
                     return Ok(ExecResult::Returned(v));
                 }
                 // case: continue (put the frame back)
@@ -237,6 +240,7 @@ impl Interpreter {
             }
             // immediately invoked function
             Expression::FunctionExp(func) => {
+                // should i create a closure here?
                 self.frames.push(Frame::new(func.body.clone()));
                 let value = self.run_frame()?.expect_returned()?;
                 return Ok(ExecResult::Value(value));
