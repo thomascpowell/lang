@@ -164,8 +164,11 @@ pub type Operator = crate::lexer::token::Operator;
 
 /**
 * Printing AST
-* (WIP but functional)
 * */
+
+fn get_padding(indent: usize) -> String {
+    "|  ".repeat(indent)
+}
 
 impl StatementList {
     pub fn print_ast(&self, indent: usize) {
@@ -174,9 +177,11 @@ impl StatementList {
         }
     }
 }
+
 impl Statement {
+
     pub fn print_ast(&self, indent: usize) {
-        let padding = "|  ".repeat(indent);
+        let padding = get_padding(indent);
         match self {
             Statement::Return(rst) => {
                 println!("{}Return", padding);
