@@ -52,7 +52,7 @@ impl Interpreter {
     }
 
     pub fn run_frame(&mut self) -> Result<ExecResult, Error> {
-        // TODO: refactor? 
+        // TODO: refactor?
         let initial_scope = self.scope.clone();
         loop {
             // get the frame off the stack
@@ -187,7 +187,7 @@ impl Interpreter {
             Operator::Ge => Value::Bool(left_val.expect_numeric()? >= right_val.expect_numeric()?),
             Operator::Lt => Value::Bool(left_val.expect_numeric()? < right_val.expect_numeric()?),
             Operator::Gt => Value::Bool(left_val.expect_numeric()? > right_val.expect_numeric()?),
-            // TODO: make these also valid for boolean?
+            // TODO: make these also valid for boolean
             Operator::Eq => Value::Bool(left_val.expect_numeric()? == right_val.expect_numeric()?),
             Operator::Ne => Value::Bool(left_val.expect_numeric()? != right_val.expect_numeric()?),
             // boolean operators (operands: bool; returns: bool)
@@ -203,12 +203,12 @@ impl Interpreter {
             .handle_expression(&exp.if_cond)?
             .expect_value()?
             .expect_bool()?;
+        let then_branch = exp.then_branch.as_ref();
+        let else_branch = exp.else_branch.as_ref();
         if cond {
-            return self.handle_expression(&exp.then_branch);
-        }
-        match exp.else_branch {
-            Some(exp) => self.handle_expression(&exp),
-            None => Ok(ExecResult::Unit),
+            self.exec(then_branch)
+        } else {
+            else_branch.map_or(Ok(ExecResult::Unit), |exp| self.exec(exp))
         }
     }
 

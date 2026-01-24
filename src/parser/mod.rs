@@ -353,7 +353,7 @@ impl Parser {
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::RParen)))?;
         // parse block
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
-        let then_branch = self.parse_expression(0)?;
+        let then_branch = self.parse_statement()?;
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::RBrace)))?;
         let mut res = IfExp {
             position: pos,
@@ -368,7 +368,7 @@ impl Parser {
         // case: else
         self.advance();
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
-        let else_branch = self.parse_expression(0)?;
+        let else_branch = self.parse_statement()?;
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::RBrace)))?;
         res.else_branch = Some(Box::new(else_branch));
         Ok(res)

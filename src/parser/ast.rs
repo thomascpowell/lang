@@ -141,8 +141,8 @@ pub struct IfExp {
     // if is an expression
     pub position: Position,
     pub if_cond: Box<Expression>,
-    pub then_branch: Box<Expression>,
-    pub else_branch: Option<Box<Expression>>,
+    pub then_branch: Box<Statement>,
+    pub else_branch: Option<Box<Statement>>,
 }
 
 /*
