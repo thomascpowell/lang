@@ -26,9 +26,6 @@ println(apply_twice(add10, 10)); // prints 30
 - More code examples can be found in `./programs`
 
 ## Features
-- Runtime-validated type system
-    - Basic data types (`f32`, `i32`, `string`, etc.)
-    - Types are fully validated 
 - Lexical scoping with closures 
     - Closures capture their environment
     - Inner scopes can redefine identifiers
@@ -39,7 +36,7 @@ println(apply_twice(add10, 10)); // prints 30
 - Standard library with native functions
     - Standard library functions are automatically in scope
     - Key functions include `print`, `println`, and `read`
-- Helpful features for debugging
-    - The CLI can print the AST or token list
+- Helpful debugging tools
     - Errors include a clear message and show what was found
     - Errors also display source position (line and column)
+    - The CLI can print the AST or token list
