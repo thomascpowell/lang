@@ -52,7 +52,7 @@ impl Interpreter {
     }
 
     pub fn run_frame(&mut self) -> Result<ExecResult, Error> {
-        // TODO: refactor 
+        // TODO: refactor? 
         let initial_scope = self.scope.clone();
         loop {
             // get the frame off the stack
@@ -72,8 +72,6 @@ impl Interpreter {
                 // case: return
                 ExecResult::Returned(v) => {
                     // restore the scope if the function returns
-                    // this is wrong because the scope is nested
-                    // self.scope = self.scope.parent.clone().unwrap();
                     self.scope = initial_scope;
                     return Ok(ExecResult::Returned(v));
                 }
