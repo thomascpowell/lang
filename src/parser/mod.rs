@@ -53,14 +53,13 @@ impl Parser {
     }
 
     fn parse_return(&mut self) -> Result<Return, Error> {
-        // get the return token
-        // or generic error because this should be impossible (caller validated)
-        let tok = self.advance().ok_or_else(|| Error::generic())?;
-        // parse the expression that follows
-        let expr = self.parse_expression(0)?;
+        // not needed, the expression already conveys that info
+        // let tok = self.advance().ok_or_else(|| Error::generic())?;
+
+        self.advance();
+        // parse the expression
         let ret = Return {
-            position: tok.position,
-            expression: expr,
+            expression: self.parse_expression(0)?,
         };
         Ok(ret)
     }
@@ -265,7 +264,7 @@ impl Parser {
         if let Statement::Expression(_) = last.clone() {
             let exp = statement_list.pop().unwrap().expect_expression()?.clone();
             statement_list.push(Statement::Return(Return {
-                position: exp.get_position().clone(),
+                // position: exp.get_position().clone(),
                 expression: exp.clone(),
             }));
         }

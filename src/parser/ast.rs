@@ -12,14 +12,14 @@ pub struct StatementList {
 #[derive(Debug, Clone)]
 pub enum Statement {
     Assignment(Assignment),
-    Expression(Expression),
+    Expression(Expression), 
     Return(Return),
 }
 
 impl Statement {
     pub fn get_position(&self) -> &Position {
         return match self {
-            Statement::Return(x) => &x.position,
+            Statement::Return(x) => &x.expression.get_position(),
             Statement::Assignment(x) => &x.position,
             Statement::Expression(x) => x.get_position(),
         };
@@ -95,7 +95,6 @@ pub struct Assignment {
 
 #[derive(Debug, Clone)]
 pub struct Return {
-    pub position: Position,
     pub expression: Expression,
 }
 
