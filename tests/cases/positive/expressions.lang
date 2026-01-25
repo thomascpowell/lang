@@ -1,5 +1,5 @@
 if (1 < 2) {
-  println("hello")
+  1 + 2
 } else {
   panic("this will not run")
 };
@@ -24,7 +24,6 @@ whatever();
 
 // simple demonstration of recursion
 function recursive = fn(param: i32) -> i32 {
-  println("param = ", param);
   return if (param > 100) {
     recursive(param/2)
   } else {
