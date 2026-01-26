@@ -230,7 +230,6 @@ impl Parser {
             TokenKind::Keyword(Keyword::Function) => Type::Function,
             _ => return Err(Error::generic_utt(tok)),
         };
-
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
         let mut statement_list: Vec<Statement> = Vec::new();
         loop {
@@ -244,23 +243,20 @@ impl Parser {
             }
             statement_list.push(self.parse_statement()?);
         }
-
-        // if last statement is an expression, make it an implicit return
+        // last statement must be something that can be returned
         let last = statement_list.last();
-
-        // confirm last statement exists
-        if last.is_none() {
+        if last.is_none() || matches!(last.unwrap(), Statement::Assignment(_)) {
             return Err(Error::new(
                 ErrorType::FunctionShouldEndWithReturn,
                 pos,
-                "",
-                Some("function must return"),
+                // need to get variant name here
+                &last.map_or("None".into(), |last| format!("{:?}", last)),
+                Some("function must return")
             ));
         }
         let last = last.unwrap();
-
-        // if the last statment is an expression
-        // we convert it to an implicit return
+        // if the last statement is an expression
+        // convert it to an implicit return
         if let Statement::Expression(_) = last.clone() {
             let exp = statement_list.pop().unwrap().expect_expression()?.clone();
             statement_list.push(Statement::Return(Return {
@@ -268,7 +264,6 @@ impl Parser {
                 expression: exp.clone(),
             }));
         }
-
         Ok(Function {
             position: pos,
             params: params,
