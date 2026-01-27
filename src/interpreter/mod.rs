@@ -225,25 +225,15 @@ impl Interpreter {
         })
     }
 
+
+    // new: no special cases
+    // evaluate the callee -> expect the result to be callable (everything is callable?) -> invoke it
     fn handle_call(&mut self, call: Call) -> Result<ExecResult, Error> {
-        let callee = call.callee.clone();
-        match *callee {
-            // call on a variable
-            Expression::IdentifierExp(identifier) => {
-                let value = self
-                    .scope
-                    .get_symbol(&identifier.name, identifier.position.clone())?
-                    .val;
-                self.handle_call_function(value, call)
-            }
-            // immediately invoked function
-            Expression::FunctionExp(func) => {
-                // should i create a closure here?
-                self.frames.push(Frame::new(func.body.clone()));
-                let value = self.run_frame()?.expect_returned()?;
-                return Ok(ExecResult::Value(value));
-            }
-            // call on anything else
+        let callee = self
+            .handle_expression(call.callee.as_ref())?
+            .expect_value()?;
+        match callee.get_type() {
+            Type::Function => self.handle_call_function(callee, call),
             _ => Ok(ExecResult::Unit),
         }
     }

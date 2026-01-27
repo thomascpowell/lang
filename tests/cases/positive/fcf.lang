@@ -6,3 +6,9 @@ function mult = fn(arg: i32) -> function {
 function triple = mult(3)
 
 assert(triple(10) == 30)
+
+function test = fn() -> function {
+  fn() -> i32 { 0 }
+};
+
+assert(test()() == 0)
