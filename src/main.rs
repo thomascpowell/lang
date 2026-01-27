@@ -66,7 +66,7 @@ fn handle_lexer(source: String) {
 }
 
 fn handle_repl() {
-    println!("error: REPL not implemented")
+    todo!()
 }
 
 /**
