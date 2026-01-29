@@ -1,4 +1,4 @@
-use crate::error_types::*;
+use crate::lang_error::*;
 use crate::lexer::token::*;
 use crate::position::Position;
 pub mod token;

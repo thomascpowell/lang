@@ -1,5 +1,5 @@
 use lang::{
-    error_types::Error,
+    lang_error::Error,
     lexer::tokenize,
     parser::{ast::StatementList, parse},
 };

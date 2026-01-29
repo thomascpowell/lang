@@ -2,8 +2,8 @@ use crate::interpreter::{closure::Closure, scope::*, value::Value};
 use std::{cell::RefCell, rc::Rc};
 
 use crate::{
-    error_types::{Error, ErrorType},
     interpreter::{exec_result::ExecResult, frame::Frame, scope::Scope, symbol::*},
+    lang_error::{Error, ErrorType},
     parser::ast::*,
 };
 
@@ -224,7 +224,6 @@ impl Interpreter {
             LiteralValue::Bool(x) => ExecResult::Value(Value::Bool(x)),
         })
     }
-
 
     // new: no special cases
     // evaluate the callee -> expect the result to be callable (everything is callable?) -> invoke it

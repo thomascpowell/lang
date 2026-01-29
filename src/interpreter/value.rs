@@ -1,9 +1,9 @@
 use std::ops::{Add, Div, Mul, Sub};
 
 use crate::{
-    error_types::Error,
     interpreter::{closure::Closure, exec_result::ExecResult, symbol::Symbol},
-    parser::ast::{Type},
+    lang_error::Error,
+    parser::ast::Type,
     position::Position,
 };
 

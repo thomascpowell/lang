@@ -1,7 +1,7 @@
 use crate::parser::ast::Literal;
 use crate::parser::ast::Operator;
 use crate::position::Position;
-use crate::{error_types::*, lexer::token::*, parser::ast::*};
+use crate::{lang_error::*, lexer::token::*, parser::ast::*};
 pub mod ast;
 
 /*
@@ -251,7 +251,7 @@ impl Parser {
                 pos,
                 // need to get variant name here
                 &last.map_or("None".into(), |last| format!("{:?}", last)),
-                Some("function must return")
+                Some("function must return"),
             ));
         }
         let last = last.unwrap();

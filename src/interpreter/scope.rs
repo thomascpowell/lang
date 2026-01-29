@@ -1,6 +1,6 @@
 use crate::{
-    error_types::{Error, ErrorType},
     interpreter::{stdlib::*, symbol::Symbol, value::Value},
+    lang_error::{Error, ErrorType},
     parser::ast::Type,
     position::Position,
 };

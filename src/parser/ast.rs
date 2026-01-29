@@ -1,4 +1,4 @@
-use crate::{error_types::Error, position::Position};
+use crate::{lang_error::Error, position::Position};
 
 /*
 * Nonterminal types
@@ -12,7 +12,7 @@ pub struct StatementList {
 #[derive(Debug, Clone)]
 pub enum Statement {
     Assignment(Assignment),
-    Expression(Expression), 
+    Expression(Expression),
     Return(Return),
 }
 
@@ -178,7 +178,6 @@ impl StatementList {
 }
 
 impl Statement {
-
     pub fn print_ast(&self, indent: usize) {
         let padding = get_padding(indent);
         match self {

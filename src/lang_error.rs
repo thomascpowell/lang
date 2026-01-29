@@ -6,7 +6,7 @@ use crate::{
 };
 
 /**
-* Error Types
+* Error Type
 * */
 
 #[derive(Debug)]
@@ -45,6 +45,8 @@ pub struct Error {
     pub found: String,
     pub message: Option<String>,
 }
+
+const NO_POSITION: Position = Position { col: 0, line: 0 };
 
 impl Error {
     pub fn new(
@@ -96,47 +98,30 @@ impl Error {
     }
 
     pub fn generic_uer(found: &ExecResult, expected: &str) -> Self {
+        let msg = Some(format!("expected {}", expected));
+        let found = format!("{:?}", found);
         Error {
             error_type: ErrorType::UnexpectedExecResult,
-            position: Position { line: 0, col: 0 },
-            found: format!("{:?}", found),
-            message: Some(format!("expected {}", expected)),
+            position: NO_POSITION,
+            found: found,
+            message: msg,
         }
     }
+
     pub fn generic_invalid_operand(operand: &Value) -> Self {
-        let operator_type: &str = match operand {
-            Value::Int(_) => "i32",
-            Value::Float(_) => "f32",
-            Value::Bool(_) => "bool",
-            Value::String(_) => "string",
-            Value::Function(_) => "function",
-            Value::NativeFunction(_) => " native function",
-            Value::Uninitialized => unreachable!(),
-        };
-        return Error::new(
-            ErrorType::InvalidOperand,
-            Position { line: 0, col: 0 },
-            operator_type,
-            Some("check operator and operand types"),
-        );
+        let op = format!("{:?}", operand.get_type());
+        return Error::new(ErrorType::InvalidOperand, NO_POSITION, op, None);
     }
+
     pub fn generic_eof(expected: &str) -> Self {
-        Error::new(
-            ErrorType::UnexpectedEOF,
-            Position { line: 0, col: 0 },
-            "EOF",
-            Some(expected),
-        )
+        Error::new(ErrorType::UnexpectedEOF, NO_POSITION, "EOF", Some(expected))
     }
+
     pub fn generic() -> Self {
-        Error::new(
-            ErrorType::Default,
-            Position { line: 0, col: 0 },
-            "unknown",
-            None,
-        )
+        Error::new(ErrorType::Default, NO_POSITION, "unknown", None)
     }
+
     pub fn generic_message(ty: ErrorType, message: String) -> Self {
-        Error::new(ty, Position { line: 0, col: 0 }, message, None)
+        Error::new(ty, NO_POSITION, message, None)
     }
 }
