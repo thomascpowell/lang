@@ -1,4 +1,4 @@
-use crate::position::Position;
+use crate::{parser::ast::LiteralValue, position::Position};
 
 /*
 * Token type
@@ -82,6 +82,19 @@ pub enum Literal {
     Bool(bool),
     String(String),
 }
+
+impl Literal {
+    // returns the AST node equivilant of Literal
+    pub fn get_literal_value(self) -> LiteralValue {
+        match self {
+            Self::Int(x) => LiteralValue::Int(x),
+            Self::Float(x) => LiteralValue::Float(x),
+            Self::Bool(x) => LiteralValue::Bool(x),
+            Self::String(x) => LiteralValue::String(x),
+        }
+    }
+}
+
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Keyword {

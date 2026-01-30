@@ -77,7 +77,16 @@ pub struct Literal {
     pub position: Position,
     pub value: LiteralValue,
 }
-pub type LiteralValue = crate::lexer::token::Literal;
+
+// pub type LiteralValue = crate::lexer::token::Literal;
+#[derive(Debug, Clone, PartialEq)]
+pub enum LiteralValue {
+    Unit,
+    Int(i32),
+    Float(f32),
+    Bool(bool),
+    String(String),
+}
 
 #[derive(Debug, Clone)]
 pub struct Identifier {

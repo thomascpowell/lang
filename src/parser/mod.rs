@@ -104,7 +104,7 @@ impl Parser {
         let pos = tok.position.clone();
         let mut lhs = match tok.kind {
             TokenKind::Literal(_) | TokenKind::Keyword(Keyword::True | Keyword::False) => {
-                Expression::LiteralExp(self.parse_literal()?)
+                Expression::LiteralExp(self.parse_literal_token()?)
             }
             TokenKind::Identifier(_) => Expression::IdentifierExp(self.parse_identifier()?),
             TokenKind::Separator(Separator::LParen) => self.parse_paren_expr()?,
@@ -179,13 +179,13 @@ impl Parser {
         })
     }
 
-    fn parse_literal(&mut self) -> Result<Literal, Error> {
+    fn parse_literal_token(&mut self) -> Result<Literal, Error> {
         let tok = self.advance().unwrap();
         let pos = tok.position.clone();
         if let TokenKind::Literal(val) = tok.kind {
             return Ok(Literal {
                 position: pos,
-                value: val,
+                value: val.get_literal_value(),
             });
         }
         // booleans are keywords in the grammar
@@ -370,7 +370,14 @@ impl Parser {
     }
 
     fn parse_paren_expr(&mut self) -> Result<Expression, Error> {
-        self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
+        let left = self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
+        // special case, unit literal
+        if self.optional(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
+            return Ok(Expression::LiteralExp(Literal {
+                position: left.position,
+                value: LiteralValue::Unit,
+            }));
+        }
         let expr = self.parse_expression(0)?;
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::RParen)))?;
         Ok(Expression::ParenExp(Box::new(expr)))
@@ -404,8 +411,7 @@ impl Parser {
         self.advance_n(1)
     }
 
-    // matches a provided condition, returns the token or an error
-    // accepts a closure containing a match macro
+    // consumes and returns a required token
     fn expect<F>(&mut self, cond: F) -> Result<Token, Error>
     where
         F: Fn(&TokenKind) -> bool,
@@ -422,21 +428,22 @@ impl Parser {
         }
     }
 
-    // consumes matching character if it exists or does nothing
-    fn optional<F>(&mut self, cond: F)
+    // like expect but optional
+    // returns a boolean representing if the token was consumed
+    fn optional<F>(&mut self, cond: F) -> bool
     where
         F: Fn(&TokenKind) -> bool,
     {
         match self.peek() {
             Some(tok) if cond(&tok.kind) => {
                 self.pos += 1;
+                true
             }
-            _ => (),
+            _ => false,
         }
     }
 
-    // like expect, but used for conditionals
-    // probably wont need this long term
+    // like optional but does not consume
     fn compare_kind<F>(&self, cond: F) -> bool
     where
         F: Fn(&TokenKind) -> bool,

@@ -20,6 +20,7 @@ pub enum Value {
     Function(Closure),
     NativeFunction(fn(Vec<Value>) -> Result<ExecResult, Error>),
     Uninitialized,
+    Unit,
 }
 
 impl Value {
@@ -78,6 +79,7 @@ impl Value {
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
             Value::NativeFunction(_) | Value::Function(_) => Type::Function,
+            Value::Unit => Type::Unit,
             Value::Uninitialized => unreachable!(),
         }
     }
@@ -90,6 +92,7 @@ impl Value {
             Self::String(s) => s.clone(),
             Self::Function(_) => "[function]".to_string(),
             Self::NativeFunction(_) => "[native function]".to_string(),
+            Self::Unit => "[unit]".to_string(),
             Value::Uninitialized => unreachable!(),
         }
     }

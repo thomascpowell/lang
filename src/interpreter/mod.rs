@@ -222,6 +222,8 @@ impl Interpreter {
             LiteralValue::Float(x) => ExecResult::Value(Value::Float(x)),
             LiteralValue::String(x) => ExecResult::Value(Value::String(x)),
             LiteralValue::Bool(x) => ExecResult::Value(Value::Bool(x)),
+            LiteralValue::Unit => ExecResult::Value(Value::Unit),
+            
         })
     }
 
