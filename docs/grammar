@@ -24,10 +24,11 @@
 <operator> ::= "+" | "-" | "*" | "/" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" | "%"
 
 // Literal
-<literal> ::= <integer_literal> | <boolean_literal> | <string_literal>
+<literal> ::= <integer_literal> | <boolean_literal> | <string_literal> | <unit_literal>
 <integer_literal> ::= [0-9]+
 <boolean_literal> ::= "true" | "false"
 <string_literal>  ::= '"' [^"]* '"'
+<unit_literal>    ::= '()'
 
 // Function
 <function> ::= "fn" "(" <parameter_list> ")" "->" <type> "{"  <statement_list> "}"

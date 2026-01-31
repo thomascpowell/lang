@@ -95,18 +95,22 @@ impl Literal {
     }
 }
 
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum Keyword {
+    // control flow
     If,
     Else,
+    // function-related
     Fn,
+    Return,
+    // literals
+    True,
+    False,
+    // types
     I32,
     F32,
     Bool,
     String,
-    True,
-    False,
-    Return,
     Function,
+    Unit,
 }

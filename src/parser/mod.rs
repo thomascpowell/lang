@@ -55,7 +55,6 @@ impl Parser {
     fn parse_return(&mut self) -> Result<Return, Error> {
         // not needed, the expression already conveys that info
         // let tok = self.advance().ok_or_else(|| Error::generic())?;
-
         self.advance();
         // parse the expression
         let ret = Return {
@@ -73,6 +72,7 @@ impl Parser {
             TokenKind::Keyword(Keyword::Bool) => self.handle_assignment(Type::Bool, pos),
             TokenKind::Keyword(Keyword::String) => self.handle_assignment(Type::String, pos),
             TokenKind::Keyword(Keyword::Function) => self.handle_assignment(Type::Function, pos),
+            TokenKind::Keyword(Keyword::Unit) => self.handle_assignment(Type::Unit, pos),
             _ => Err(Error::new(
                 ErrorType::UnexpectedTokenType,
                 pos,
@@ -222,14 +222,7 @@ impl Parser {
         // parse return type
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::Arrow)))?;
         let tok = self.expect(is_type)?;
-        let returns = match tok.kind {
-            TokenKind::Keyword(Keyword::Bool) => Type::Bool,
-            TokenKind::Keyword(Keyword::I32) => Type::I32,
-            TokenKind::Keyword(Keyword::F32) => Type::F32,
-            TokenKind::Keyword(Keyword::String) => Type::String,
-            TokenKind::Keyword(Keyword::Function) => Type::Function,
-            _ => return Err(Error::generic_utt(tok)),
-        };
+        let returns = get_type_from_keyword(tok)?;
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
         let mut statement_list: Vec<Statement> = Vec::new();
         loop {
@@ -322,6 +315,7 @@ impl Parser {
             TokenKind::Keyword(Keyword::F32) => Type::F32,
             TokenKind::Keyword(Keyword::String) => Type::String,
             TokenKind::Keyword(Keyword::Function) => Type::Function,
+            TokenKind::Keyword(Keyword::Unit) => Type::Unit,
             _ => return Err(Error::generic_utt(type_token)),
         };
         let pos = id.position.clone();
@@ -466,14 +460,35 @@ impl Parser {
     }
 }
 
-// returns true if token kind is a type
-fn is_type(kind: &TokenKind) -> bool {
-    match kind {
-        TokenKind::Keyword(Keyword::I32) => true,
-        TokenKind::Keyword(Keyword::F32) => true,
-        TokenKind::Keyword(Keyword::String) => true,
-        TokenKind::Keyword(Keyword::Bool) => true,
-        TokenKind::Keyword(Keyword::Function) => true,
+fn get_type_from_keyword(token: Token) -> Result<Type, Error> {
+    let res = match token.kind {
+        TokenKind::Keyword(Keyword::Bool) => Type::Bool,
+        TokenKind::Keyword(Keyword::I32) => Type::I32,
+        TokenKind::Keyword(Keyword::F32) => Type::F32,
+        TokenKind::Keyword(Keyword::String) => Type::String,
+        TokenKind::Keyword(Keyword::Function) => Type::Function,
+        TokenKind::Keyword(Keyword::Unit) => Type::Unit,
+        _ => {
+            return Err(Error::new(
+                ErrorType::UnexpectedTokenType,
+                token.position,
+                format!("{:?}", token.kind),
+                Some("expected a token corresponding to a type"),
+            ));
+        }
+    };
+    Ok(res)
+}
+
+// returns true if token is a type
+fn is_type(token: &TokenKind) -> bool {
+    match token {
+        TokenKind::Keyword(Keyword::Bool)
+        | TokenKind::Keyword(Keyword::I32)
+        | TokenKind::Keyword(Keyword::F32)
+        | TokenKind::Keyword(Keyword::String)
+        | TokenKind::Keyword(Keyword::Function)
+        | TokenKind::Keyword(Keyword::Unit) => true,
         _ => false,
     }
 }

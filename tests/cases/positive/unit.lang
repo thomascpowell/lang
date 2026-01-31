@@ -1,0 +1,5 @@
+fn() -> unit { return () }()
+
+unit hello = ();
+
+println(hello)
