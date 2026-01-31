@@ -1,16 +1,20 @@
-// a classic programming problem
+function fizzbuzz = fn(i: i32) -> unit {
+  i32 c = 100-i
+  print(c, ": ")
 
-function fizzbuzz = fn(i: i32) -> i32 {
-  i32 c = 100-i;
-  print(c, ": ");
   if (c % 3 == 0) {
     print("Fizz")
-  };
+  }
+
   if (c % 5 == 0) {
     print("Buzz")
-  };
-  println();
-  return if (i > 0) { fizzbuzz(i-1) } else { 0 };
-};
+  }
+  println()
 
-fizzbuzz(100);
+  if (i > 0) {
+    fizzbuzz(i-1)
+  }
+  return ()
+}
+
+fizzbuzz(100)

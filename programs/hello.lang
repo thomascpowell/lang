@@ -2,7 +2,7 @@ function hello = fn() -> i32 {
   print("name: ")
   string name = read()
   println("hello ", name)
-  return 0;
+  return 0
 }
 
 hello()

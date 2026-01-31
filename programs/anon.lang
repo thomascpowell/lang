@@ -1,8 +1,0 @@
-// simple demo of anonymous functions
-
-function conv = fn(f: function, target: f32) -> i32 {
-  return f(target)
-}
-
-i32 res = conv(fn(x: f32) -> i32 { return floor(x)}, 7.2)
-assert(res == 7)

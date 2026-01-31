@@ -1,9 +1,9 @@
 // euclid's algorithm
 
 function gcd = fn(a: i32, b: i32) -> i32 {
-  return if (b == 0) { a } else { gcd(b, a % b) };
+  return if (b == 0) { a } else { gcd(b, a % b) }
 };
 
-i32 a = 1071;
-i32 b = 462;
-println("gcd of ", a, " and ", b, " is: ", gcd(a, b));
+i32 a = 1071
+i32 b = 462
+println("gcd of ", a, " and ", b, " is: ", gcd(a, b))
