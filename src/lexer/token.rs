@@ -24,6 +24,8 @@ pub enum TokenKind {
     Separator(Separator),
     Operator(Operator),
     Literal(Literal),
+    // comments are created as valid tokens
+    // but currently this information is not used elsewhere
     Comment(String),
 }
 

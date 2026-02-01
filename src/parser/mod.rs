@@ -12,7 +12,6 @@ pub fn parse(tokens: Vec<Token>) -> Result<StatementList, Error> {
     let mut res = Vec::new();
     let mut parser = Parser::new(tokens);
     while parser.has_next() {
-        parser.skip_comments();
         if !parser.has_next() {
             break;
         }
@@ -445,17 +444,6 @@ impl Parser {
         match self.peek() {
             Some(tok) if cond(&tok.kind) => true,
             _ => false,
-        }
-    }
-
-    pub fn skip_comments(&mut self) {
-        loop {
-            match self.peek() {
-                Some(t) if matches!(t.kind, TokenKind::Comment(_)) => {
-                    self.advance();
-                }
-                _ => break,
-            }
         }
     }
 }

@@ -3,13 +3,14 @@ use lang::lexer::tokenize;
 
 #[test]
 fn test_tokenizer() {
-    let program = "
-        fn main(n: i32) -> i32 { 
-            //some comment
-            string x = \"hello\";
-            i32 y = 4 / n;
-            return 0;
-        }"
+    let program = r#" 
+    fn main(n: i32) -> i32 {
+        // some comment
+        string x = "hello";
+        i32 y = 4 / n;
+        return 0;
+    } // some comment
+    "#
     .to_string();
 
     let expected = vec![
@@ -23,7 +24,7 @@ fn test_tokenizer() {
         TokenKind::Separator(Separator::Arrow),
         TokenKind::Keyword(Keyword::I32),
         TokenKind::Separator(Separator::LBrace),
-        TokenKind::Comment("some comment".to_string()),
+        // TokenKind::Comment("some comment".to_string()),
         TokenKind::Keyword(Keyword::String),
         TokenKind::Identifier("x".to_string()),
         TokenKind::Operator(Operator::Assign),
@@ -84,10 +85,10 @@ fn test_error() {
     let tokens = tokenize(program);
     assert!(tokens.is_err());
     print_err(&tokens.unwrap_err().display(), false);
-    let program = "
+    let program = r#" 
         // this number is really big lol
         3965264536463463462346243643664326646243623462436643
-    "
+    "#
     .to_string();
     let tokens = tokenize(program);
     assert!(tokens.is_err());

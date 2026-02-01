@@ -1,0 +1,18 @@
+// hello
+
+(
+  // hello
+  1
+)
+
+fn() -> unit {
+  ()
+  // hello
+}
+
+if (false) {
+  // hello
+  ()
+}
+
+// hello

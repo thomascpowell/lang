@@ -12,7 +12,11 @@ pub fn tokenize(input: String) -> Result<Vec<Token>, Error> {
     let mut lexer = Lexer::new(input);
     lexer.skip_whitespace();
     while lexer.has_next() {
-        res.push(lexer.next_token()?);
+        let tok = lexer.next_token()?;
+        if matches!(tok.kind, TokenKind::Comment(_)) {
+            continue;
+        };
+        res.push(tok);
         lexer.skip_whitespace();
     }
     Ok(res)
@@ -94,6 +98,7 @@ impl Lexer {
             c if c == '/' && self.peek_next().is_some_and(|c| c == '/') => {
                 self.advance_n(2);
                 let comment = self.consume_while(|c| c != '\n');
+                self.skip_whitespace();
                 (TokenKind::Comment(comment.clone()), comment)
             }
             // Separators
