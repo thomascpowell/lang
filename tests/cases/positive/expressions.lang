@@ -23,11 +23,7 @@ whatever();
 "a string";
 
 function recursive = fn(param: i32) -> i32 {
-  return if (param > 100) {
-    recursive(param/2)
-  } else {
-    param
-  };
+  if (param > 100) recursive(param/2) else param
 };
 
 recursive(1000);

@@ -1,2 +1,3 @@
 if (false) { panic() }
-if (true) { () } else { panic() }
+if (true) () else panic()
+if (true) () else panic()
