@@ -101,6 +101,7 @@ impl Parser {
             .peek()
             .ok_or_else(|| Error::generic_eof("expected an expression"))?;
         let pos = tok.position.clone();
+        // simple expressions
         let mut lhs = match tok.kind {
             TokenKind::Literal(_) | TokenKind::Keyword(Keyword::True | Keyword::False) => {
                 Expression::LiteralExp(self.parse_literal_token()?)
@@ -120,14 +121,28 @@ impl Parser {
         };
         // right-recursive descent (if operator is present)
         while let Some(tok) = self.peek() {
+            // function calls
             if matches!(tok.kind, TokenKind::Separator(Separator::LParen)) {
                 lhs = Expression::CallExp(self.parse_call(lhs)?);
                 continue;
             }
+            // check for operator
             let op = match &tok.kind {
                 TokenKind::Operator(op) => op.clone(),
+                // special case: cons
+                TokenKind::Cons => {
+                    let cons_prec = 1;
+                    if cons_prec < min_prec {
+                        break;
+                    }
+                    self.advance();
+                    let rhs = self.parse_expression(cons_prec)?;
+                    lhs = Expression::ConsExp(ConsExp::new(pos.clone(), lhs, rhs));
+                    continue;
+                }
                 _ => break,
             };
+            // handle binary opeartor
             let prec = op.get_precedence();
             if prec < min_prec {
                 break;
@@ -152,7 +167,7 @@ impl Parser {
         if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
             self.advance();
             return Ok(Call {
-                position: pos.clone(),
+                position: pos,
                 callee: Box::new(callee),
                 args,
             });
@@ -343,7 +358,7 @@ impl Parser {
         // self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
         // let then_branch = self.parse_statement()?;
         // self.expect(|x| matches!(x, TokenKind::Separator(Separator::RBrace)))?;
-        
+
         let mut res = IfExp {
             position: pos,
             if_cond: Box::new(cond),

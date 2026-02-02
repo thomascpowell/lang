@@ -157,6 +157,7 @@ impl Interpreter {
                 node: exp.clone(),
                 env: Rc::clone(&self.scope),
             }))),
+            Expression::ConsExp(_) => todo!(),
         }
     }
 
@@ -223,7 +224,6 @@ impl Interpreter {
             LiteralValue::String(x) => ExecResult::Value(Value::String(x)),
             LiteralValue::Bool(x) => ExecResult::Value(Value::Bool(x)),
             LiteralValue::Unit => ExecResult::Value(Value::Unit),
-            
         })
     }
 

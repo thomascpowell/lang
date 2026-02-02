@@ -24,10 +24,8 @@ pub enum TokenKind {
     Separator(Separator),
     Operator(Operator),
     Literal(Literal),
-
     // comments are thrown out atm
     Comment(String),
-
     // cons is a _constructor_
     Cons
 }
@@ -57,13 +55,13 @@ pub enum Operator {
 impl Operator {
     pub fn get_precedence(&self) -> u8 {
         match self {
-            Operator::Or => 1,
-            Operator::And => 2,
-            Operator::Eq | Operator::Ne => 3,
-            Operator::Lt | Operator::Le | Operator::Gt | Operator::Ge => 4,
-            Operator::Add | Operator::Sub => 5,
-            Operator::Mul | Operator::Div | Operator::Mod => 6,
-            // if cons was here it would be very low precedence
+            // if cons were here it would be very low precedence (1)
+            Operator::Or => 2,
+            Operator::And => 3,
+            Operator::Eq | Operator::Ne => 4,
+            Operator::Lt | Operator::Le | Operator::Gt | Operator::Ge => 5,
+            Operator::Add | Operator::Sub => 6,
+            Operator::Mul | Operator::Div | Operator::Mod => 7,
             _ => 0,
         }
     }

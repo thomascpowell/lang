@@ -119,7 +119,6 @@ pub struct Function {
 
 #[derive(Debug, Clone)]
 pub struct Param {
-    // for def
     pub position: Position,
     pub param_type: Type,
     pub identifier: String,

@@ -1,4 +1,4 @@
-// This is the grammar for "lang"
+// General grammar for "lang"
 
 // A program is a list of statements
 <program> ::= <statement_list>
