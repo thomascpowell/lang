@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 
 use crate::{
-    interpreter::{exec_result::ExecResult, value::Value},
+    interpreter::{exec_result::ExecResult, list::List, value::Value},
     lang_error::{Error, ErrorType},
     position::Position,
 };
@@ -47,6 +47,12 @@ pub fn std_floor(args: Vec<Value>) -> Result<ExecResult, Error> {
             ))?
             .expect_float()? as i32,
     )))
+}
+
+pub fn std_new_list(_args: Vec<Value>) -> Result<ExecResult, Error> {
+    // temporary (?) way of creating an empty list ('[]')
+    // should be replaced when (if) list literal syntax is added
+    Ok(ExecResult::Value(Value::List(List::Nil)))
 }
 
 pub fn std_assert(args: Vec<Value>) -> Result<ExecResult, Error> {

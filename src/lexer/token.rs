@@ -117,4 +117,5 @@ pub enum Keyword {
     String,
     Function,
     Unit,
+    List,
 }

@@ -108,9 +108,9 @@ impl Error {
         }
     }
 
-    pub fn generic_invalid_operand(operand: &Value) -> Self {
+    pub fn generic_invalid_operand(operand: &Value, expected: Option<&str>) -> Self {
         let op = format!("{:?}", operand.get_type());
-        return Error::new(ErrorType::InvalidOperand, NO_POSITION, op, None);
+        return Error::new(ErrorType::InvalidOperand, NO_POSITION, op, expected);
     }
 
     pub fn generic_eof(expected: &str) -> Self {

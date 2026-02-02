@@ -251,6 +251,7 @@ fn classify_keyword_or_identifier(identifier: &str) -> TokenKind {
         "else" => TokenKind::Keyword(Keyword::Else),
         "return" => TokenKind::Keyword(Keyword::Return),
         "unit" => TokenKind::Keyword(Keyword::Unit),
+        "list" => TokenKind::Keyword(Keyword::List),
         _ => TokenKind::Identifier(identifier.to_string()),
     }
 }

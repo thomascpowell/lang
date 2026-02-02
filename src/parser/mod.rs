@@ -72,6 +72,7 @@ impl Parser {
             TokenKind::Keyword(Keyword::String) => self.handle_assignment(Type::String, pos),
             TokenKind::Keyword(Keyword::Function) => self.handle_assignment(Type::Function, pos),
             TokenKind::Keyword(Keyword::Unit) => self.handle_assignment(Type::Unit, pos),
+            TokenKind::Keyword(Keyword::List) => self.handle_assignment(Type::List, pos),
             _ => Err(Error::new(
                 ErrorType::UnexpectedTokenType,
                 pos,
@@ -330,6 +331,7 @@ impl Parser {
             TokenKind::Keyword(Keyword::String) => Type::String,
             TokenKind::Keyword(Keyword::Function) => Type::Function,
             TokenKind::Keyword(Keyword::Unit) => Type::Unit,
+            TokenKind::Keyword(Keyword::List) => Type::List,
             _ => return Err(Error::generic_utt(type_token)),
         };
         let pos = id.position.clone();
@@ -507,6 +509,7 @@ fn is_type(token: &TokenKind) -> bool {
         | TokenKind::Keyword(Keyword::F32)
         | TokenKind::Keyword(Keyword::String)
         | TokenKind::Keyword(Keyword::Function)
+        | TokenKind::Keyword(Keyword::List)
         | TokenKind::Keyword(Keyword::Unit) => true,
         _ => false,
     }

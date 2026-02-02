@@ -72,6 +72,10 @@ impl Expression {
             Expression::ParenExp(x) => &x.get_position(),
         }
     }
+
+    pub fn expect_cons(&self) -> Result<ConsExp, Error> {
+        todo!()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -156,8 +160,8 @@ pub struct IfExp {
 #[derive(Debug, Clone)]
 pub struct ConsExp {
     pub position: Position,
-    head: Box<Expression>,
-    tail: Box<Expression>,
+    pub head: Box<Expression>,
+    pub tail: Box<Expression>,
 }
 
 impl ConsExp {
@@ -182,6 +186,7 @@ pub enum Type {
     Bool,
     Function,
     Unit,
+    List,
 }
 
 pub type Operator = crate::lexer::token::Operator;

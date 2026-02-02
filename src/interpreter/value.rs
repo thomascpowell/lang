@@ -1,7 +1,7 @@
 use std::ops::{Add, Div, Mul, Sub};
 
 use crate::{
-    interpreter::{closure::Closure, exec_result::ExecResult, symbol::Symbol},
+    interpreter::{closure::Closure, exec_result::ExecResult, list::List, symbol::Symbol},
     lang_error::Error,
     parser::ast::Type,
     position::Position,
@@ -20,6 +20,7 @@ pub enum Value {
     Function(Closure),
     NativeFunction(fn(Vec<Value>) -> Result<ExecResult, Error>),
     Uninitialized,
+    List(List),
     Unit,
 }
 
@@ -28,20 +29,23 @@ impl Value {
         if let Value::Int(x) = self {
             return Ok(*x);
         }
-        Err(Error::generic_invalid_operand(self))
+        Err(Error::generic_invalid_operand(self, Some("expected i32")))
     }
     pub fn expect_float(&self) -> Result<f32, Error> {
         if let Value::Float(x) = self {
             return Ok(*x);
         }
-        Err(Error::generic_invalid_operand(self))
+        Err(Error::generic_invalid_operand(self, Some("expected f32")))
     }
 
     pub fn expect_numeric(&self) -> Result<f32, Error> {
         match self {
             Value::Float(x) => Ok(*x),
             Value::Int(x) => Ok(*x as f32),
-            _ => Err(Error::generic_invalid_operand(self)),
+            _ => Err(Error::generic_invalid_operand(
+                self,
+                Some("expected numeric (i32, f32)"),
+            )),
         }
     }
 
@@ -49,19 +53,34 @@ impl Value {
         if let Value::Bool(x) = self {
             return Ok(*x);
         }
-        Err(Error::generic_invalid_operand(self))
+        Err(Error::generic_invalid_operand(self, Some("expected bool")))
     }
+
     pub fn expect_string(&self) -> Result<String, Error> {
         if let Value::String(x) = self {
             return Ok(x.clone());
         }
-        Err(Error::generic_invalid_operand(self))
+        Err(Error::generic_invalid_operand(
+            self,
+            Some("expected string"),
+        ))
     }
+
     pub fn expect_function(&mut self) -> Result<Closure, Error> {
         if let Value::Function(x) = self {
             return Ok(x.clone());
         }
-        Err(Error::generic_invalid_operand(self))
+        Err(Error::generic_invalid_operand(
+            self,
+            Some("expected function"),
+        ))
+    }
+
+    pub fn expect_list(&mut self) -> Result<List, Error> {
+        if let Value::List(x) = self {
+            return Ok(x.clone());
+        }
+        Err(Error::generic_invalid_operand(self, Some("expected list")))
     }
 
     pub fn into_symbol(self, pos: Position) -> Symbol {
@@ -80,6 +99,7 @@ impl Value {
             Value::String(_) => Type::String,
             Value::NativeFunction(_) | Value::Function(_) => Type::Function,
             Value::Unit => Type::Unit,
+            Value::List(_) => Type::List,
             Value::Uninitialized => unreachable!(),
         }
     }
@@ -93,6 +113,8 @@ impl Value {
             Self::Function(_) => "[function]".to_string(),
             Self::NativeFunction(_) => "[native function]".to_string(),
             Self::Unit => "[unit]".to_string(),
+            // TODO: improve this?
+            Self::List(_) => "[list]".to_string(),
             Value::Uninitialized => unreachable!(),
         }
     }

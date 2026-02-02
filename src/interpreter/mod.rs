@@ -1,4 +1,9 @@
-use crate::interpreter::{closure::Closure, scope::*, value::Value};
+use crate::interpreter::{
+    closure::Closure,
+    list::{Cons, List},
+    scope::*,
+    value::Value,
+};
 use std::{cell::RefCell, rc::Rc};
 
 use crate::{
@@ -10,6 +15,7 @@ use crate::{
 pub mod closure;
 pub mod exec_result;
 pub mod frame;
+pub mod list;
 pub mod scope;
 pub mod stdlib;
 pub mod symbol;
@@ -52,7 +58,6 @@ impl Interpreter {
     }
 
     pub fn run_frame(&mut self) -> Result<ExecResult, Error> {
-        // TODO: refactor?
         let initial_scope = self.scope.clone();
         loop {
             // get the frame off the stack
@@ -147,6 +152,7 @@ impl Interpreter {
 
     fn handle_expression(&mut self, expression: &Expression) -> Result<ExecResult, Error> {
         match expression {
+            Expression::ConsExp(exp) => self.handle_cons(exp.clone()),
             Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
             Expression::CallExp(exp) => self.handle_call(exp.clone()),
             Expression::LiteralExp(exp) => self.handle_literal(exp.clone()),
@@ -157,7 +163,6 @@ impl Interpreter {
                 node: exp.clone(),
                 env: Rc::clone(&self.scope),
             }))),
-            Expression::ConsExp(_) => todo!(),
         }
     }
 
@@ -324,5 +329,18 @@ impl Interpreter {
             ));
         }
         Ok(res)
+    }
+
+    fn handle_cons(&mut self, exp: ConsExp) -> Result<ExecResult, Error> {
+        let head = self.handle_expression(exp.head.as_ref())?.expect_value()?;
+        let tail = self
+            .handle_expression(exp.tail.as_ref())?
+            .expect_value()?
+            .expect_list()?;
+        let res = List::Cons(Cons {
+            head: Box::new(head),
+            tail: Box::new(tail),
+        });
+        Ok(ExecResult::Value(Value::List(res)))
     }
 }
