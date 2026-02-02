@@ -56,6 +56,7 @@ pub enum Expression {
     ParenExp(Box<Expression>),
     BinaryExp(BinaryExp),
     IfExp(IfExp),
+    ConsExp(ConsExp),
 }
 
 impl Expression {
@@ -67,6 +68,7 @@ impl Expression {
             Expression::CallExp(x) => &x.position,
             Expression::BinaryExp(x) => &x.position,
             Expression::IfExp(x) => &x.position,
+            Expression::ConsExp(x) => &x.position,
             Expression::ParenExp(x) => &x.get_position(),
         }
     }
@@ -132,7 +134,6 @@ pub struct Call {
 }
 #[derive(Debug, Clone)]
 pub struct Argument {
-    // for call
     pub position: Position,
     pub value: Expression,
 }
@@ -147,11 +148,27 @@ pub struct BinaryExp {
 
 #[derive(Debug, Clone)]
 pub struct IfExp {
-    // if is an expression
     pub position: Position,
     pub if_cond: Box<Expression>,
     pub then_branch: Box<Statement>,
     pub else_branch: Option<Box<Statement>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConsExp {
+    pub position: Position,
+    head: Box<Expression>,
+    tail: Box<Expression>,
+}
+
+impl ConsExp {
+    pub fn new(position: Position, head: Expression, tail: Expression) -> Self {
+        Self {
+            position: position,
+            head: Box::new(head),
+            tail: Box::new(tail),
+        }
+    }
 }
 
 /*
@@ -218,6 +235,11 @@ impl Expression {
                 println!("{}BinaryExp: {:?}", padding, bexp.operator);
                 bexp.left.print_ast(indent + 1);
                 bexp.right.print_ast(indent + 1);
+            }
+            Expression::ConsExp(cexp) => {
+                println!("{}Cons", padding);
+                cexp.head.print_ast(indent + 1);
+                cexp.tail.print_ast(indent + 1);
             }
             Expression::FunctionExp(fexp) => {
                 println!("{}Function", padding);

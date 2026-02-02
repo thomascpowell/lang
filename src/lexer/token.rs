@@ -24,9 +24,12 @@ pub enum TokenKind {
     Separator(Separator),
     Operator(Operator),
     Literal(Literal),
-    // comments are created as valid tokens
-    // but currently this information is not used elsewhere
+
+    // comments are thrown out atm
     Comment(String),
+
+    // cons is a _constructor_
+    Cons
 }
 
 /*
@@ -60,6 +63,7 @@ impl Operator {
             Operator::Lt | Operator::Le | Operator::Gt | Operator::Ge => 4,
             Operator::Add | Operator::Sub => 5,
             Operator::Mul | Operator::Div | Operator::Mod => 6,
+            // if cons was here it would be very low precedence
             _ => 0,
         }
     }

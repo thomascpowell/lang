@@ -95,11 +95,17 @@ impl Lexer {
                 (TokenKind::Literal(Literal::String(s.clone())), s)
             }
             // Comment
-            c if c == '/' && self.peek_next().is_some_and(|c| c == '/') => {
+            '/' if self.is_next('/') => {
                 self.advance_n(2);
                 let comment = self.consume_while(|c| c != '\n');
                 self.skip_whitespace();
                 (TokenKind::Comment(comment.clone()), comment)
+            }
+            // Constructor
+            ':' if self.is_next(':') => {
+                self.advance_n(2);
+                self.skip_whitespace();
+                (TokenKind::Cons, "::".to_string())
             }
             // Separators
             '(' => self.make_simple_token(TokenKind::Separator(Separator::LParen), '('),
@@ -110,32 +116,32 @@ impl Lexer {
             ';' => self.make_simple_token(TokenKind::Separator(Separator::Semicolon), ';'),
             ':' => self.make_simple_token(TokenKind::Separator(Separator::Colon), ':'),
             // Separator (Double)
-            '-' if self.peek_next().is_some_and(|c| c == '>') => {
+            '-' if self.is_next('>') => {
                 self.advance_n(2);
                 (TokenKind::Separator(Separator::Arrow), "->".to_string())
             }
             // Operators (Double)
-            '!' if self.peek_next().is_some_and(|c| c == '=') => {
+            '!' if self.is_next('=') => {
                 self.advance_n(2);
                 (TokenKind::Operator(Operator::Ne), "!=".to_string())
             }
-            '<' if self.peek_next().is_some_and(|c| c == '=') => {
+            '<' if self.is_next('=') => {
                 self.advance_n(2);
                 (TokenKind::Operator(Operator::Le), "<=".to_string())
             }
-            '>' if self.peek_next().is_some_and(|c| c == '=') => {
+            '>' if self.is_next('=') => {
                 self.advance_n(2);
                 (TokenKind::Operator(Operator::Ge), ">=".to_string())
             }
-            '&' if self.peek_next().is_some_and(|c| c == '&') => {
+            '&' if self.is_next('&') => {
                 self.advance_n(2);
                 (TokenKind::Operator(Operator::And), "&&".to_string())
             }
-            '|' if self.peek_next().is_some_and(|c| c == '|') => {
+            '|' if self.is_next('|') => {
                 self.advance_n(2);
                 (TokenKind::Operator(Operator::Or), "||".to_string())
             }
-            '=' if self.peek_next().is_some_and(|c| c == '=') => {
+            '=' if self.is_next('=') => {
                 self.advance_n(2);
                 (TokenKind::Operator(Operator::Eq), "==".to_string())
             }
@@ -193,6 +199,10 @@ impl Lexer {
 
     fn peek_next(&self) -> Option<char> {
         self.src.get(self.pos + 1).cloned()
+    }
+
+    fn is_next(&mut self, ch: char) -> bool {
+        self.peek_next().is_some_and(|c| c == ch)
     }
 
     fn skip_whitespace(&mut self) {
