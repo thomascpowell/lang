@@ -18,7 +18,8 @@
 // Expression 
 <expression> ::= <call> | <literal> | <identifier> | <function> | <binary_expr> | <if_expr> | "(" <expression> ")"
 <binary_expr> ::= <expression> <operator> <expression>
-<if_expr> ::= "if" "(" <expression> ")" "{" <statement> "}" ("else" "{" <statement> "}" )?
+<if_expr> ::= "if" "(" <expression> ")" <statement_with_optional_braces> [ "else" <statement_with_optional_braces> ]
+<statement_with_optional_braces> ::= "{" <statement> "}" | <statement>
 
 // Operator
 <operator> ::= "+" | "-" | "*" | "/" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" | "%"
