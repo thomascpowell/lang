@@ -113,8 +113,9 @@ impl Value {
             Self::Function(_) => "[function]".to_string(),
             Self::NativeFunction(_) => "[native function]".to_string(),
             Self::Unit => "[unit]".to_string(),
-            // TODO: improve this?
-            Self::List(_) => "[list]".to_string(),
+            Self::List(l) => l.display(true),
+
+
             Value::Uninitialized => unreachable!(),
         }
     }
