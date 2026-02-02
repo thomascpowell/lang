@@ -33,6 +33,9 @@ println(apply_twice(add10, 10)); // prints 30
 - First-class function support
     - Functions are values created by anonymous function expressions
     - Functions can be assigned to variables, passed as arguments, and returned
+- Immutable lists
+    - Lists are constructed using `::` (cons)
+    - Implemented as a linked list, they are efficient at the front
 - Standard library with native functions
     - Standard library functions are automatically in scope
     - Key functions include `print`, `println`, and `read`
