@@ -1,4 +1,5 @@
 // AST for programs/example.lang
+// Command: ./lang parser programs/example.lang
 
 Assignment: Function apply_twice
 |  Function

@@ -26,20 +26,18 @@ println(apply_twice(add10, 10)); // prints 30
 - More code examples can be found in `./programs`
 
 ## Features
-- Lexical scoping with closures 
+- Lexical scopes 
     - Closures capture their environment
-    - Inner scopes can redefine identifiers
-    - Recursion works correctly
-- First-class function support
+    - Recursion and shadowing are fully supported
+- First-class functions
     - Functions are values created by anonymous function expressions
     - Functions can be assigned to variables, passed as arguments, and returned
 - Immutable lists
-    - Lists are constructed using `::` (cons)
-    - Implemented as a linked list, they are efficient at the front
-- Standard library with native functions
+    - Lists are constructed using `::`
+    - Implemented as a linked list
+- Standard library
     - Standard library functions are automatically in scope
-    - Key functions include `print`, `println`, and `read`
+    - Key functions include `assert`, `println`, and `read`
 - Helpful debugging tools
-    - Errors include a clear message and show what was found
-    - Errors also display source position (line and column)
+    - Errors include a clear explanation and source position
     - The CLI can print the AST or token list
