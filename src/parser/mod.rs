@@ -489,6 +489,7 @@ fn get_type_from_keyword(token: Token) -> Result<Type, Error> {
         TokenKind::Keyword(Keyword::String) => Type::String,
         TokenKind::Keyword(Keyword::Function) => Type::Function,
         TokenKind::Keyword(Keyword::Unit) => Type::Unit,
+        TokenKind::Keyword(Keyword::List) => Type::List,
         _ => {
             return Err(Error::new(
                 ErrorType::UnexpectedTokenType,

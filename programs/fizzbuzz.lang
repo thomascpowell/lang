@@ -1,19 +1,10 @@
 function fizzbuzz = fn(i: i32) -> unit {
   i32 c = 100-i
   print(c, ": ")
-
-  if (c % 3 == 0) {
-    print("Fizz")
-  }
-
-  if (c % 5 == 0) {
-    print("Buzz")
-  }
+  if (c % 3 == 0) print("Fizz")
+  if (c % 5 == 0) print("Buzz")
   println()
-
-  if (i > 0) {
-    fizzbuzz(i-1)
-  }
+  if (i > 0) fizzbuzz(i-1)
   return ()
 }
 
