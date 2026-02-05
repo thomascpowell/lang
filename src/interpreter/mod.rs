@@ -337,9 +337,11 @@ impl Interpreter {
             .handle_expression(exp.tail.as_ref())?
             .expect_value()?
             .expect_list()?;
+        let length = tail.length() + 1;
         let res = List::Cons(Cons {
             head: Box::new(head),
             tail: Box::new(tail),
+            length: length,
         });
         Ok(ExecResult::Value(Value::List(res)))
     }

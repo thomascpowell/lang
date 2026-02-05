@@ -46,6 +46,11 @@ pub fn std_new_list(_args: Vec<Value>) -> Result<ExecResult, Error> {
     Ok(ExecResult::Value(Value::List(List::Nil)))
 }
 
+pub fn std_length(args: Vec<Value>) -> Result<ExecResult, Error> {
+    let list = get_arg(&args, 0)?.expect_list()?;
+    Ok(ExecResult::Value(Value::Int(list.length() as i32)))
+}
+
 pub fn std_head(args: Vec<Value>) -> Result<ExecResult, Error> {
     let list = get_arg(&args, 0)?.expect_list()?.clone();
     match list {

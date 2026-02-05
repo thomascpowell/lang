@@ -18,10 +18,18 @@ impl List {
             Self::Cons(c) => format!("{} {}{}", open, c.head.display(), c.tail.display(false)),
         }
     }
+
+    pub fn length(&self) -> usize {
+        match self {
+            List::Nil => 0,
+            List::Cons(c) => c.length,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct Cons {
     pub head: Box<Value>,
     pub tail: Box<List>,
+    pub length: usize,
 }

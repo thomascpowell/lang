@@ -25,6 +25,7 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
     // TODO: this could probably be a macro?
     let names = vec![
         "floor", "print", "println", "panic", "read", "assert", "new_list", "head", "tail",
+        "length",
     ];
     let functions = vec![
         std_floor,
@@ -36,6 +37,7 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
         std_new_list,
         std_head,
         std_tail,
+        std_length,
     ];
     for (name, function) in zip(names, functions) {
         let symbol = Symbol {
