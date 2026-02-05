@@ -38,34 +38,16 @@ pub fn std_read(_args: Vec<Value>) -> Result<ExecResult, Error> {
 
 pub fn std_floor(args: Vec<Value>) -> Result<ExecResult, Error> {
     Ok(ExecResult::Value(Value::Int(
-        args.get(0)
-            .ok_or(Error::new(
-                ErrorType::StdMissingArgs,
-                POSITION,
-                "missing argument to stdlib function",
-                None,
-            ))?
-            .expect_float()? as i32,
+        get_arg(&args, 0)?.expect_float()? as i32,
     )))
 }
 
 pub fn std_new_list(_args: Vec<Value>) -> Result<ExecResult, Error> {
-    // temporary (?) way of creating an empty list ('[]')
-    // should be replaced when (if) list literal syntax is added
     Ok(ExecResult::Value(Value::List(List::Nil)))
 }
 
 pub fn std_head(args: Vec<Value>) -> Result<ExecResult, Error> {
-    let list = args
-        .get(0)
-        .ok_or(Error::new(
-            ErrorType::StdMissingArgs,
-            POSITION,
-            "missing argument to stdlib function",
-            None,
-        ))?
-        .expect_list()?
-        .clone();
+    let list = get_arg(&args, 0)?.expect_list()?.clone();
     match list {
         List::Nil => {
             return Err(Error::new(
@@ -80,17 +62,7 @@ pub fn std_head(args: Vec<Value>) -> Result<ExecResult, Error> {
 }
 
 pub fn std_tail(args: Vec<Value>) -> Result<ExecResult, Error> {
-    // TODO: extract this to helper function for getting args
-    let list = args
-        .get(0)
-        .ok_or(Error::new(
-            ErrorType::StdMissingArgs,
-            POSITION,
-            "missing argument to stdlib function",
-            None,
-        ))?
-        .expect_list()?
-        .clone();
+    let list = get_arg(&args, 0)?.expect_list()?.clone();
     match list {
         List::Nil => {
             return Err(Error::new(
@@ -105,20 +77,10 @@ pub fn std_tail(args: Vec<Value>) -> Result<ExecResult, Error> {
 }
 
 pub fn std_assert(args: Vec<Value>) -> Result<ExecResult, Error> {
+    let cond = get_arg(&args, 0)?.expect_bool()?;
     let optional_msg = args
         .get(1)
         .and_then(|r| return Some(r.expect_string().unwrap()));
-
-    let cond = args
-        .get(0)
-        .ok_or(Error::new(
-            ErrorType::StdMissingArgs,
-            POSITION,
-            "missing argument to stdlib function",
-            None,
-        ))?
-        .expect_bool()?;
-
     if !cond {
         return Err(Error::new(
             ErrorType::StdAssertionFailure,
@@ -132,4 +94,17 @@ pub fn std_assert(args: Vec<Value>) -> Result<ExecResult, Error> {
 
 pub fn std_panic(_args: Vec<Value>) -> Result<ExecResult, Error> {
     panic!("[panic]");
+}
+
+/**
+* Helper functions
+* */
+
+fn get_arg<'a>(args: &'a Vec<Value>, index: usize) -> Result<&'a Value, Error> {
+    args.get(index).ok_or(Error::new(
+        ErrorType::StdMissingArgs,
+        POSITION,
+        "missing or incorrect argument to stdlib function",
+        None,
+    ))
 }
