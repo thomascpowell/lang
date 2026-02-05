@@ -55,6 +55,55 @@ pub fn std_new_list(_args: Vec<Value>) -> Result<ExecResult, Error> {
     Ok(ExecResult::Value(Value::List(List::Nil)))
 }
 
+pub fn std_head(args: Vec<Value>) -> Result<ExecResult, Error> {
+    let list = args
+        .get(0)
+        .ok_or(Error::new(
+            ErrorType::StdMissingArgs,
+            POSITION,
+            "missing argument to stdlib function",
+            None,
+        ))?
+        .expect_list()?
+        .clone();
+    match list {
+        List::Nil => {
+            return Err(Error::new(
+                ErrorType::EmptyList,
+                POSITION,
+                "expected head to exist",
+                None,
+            ));
+        }
+        List::Cons(c) => Ok(ExecResult::Value(c.head.as_ref().clone())),
+    }
+}
+
+pub fn std_tail(args: Vec<Value>) -> Result<ExecResult, Error> {
+    // TODO: extract this to helper function for getting args
+    let list = args
+        .get(0)
+        .ok_or(Error::new(
+            ErrorType::StdMissingArgs,
+            POSITION,
+            "missing argument to stdlib function",
+            None,
+        ))?
+        .expect_list()?
+        .clone();
+    match list {
+        List::Nil => {
+            return Err(Error::new(
+                ErrorType::EmptyList,
+                POSITION,
+                "expected head to exist",
+                None,
+            ));
+        }
+        List::Cons(c) => Ok(ExecResult::Value(Value::List(c.tail.as_ref().clone()))),
+    }
+}
+
 pub fn std_assert(args: Vec<Value>) -> Result<ExecResult, Error> {
     let optional_msg = args
         .get(1)

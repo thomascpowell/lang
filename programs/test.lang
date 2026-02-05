@@ -1,0 +1,4 @@
+list x = 1 :: 2 :: 3 :: new_list()
+
+println(head(x))
+println(tail(x))

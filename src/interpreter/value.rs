@@ -66,7 +66,7 @@ impl Value {
         ))
     }
 
-    pub fn expect_function(&mut self) -> Result<Closure, Error> {
+    pub fn expect_function(&self) -> Result<Closure, Error> {
         if let Value::Function(x) = self {
             return Ok(x.clone());
         }
@@ -76,7 +76,7 @@ impl Value {
         ))
     }
 
-    pub fn expect_list(&mut self) -> Result<List, Error> {
+    pub fn expect_list(&self) -> Result<List, Error> {
         if let Value::List(x) = self {
             return Ok(x.clone());
         }

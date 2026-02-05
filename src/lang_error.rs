@@ -30,6 +30,7 @@ pub enum ErrorType {
     InvalidParams,
     InvalidFunctionBody,
     TypeMismatch,
+    EmptyList,
     // Stdlib
     StdRead,
     StdMissingArgs,

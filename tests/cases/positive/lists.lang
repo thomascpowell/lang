@@ -1,3 +1,6 @@
-list x = new_list()
-list y = 1 :: 2 :: x
-list z =  3 :: 2 :: y
+list x = 1 :: 2 :: 3 :: 4 :: 5 :: new_list()
+
+list tail_x = tail(x)
+i32 head_x = head(x)
+
+assert(head(tail(x)) == 2)

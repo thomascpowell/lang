@@ -22,8 +22,9 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
         parent: None,
     };
     let pos = Position { col: 0, line: 0 };
+    // TODO: this could probably be a macro?
     let names = vec![
-        "floor", "print", "println", "panic", "read", "assert", "new_list",
+        "floor", "print", "println", "panic", "read", "assert", "new_list", "head", "tail",
     ];
     let functions = vec![
         std_floor,
@@ -33,6 +34,8 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
         std_read,
         std_assert,
         std_new_list,
+        std_head,
+        std_tail,
     ];
     for (name, function) in zip(names, functions) {
         let symbol = Symbol {
