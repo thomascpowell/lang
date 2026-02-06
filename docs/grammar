@@ -1,5 +1,5 @@
 // A program is a list of statements
-<program> ::= <statement_list>
+<program>        ::= <statement_list>
 <statement_list> ::= <statement_list> <statement> | epsilon
 
 // A statement is either: assignment, expression, or return
@@ -10,31 +10,33 @@
 
 // Assignment
 <assignment> ::= <type> <identifier> "=" <expression>
-<type> ::= "i32" | "f32" | "bool" | "string" | "function"
 <identifier> ::= [a-zA-Z_][a-zA-Z0-9_]*
+<type>       ::= "i32" | "f32" | "bool" | "string" | "function"
 
 // Expression
-<expression> ::= <call> | <literal> | <identifier> | <function>  | <if_expr> | "(" <expression> ")" 
-<if_expr> ::= "if" "(" <expression> ")" <statement_with_optional_braces> [ "else" <statement_with_optional_braces> ]
-<statement_with_optional_braces> ::= "{" <statement> "}" | <statement>
+<expression>  ::= <call> | <literal> | <identifier> | <function>  | <if_expr> | <list_expr> | "(" <expression> ")" 
+<if_expr>     ::= "if" "(" <expression> ")" <statement_with_optional_braces> [ "else" <statement_with_optional_braces> ]
 <binary_expr> ::= <expression> <operator> <expression>
-<cons_expr> ::= <expression> "::" <expression>
+<cons_expr>   ::= <expression> "::" <expression>
+<list_expr>   ::= [' <literal>+ ']'
+
+<statement_with_optional_braces> ::= "{" <statement> "}" | <statement>
 
 // Operator
 <operator> ::= "+" | "-" | "*" | "/" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" | "%"
 
 // Literal
-<literal> ::= <integer_literal> | <boolean_literal> | <string_literal> | <unit_literal>
+<literal>         ::= <integer_literal> | <boolean_literal> | <string_literal> | <unit_literal>
 <integer_literal> ::= [0-9]+
 <boolean_literal> ::= "true" | "false"
-<string_literal>  ::= '"' [^"]* '"'
+<string_literal>  ::= '"' [^"]+ '"'
 <unit_literal>    ::= '()'
 
 // Function
-<function> ::= "fn" "(" <parameter_list> ")" "->" <type> "{"  <statement_list> "}"
+<function>       ::= "fn" "(" <parameter_list> ")" "->" <type> "{"  <statement_list> "}"
 <parameter_list> ::= <parameter> ("," <parameter>)*
-<parameter> ::= <identifier> ":" <type>
+<parameter>      ::= <identifier> ":" <type>
 
 // Call
-<call> ::= <expression> "(" <argument_list> ")"
+<call>          ::= <expression> "(" <argument_list> ")"
 <argument_list> ::= <expression> ("," <expression>)*

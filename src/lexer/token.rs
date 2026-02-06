@@ -69,10 +69,12 @@ impl Operator {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Separator {
-    LParen,
+    LParen, 
     RParen,
     LBrace,
     RBrace,
+    LBracket,
+    RBracket,
     Comma,
     Semicolon,
     Colon,
