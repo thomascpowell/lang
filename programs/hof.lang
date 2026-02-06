@@ -1,6 +1,0 @@
-// anonymous function as an argument
-function demo = fn(f: function) -> i32 {
-  return f(100)
-}
-
-println ( demo(fn(x: i32) -> i32 { return x * x }) )
