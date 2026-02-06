@@ -281,7 +281,7 @@ impl Interpreter {
             return Err(Error::new(
                 ErrorType::InvalidParams,
                 position,
-                format!("{:?}", args.len()),
+                format!("found: {:?}, expected {:?}", num_args, num_params),
                 Some("incorrect number of arguments"),
             ));
         }

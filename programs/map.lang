@@ -1,0 +1,11 @@
+// map() implementation in lang
+
+function map = fn(f: function, l: list) -> list {
+  if (length(l) == 0) new_list() else f(head(l)) :: map(f, tail(l))
+}
+
+list numbers = 1 :: 2 :: 3 :: new_list()
+function double = fn(x: i32) -> i32 { x * 2 }
+
+println("numbers: ", numbers)
+println("map output: ", map(double, numbers))
