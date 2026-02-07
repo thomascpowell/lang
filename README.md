@@ -1,6 +1,6 @@
-# Lang
+# "lang"
 
-A small, functional programming language written from scratch in Rust.
+A functional programming language implemented in Rust.
 
 [![tests](https://github.com/thomascpowell/lang/actions/workflows/rust.yml/badge.svg)](https://github.com/thomascpowell/lang/actions/workflows/rust.yml)
 
@@ -33,8 +33,8 @@ println(apply_twice(add10, 10)); // prints 30
     - Functions are values created by anonymous function expressions
     - Functions can be assigned to variables, passed as arguments, and returned
 - Immutable lists
-    - Lists are constructed using `::`
     - Implemented as a linked list
+    - Constructed using list literals or `::`
 - Standard library
     - Standard library functions are automatically in scope
     - Key functions include `assert`, `println`, and `read`
