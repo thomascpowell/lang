@@ -5,19 +5,21 @@ A functional programming language implemented in Rust.
 [![tests](https://github.com/thomascpowell/lang/actions/workflows/rust.yml/badge.svg)](https://github.com/thomascpowell/lang/actions/workflows/rust.yml)
 
 ```
-// Example
+// Insertion sort implementation
 
-function apply_twice = fn(f: function, x: i32) -> i32 {
-  return f(f(x));
+function insert = fn(x: i32, sorted: list) -> list {
+  if (length(sorted) == 0) [x] 
+  else if (x <= head(sorted)) x :: sorted 
+  else head(sorted) :: insert(x, tail(sorted))
 }
 
-function add = fn(n: i32) -> function {
-  return fn(x: i32) -> i32 { x + n };
+function sort = fn(l: list) -> list {
+  if (length(l) == 0) []
+  else insert(head(l), sort(tail(l)))
 }
 
-function add10 = add(10);
-
-println(apply_twice(add10, 10)); // prints 30
+list test = [2, 7, 4, 3]
+println(sort(test))
 ```
 
 ## Overview
