@@ -112,6 +112,8 @@ impl Parser {
             TokenKind::Keyword(Keyword::Fn) => Expression::FunctionExp(self.parse_function()?),
             TokenKind::Keyword(Keyword::If) => Expression::IfExp(self.parse_if_expr()?),
             TokenKind::Separator(Separator::LBracket) => {
+                // list expression is a list literal, e.g. [1, 2, 3] 
+                // not to be confused with cons, which is parsed below
                 Expression::ListExp(self.parse_list_expr()?)
             }
             _ => {
@@ -146,7 +148,7 @@ impl Parser {
                 }
                 _ => break,
             };
-            // handle binary opeartor
+            // handle binary operator
             let prec = op.get_precedence();
             if prec < min_prec {
                 break;

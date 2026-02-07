@@ -153,7 +153,7 @@ impl Interpreter {
     fn handle_expression(&mut self, expression: &Expression) -> Result<ExecResult, Error> {
         match expression {
             Expression::ConsExp(exp) => self.handle_cons(exp.clone()),
-            Expression::ListExp(_) => todo!(),
+            Expression::ListExp(exp) => self.handle_list_exp(exp.clone()),
             Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
             Expression::CallExp(exp) => self.handle_call(exp.clone()),
             Expression::LiteralExp(exp) => self.handle_literal(exp.clone()),
@@ -233,8 +233,20 @@ impl Interpreter {
         })
     }
 
-    // new: no special cases
-    // evaluate the callee -> expect the result to be callable (everything is callable?) -> invoke it
+    fn handle_list_exp(&mut self, lexp: ListExp) -> Result<ExecResult, Error> {
+        let mut res = List::Nil;
+        for item in lexp.items.iter().rev() {
+            let val = self.handle_expression(&item)?.expect_value()?;
+            let length = res.length() + 1;
+            res = List::Cons(Cons {
+                head: Box::new(val),
+                tail: Box::new(res),
+                length: length,
+            });
+        }
+        Ok(ExecResult::Value(Value::List(res)))
+    }
+
     fn handle_call(&mut self, call: Call) -> Result<ExecResult, Error> {
         let callee = self
             .handle_expression(call.callee.as_ref())?

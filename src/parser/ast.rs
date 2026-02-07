@@ -56,9 +56,9 @@ pub enum Expression {
     ParenExp(Box<Expression>),
     BinaryExp(BinaryExp),
     IfExp(IfExp),
-    // expression with cons
+    // ConsExp (constructor) e.g. 1 :: 2 ...
     ConsExp(ConsExp),
-    // list literal
+    // ListExp (list literal) e.g. [1, 2, 3]
     ListExp(ListExp),
 }
 

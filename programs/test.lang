@@ -1,1 +1,4 @@
 list x = [1, 2, 3]
+list y = 1 :: tail(x)
+
+println(y)
