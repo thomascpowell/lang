@@ -56,7 +56,10 @@ pub enum Expression {
     ParenExp(Box<Expression>),
     BinaryExp(BinaryExp),
     IfExp(IfExp),
+    // expression with cons
     ConsExp(ConsExp),
+    // list literal
+    ListExp(ListExp),
 }
 
 impl Expression {
@@ -69,6 +72,7 @@ impl Expression {
             Expression::BinaryExp(x) => &x.position,
             Expression::IfExp(x) => &x.position,
             Expression::ConsExp(x) => &x.position,
+            Expression::ListExp(x) => &x.position,
             Expression::ParenExp(x) => &x.get_position(),
         }
     }
@@ -174,6 +178,12 @@ impl ConsExp {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct ListExp {
+    pub position: Position,
+    pub items: Vec<Expression>,
+}
+
 /*
 * Keywords & Operators
 * */
@@ -244,6 +254,10 @@ impl Expression {
                 println!("{}Cons", padding);
                 cexp.head.print_ast(indent + 1);
                 cexp.tail.print_ast(indent + 1);
+            }
+            Expression::ListExp(lexp) => {
+                println!("{}List", padding);
+                lexp.items.iter().for_each(|x| x.print_ast(indent + 1));
             }
             Expression::FunctionExp(fexp) => {
                 println!("{}Function", padding);

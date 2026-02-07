@@ -111,6 +111,9 @@ impl Parser {
             TokenKind::Separator(Separator::LParen) => self.parse_paren_expr()?,
             TokenKind::Keyword(Keyword::Fn) => Expression::FunctionExp(self.parse_function()?),
             TokenKind::Keyword(Keyword::If) => Expression::IfExp(self.parse_if_expr()?),
+            TokenKind::Separator(Separator::LBracket) => {
+                Expression::ListExp(self.parse_list_expr()?)
+            }
             _ => {
                 return Err(Error::new(
                     ErrorType::UnexpectedTokenType,
@@ -191,6 +194,22 @@ impl Parser {
             position: pos,
             callee: Box::new(callee),
             args,
+        })
+    }
+
+    fn parse_list_expr(&mut self) -> Result<ListExp, Error> {
+        let tok = self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBracket)))?;
+        let mut items = Vec::new();
+        loop {
+            items.push(self.parse_expression(0)?);
+            if self.optional(|x| matches!(x, TokenKind::Separator(Separator::RBracket))) {
+                break;
+            }
+            self.expect(|x| matches!(x, TokenKind::Separator(Separator::Comma)))?;
+        }
+        Ok(ListExp {
+            position: tok.position,
+            items: items,
         })
     }
 
@@ -350,38 +369,19 @@ impl Parser {
     fn parse_if_expr(&mut self) -> Result<IfExp, Error> {
         let if_tok = self.expect(|x| matches!(x, TokenKind::Keyword(Keyword::If)))?;
         let pos = if_tok.position.clone();
-
-        // condition
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
         let cond = self.parse_expression(0)?;
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::RParen)))?;
-
-        // (old) parse true branch
-        // self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
-        // let then_branch = self.parse_statement()?;
-        // self.expect(|x| matches!(x, TokenKind::Separator(Separator::RBrace)))?;
-
         let mut res = IfExp {
             position: pos,
             if_cond: Box::new(cond),
             then_branch: Box::new(self.parse_branch()?),
             else_branch: None,
         };
-
         if self.optional(|x| matches!(x, TokenKind::Keyword(Keyword::Else))) {
             let else_branch = self.parse_branch()?;
             res.else_branch = Some(Box::new(else_branch));
         }
-
-        // old parse else branch
-        // if !self.compare_kind(|x| matches!(x, TokenKind::Keyword(Keyword::Else))) {
-        //     return Ok(res);
-        // }
-        // self.advance();
-        // self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBrace)))?;
-        // let else_branch = self.parse_statement()?;
-        // self.expect(|x| matches!(x, TokenKind::Separator(Separator::RBrace)))?;
-        // res.else_branch = Some(Box::new(else_branch));
         Ok(res)
     }
 

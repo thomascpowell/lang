@@ -153,6 +153,7 @@ impl Interpreter {
     fn handle_expression(&mut self, expression: &Expression) -> Result<ExecResult, Error> {
         match expression {
             Expression::ConsExp(exp) => self.handle_cons(exp.clone()),
+            Expression::ListExp(_) => todo!(),
             Expression::IdentifierExp(exp) => Ok(ExecResult::Value(self.handle_identifer(exp)?)),
             Expression::CallExp(exp) => self.handle_call(exp.clone()),
             Expression::LiteralExp(exp) => self.handle_literal(exp.clone()),

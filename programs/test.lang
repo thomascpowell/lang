@@ -1,13 +1,1 @@
-list a = new_list()
-
-println(length(a))
-
-list a = 1 :: a
-
-println(length(a))
-
-list a = 2 :: a
-
-println(length(a))
-
-println(a)
+list x = [1, 2, 3]
