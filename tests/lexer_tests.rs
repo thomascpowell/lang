@@ -47,8 +47,10 @@ fn test_tokenizer() {
 
 #[test]
 fn test_operators_separators() {
-    let program = "%{}(())+ -/ * ==!= <;; > <=>= && || ! =: - ->".to_string();
+    let program = "[]%{}(())+ -/ * ==!= <;; > <=>= && || ! =: - ->".to_string();
     let expected = vec![
+        TokenKind::Separator(Separator::LBracket),
+        TokenKind::Separator(Separator::RBracket),
         TokenKind::Operator(Operator::Mod),
         TokenKind::Separator(Separator::LBrace),
         TokenKind::Separator(Separator::RBrace),

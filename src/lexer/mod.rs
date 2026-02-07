@@ -112,6 +112,8 @@ impl Lexer {
             ')' => self.make_simple_token(TokenKind::Separator(Separator::RParen), ')'),
             '{' => self.make_simple_token(TokenKind::Separator(Separator::LBrace), '{'),
             '}' => self.make_simple_token(TokenKind::Separator(Separator::RBrace), '}'),
+            '[' => self.make_simple_token(TokenKind::Separator(Separator::LBracket), '['),
+            ']' => self.make_simple_token(TokenKind::Separator(Separator::RBracket), ']'),
             ',' => self.make_simple_token(TokenKind::Separator(Separator::Comma), ','),
             ';' => self.make_simple_token(TokenKind::Separator(Separator::Semicolon), ';'),
             ':' => self.make_simple_token(TokenKind::Separator(Separator::Colon), ':'),
