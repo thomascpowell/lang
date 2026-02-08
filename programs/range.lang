@@ -1,6 +1,6 @@
 function range = fn(left: i32, right: i32) -> list {
-  if (left == right) return new_list()
-  left :: range(left+1, right) 
+  if (left == right) []
+  else left :: range(left+1, right) 
 }
 
 println(range(1, 10))

@@ -1,8 +1,8 @@
-function hello = fn() -> i32 {
+function hello = fn() -> unit {
   print("name: ")
   string name = read()
-  println("hello ", name)
-  return 0
+  println("hello ", name);
+  ()
 }
 
 hello()

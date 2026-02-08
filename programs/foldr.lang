@@ -1,10 +1,11 @@
 // foldr() implementation in lang
 
 function foldr = fn(f: function, l: list) -> i32 {
-  if (length(l) == 0) 0 else f(head(l), foldr(f, tail(l)))
+  if (length(l) == 0) 0 
+  else f(head(l), foldr(f, tail(l)))
 }
 
-list numbers = 1 :: 2 :: 3 :: new_list()
+list numbers = [1, 2, 3, 4, 5]
 function add = fn(left: i32, right: i32) -> i32 { left + right }
 
 println("numbers: ", numbers)

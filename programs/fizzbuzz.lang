@@ -5,7 +5,7 @@ function fizzbuzz = fn(i: i32) -> unit {
   if (c % 5 == 0) print("Buzz")
   println()
   if (i > 0) fizzbuzz(i-1)
-  return ()
+  else ()
 }
 
 fizzbuzz(100)
