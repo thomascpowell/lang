@@ -1,7 +1,9 @@
-use crate::parser::ast::Literal;
-use crate::parser::ast::Operator;
-use crate::position::Position;
-use crate::{lang_error::*, lexer::token::*, parser::ast::*};
+use crate::{
+    lexer::token::*,
+    parser::ast::Operator,
+    parser::ast::{Literal, *},
+    utils::{lang_error::*, position::Position},
+};
 pub mod ast;
 
 /*

@@ -1,8 +1,8 @@
 use crate::{
     interpreter::{stdlib::*, symbol::Symbol, value::Value},
-    lang_error::{Error, ErrorType},
     parser::ast::Type,
-    position::Position,
+    utils::lang_error::{Error, ErrorType},
+    utils::position::Position,
 };
 use std::{cell::RefCell, collections::HashMap, iter::zip, rc::Rc};
 
@@ -24,8 +24,7 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
     let pos = Position { col: 0, line: 0 };
     // TODO: this could probably be a macro?
     let names = vec![
-        "floor", "print", "println", "panic", "read", "assert", "new_list", "head", "tail",
-        "length",
+        "floor", "print", "println", "panic", "read", "assert", "head", "tail", "length",
     ];
     let functions = vec![
         std_floor,
@@ -34,7 +33,6 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
         std_panic,
         std_read,
         std_assert,
-        std_new_list,
         std_head,
         std_tail,
         std_length,
@@ -47,7 +45,7 @@ pub fn get_stdlib_scope() -> Rc<Scope> {
         };
         new_scope
             .symbols
-            .insert(name.into(), Rc::new(RefCell::new(symbol)));
+            .insert(name.to_string(), Rc::new(RefCell::new(symbol)));
     }
     return Rc::new(new_scope);
 }

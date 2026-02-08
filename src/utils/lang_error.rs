@@ -2,7 +2,7 @@ use crate::{
     interpreter::{exec_result::ExecResult, value::Value},
     lexer::token::Token,
     parser::ast::Statement,
-    position::Position,
+    utils::position::Position,
 };
 
 /**

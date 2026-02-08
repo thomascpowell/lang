@@ -1,4 +1,4 @@
-use crate::{parser::ast::LiteralValue, position::Position};
+use crate::{parser::ast::LiteralValue, utils::position::Position};
 
 /*
 * Token type

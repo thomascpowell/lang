@@ -1,7 +1,7 @@
 use lang::{
-    lang_error::Error,
     lexer::tokenize,
     parser::{ast::StatementList, parse},
+    utils::lang_error::Error,
 };
 
 #[test]

@@ -2,9 +2,9 @@ use std::ops::{Add, Div, Mul, Sub};
 
 use crate::{
     interpreter::{closure::Closure, exec_result::ExecResult, list::List, symbol::Symbol},
-    lang_error::Error,
     parser::ast::Type,
-    position::Position,
+    utils::lang_error::Error,
+    utils::position::Position,
 };
 
 /**
@@ -114,7 +114,6 @@ impl Value {
             Self::NativeFunction(_) => "[native function]".to_string(),
             Self::Unit => "[unit]".to_string(),
             Self::List(l) => l.display(true),
-
 
             Value::Uninitialized => unreachable!(),
         }

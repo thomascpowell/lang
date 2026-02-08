@@ -2,8 +2,8 @@ use std::io::{self, Write};
 
 use crate::{
     interpreter::{exec_result::ExecResult, list::List, value::Value},
-    lang_error::{Error, ErrorType},
-    position::Position,
+    utils::lang_error::{Error, ErrorType},
+    utils::position::Position,
 };
 
 /**

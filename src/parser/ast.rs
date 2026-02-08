@@ -1,4 +1,4 @@
-use crate::{lang_error::Error, position::Position};
+use crate::utils::{lang_error::Error, position::Position};
 
 /*
 * Nonterminal types

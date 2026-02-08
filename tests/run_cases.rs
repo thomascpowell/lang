@@ -1,4 +1,4 @@
-use lang::{interpreter::interpret, lang_error::Error, lexer::tokenize, parser::parse};
+use lang::{interpreter::interpret, lexer::tokenize, parser::parse, utils::lang_error::Error};
 use std::{fs, path::Path};
 
 #[test]

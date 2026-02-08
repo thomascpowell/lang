@@ -1,6 +1,10 @@
-use crate::lang_error::*;
-use crate::lexer::token::*;
-use crate::position::Position;
+use crate::{
+    lexer::token::*,
+    utils::{
+        lang_error::{Error, ErrorType},
+        position::Position,
+    },
+};
 pub mod token;
 
 /*

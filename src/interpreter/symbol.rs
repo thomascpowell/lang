@@ -1,6 +1,4 @@
-use crate::interpreter::value::Value;
-use crate::parser::ast::Type;
-use crate::position::Position;
+use crate::{interpreter::value::Value, parser::ast::Type, utils::position::Position};
 
 /**
 * Symbol type

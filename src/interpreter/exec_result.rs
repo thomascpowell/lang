@@ -1,4 +1,4 @@
-use crate::{interpreter::value::Value, lang_error::Error};
+use crate::{interpreter::value::Value, utils::lang_error::Error};
 
 /**
 * ExecResult type

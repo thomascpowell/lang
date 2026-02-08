@@ -8,8 +8,8 @@ use std::{cell::RefCell, rc::Rc};
 
 use crate::{
     interpreter::{exec_result::ExecResult, frame::Frame, scope::Scope, symbol::*},
-    lang_error::{Error, ErrorType},
     parser::ast::*,
+    utils::lang_error::{Error, ErrorType},
 };
 
 pub mod closure;
