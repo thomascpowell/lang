@@ -1,0 +1,15 @@
+// Insertion sort implementation
+
+function insert = fn(x: i32, sorted: list) -> list {
+  if (length(sorted) == 0) [x] 
+  else if (x <= head(sorted)) x :: sorted 
+  else head(sorted) :: insert(x, tail(sorted))
+}
+
+function sort = fn(l: list) -> list {
+  if (length(l) == 0) []
+  else insert(head(l), sort(tail(l)))
+}
+
+list test = [2, 7, 4, 3]
+println(sort(test))

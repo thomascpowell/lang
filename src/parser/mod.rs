@@ -202,7 +202,11 @@ impl Parser {
     fn parse_list_expr(&mut self) -> Result<ListExp, Error> {
         let tok = self.expect(|x| matches!(x, TokenKind::Separator(Separator::LBracket)))?;
         let mut items = Vec::new();
+        // could probably be cleaner
         loop {
+            if self.optional(|x| matches!(x, TokenKind::Separator(Separator::RBracket))) {
+                break;
+            }
             items.push(self.parse_expression(0)?);
             if self.optional(|x| matches!(x, TokenKind::Separator(Separator::RBracket))) {
                 break;
