@@ -44,7 +44,6 @@ impl Interpreter {
         }
     }
 
-    // runs frame 0 (entire program)
     pub fn run_program(&mut self) -> Result<(), Error> {
         let result = self.run_frame()?;
         // frame 0 cannot have a return value
@@ -63,15 +62,15 @@ impl Interpreter {
             // get the frame off the stack
             let mut frame = match self.frames.pop() {
                 Some(f) => f,
-                None => return Ok(ExecResult::Unit),
+                None => return Ok(ExecResult::Value(Value::Unit)),
             };
             // case: EOF
             if frame.done() {
                 assert!(self.frames.is_empty());
-                return Ok(ExecResult::Unit);
+                return Ok(ExecResult::Value(Value::Unit));
             }
             // execute a statement
-            let stmt = frame.peek().expect("statement");
+            let stmt = frame.peek().expect("statement missing");
             let result = self.exec(stmt)?;
             match result {
                 // case: return
@@ -120,7 +119,13 @@ impl Interpreter {
         let name = a.identifier.clone();
         let cell = Rc::new(RefCell::new(symbol));
         self.scope = self.scope.extend(name, cell);
-        Ok(ExecResult::Unit)
+        Ok(ExecResult::Value(Value::Unit))
+    }
+
+    fn interpret_return(&mut self, r: &Return) -> Result<ExecResult, Error> {
+        Ok(ExecResult::Returned(
+            self.handle_expression(&r.expression)?.expect_value()?,
+        ))
     }
 
     fn handle_closure(&mut self, a: &Assignment) -> Result<ExecResult, Error> {
@@ -141,13 +146,7 @@ impl Interpreter {
             ty: Type::Function,
             val: rhs,
         };
-        Ok(ExecResult::Unit)
-    }
-
-    fn interpret_return(&mut self, r: &Return) -> Result<ExecResult, Error> {
-        Ok(ExecResult::Returned(
-            self.handle_expression(&r.expression)?.expect_value()?,
-        ))
+        Ok(ExecResult::Value(Value::Unit))
     }
 
     fn handle_expression(&mut self, expression: &Expression) -> Result<ExecResult, Error> {
@@ -215,7 +214,7 @@ impl Interpreter {
         if cond {
             self.exec(then_branch)
         } else {
-            else_branch.map_or(Ok(ExecResult::Unit), |exp| self.exec(exp))
+            else_branch.map_or(Ok(ExecResult::Value(Value::Unit)), |exp| self.exec(exp))
         }
     }
 
@@ -253,7 +252,7 @@ impl Interpreter {
             .expect_value()?;
         match callee.get_type() {
             Type::Function => self.handle_call_function(callee, call),
-            _ => Ok(ExecResult::Unit),
+            _ => Ok(ExecResult::Value(Value::Unit)),
         }
     }
 
@@ -271,7 +270,7 @@ impl Interpreter {
                 f(arg_values)
             }
             // otherwise, return unit type (calling any other value, e.g. 7())
-            _ => Ok(ExecResult::Unit),
+            _ => Ok(ExecResult::Value(Value::Unit)),
         }
     }
 

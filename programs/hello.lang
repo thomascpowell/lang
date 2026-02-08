@@ -2,7 +2,6 @@ function hello = fn() -> unit {
   print("name: ")
   string name = read()
   println("hello ", name);
-  ()
 }
 
 hello()

@@ -16,7 +16,7 @@ pub fn std_print(args: Vec<Value>) -> Result<ExecResult, Error> {
     for a in &args {
         print!("{}", a.display());
     }
-    Ok(ExecResult::Unit)
+    Ok(ExecResult::Value(Value::Unit))
 }
 
 pub fn std_println(args: Vec<Value>) -> Result<ExecResult, Error> {
@@ -24,7 +24,7 @@ pub fn std_println(args: Vec<Value>) -> Result<ExecResult, Error> {
         print!("{}", a.display());
     }
     println!();
-    Ok(ExecResult::Unit)
+    Ok(ExecResult::Value(Value::Unit))
 }
 
 pub fn std_read(_args: Vec<Value>) -> Result<ExecResult, Error> {
@@ -40,10 +40,6 @@ pub fn std_floor(args: Vec<Value>) -> Result<ExecResult, Error> {
     Ok(ExecResult::Value(Value::Int(
         get_arg(&args, 0)?.expect_float()? as i32,
     )))
-}
-
-pub fn std_new_list(_args: Vec<Value>) -> Result<ExecResult, Error> {
-    Ok(ExecResult::Value(Value::List(List::Nil)))
 }
 
 pub fn std_length(args: Vec<Value>) -> Result<ExecResult, Error> {
@@ -94,7 +90,7 @@ pub fn std_assert(args: Vec<Value>) -> Result<ExecResult, Error> {
             optional_msg.as_deref(),
         ));
     };
-    Ok(ExecResult::Unit)
+    Ok(ExecResult::Value(Value::Unit))
 }
 
 pub fn std_panic(_args: Vec<Value>) -> Result<ExecResult, Error> {

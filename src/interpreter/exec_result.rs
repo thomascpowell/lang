@@ -6,18 +6,12 @@ use crate::{interpreter::value::Value, utils::lang_error::Error};
 
 #[derive(Debug)]
 pub enum ExecResult {
-    Unit,            // statement produces nothing
-    Value(Value),    // expression result
-    Returned(Value), // function return
+    // this is used for control flow
+    Value(Value),
+    Returned(Value),
 }
 
 impl ExecResult {
-    pub fn expect_unit(&self) -> Result<(), Error> {
-        if matches!(self, ExecResult::Unit) {
-            return Ok(());
-        }
-        Err(Error::generic_uer(self, "ExecResult::Unit"))
-    }
     pub fn expect_value(&self) -> Result<Value, Error> {
         if let ExecResult::Value(v) = self {
             return Ok(v.clone());
