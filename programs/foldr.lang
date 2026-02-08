@@ -1,4 +1,4 @@
-// foldr() implementation in lang
+// foldr implementation in lang
 
 function foldr = fn(f: function, l: list) -> i32 {
   if (length(l) == 0) 0 

@@ -3,7 +3,6 @@ use std::rc::Rc;
 
 /**
 * Closure type
-* The interpreter representation of a function type
 * */
 
 #[derive(Debug, Clone)]

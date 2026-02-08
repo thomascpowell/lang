@@ -1,10 +1,10 @@
-// euclid's algorithm
+// Euclid's algorithm
 
 function gcd = fn(a: i32, b: i32) -> i32 {
-  if (b == 0) return a 
-  gcd(b, a % b) 
+  if (b == 0) a 
+  else gcd(b, a % b) 
 };
 
 i32 a = 1071
 i32 b = 462
-println("gcd of ", a, " and ", b, " is: ", gcd(a, b))
+println("The GCD of ", a, " and ", b, " is ", gcd(a, b))

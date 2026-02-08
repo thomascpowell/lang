@@ -1,4 +1,4 @@
-// map() implementation in lang
+// Map implementation in lang
 
 function map = fn(f: function, l: list) -> list {
   if (length(l) == 0) [] 

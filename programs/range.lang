@@ -1,6 +1,15 @@
+// Generates a list between two numbers
 function range = fn(left: i32, right: i32) -> list {
   if (left == right) []
   else left :: range(left+1, right) 
 }
 
-println(range(1, 10))
+// Applies a function for each item
+function for_each = fn(l: list, f: function) -> unit {
+  if (length(l) == 0) return ()
+  println(head(l))
+  for_each(tail(l), f)
+}
+
+// Call for_each with stdlib function as argument
+for_each(range(1, 10), println)

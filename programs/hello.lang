@@ -1,7 +1,7 @@
-function hello = fn() -> unit {
-  print("name: ")
-  string name = read()
-  println("hello ", name);
-}
+// An example using read() to get user input
 
-hello()
+fn() -> unit {
+  print("name: ")
+  println("hello ", read());
+}()
+

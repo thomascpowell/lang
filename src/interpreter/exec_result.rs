@@ -6,7 +6,6 @@ use crate::{interpreter::value::Value, utils::lang_error::Error};
 
 #[derive(Debug)]
 pub enum ExecResult {
-    // this is used for control flow
     Value(Value),
     Returned(Value),
 }

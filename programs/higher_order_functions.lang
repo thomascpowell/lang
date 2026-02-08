@@ -1,4 +1,4 @@
-// example used in README.md
+// An example using higher order functions
 
 function apply_twice = fn(f: function, x: i32) -> i32 {
   return f(f(x));

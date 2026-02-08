@@ -1,8 +1,8 @@
+use crate::interpreter::value::Value;
+
 /*
 * List type
 * */
-
-use crate::interpreter::value::Value;
 
 #[derive(Debug, Clone)]
 pub enum List {
