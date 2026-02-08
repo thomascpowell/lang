@@ -64,6 +64,7 @@ pub enum Expression {
 
 impl Expression {
     pub fn get_position(&self) -> &Position {
+        // awful
         match self {
             Expression::LiteralExp(x) => &x.position,
             Expression::IdentifierExp(x) => &x.position,
@@ -76,10 +77,6 @@ impl Expression {
             Expression::ParenExp(x) => &x.get_position(),
         }
     }
-
-    pub fn expect_cons(&self) -> Result<ConsExp, Error> {
-        todo!()
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -88,7 +85,6 @@ pub struct Literal {
     pub value: LiteralValue,
 }
 
-// pub type LiteralValue = crate::lexer::token::Literal;
 #[derive(Debug, Clone, PartialEq)]
 pub enum LiteralValue {
     Unit,
@@ -135,7 +131,6 @@ pub struct Param {
 #[derive(Debug, Clone)]
 pub struct Call {
     pub position: Position,
-    // any expression can be called
     pub callee: Box<Expression>,
     pub args: Vec<Argument>,
 }
@@ -280,16 +275,10 @@ impl Expression {
             }
             Expression::CallExp(cexp) => {
                 println!("{}CallExp", padding);
-                println!("{}Callee:", padding);
+                println!("{}Callee", padding);
                 cexp.callee.print_ast(indent + 1);
-                if cexp.args.is_empty() {
-                    println!("{}Args: ()", padding);
-                } else {
-                    println!("{}Args:", padding);
-                    for arg in &cexp.args {
-                        arg.value.print_ast(indent + 1);
-                    }
-                }
+                println!("{}Args", padding);
+                cexp.args.iter().for_each(|x| x.value.print_ast(indent + 1));
             }
         }
     }

@@ -27,7 +27,7 @@ pub enum TokenKind {
     // comments are thrown out atm
     Comment(String),
     // cons is a _constructor_
-    Cons
+    Cons,
 }
 
 /*
@@ -52,24 +52,10 @@ pub enum Operator {
     Assign,
     Not,
 }
-impl Operator {
-    pub fn get_precedence(&self) -> u8 {
-        match self {
-            // if cons were here it would be very low precedence (1)
-            Operator::Or => 2,
-            Operator::And => 3,
-            Operator::Eq | Operator::Ne => 4,
-            Operator::Lt | Operator::Le | Operator::Gt | Operator::Ge => 5,
-            Operator::Add | Operator::Sub => 6,
-            Operator::Mul | Operator::Div | Operator::Mod => 7,
-            _ => 0,
-        }
-    }
-}
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Separator {
-    LParen, 
+    LParen,
     RParen,
     LBrace,
     RBrace,

@@ -112,7 +112,7 @@ impl Parser {
             TokenKind::Keyword(Keyword::Fn) => Expression::FunctionExp(self.parse_function()?),
             TokenKind::Keyword(Keyword::If) => Expression::IfExp(self.parse_if_expr()?),
             TokenKind::Separator(Separator::LBracket) => {
-                // list expression is a list literal, e.g. [1, 2, 3] 
+                // list expression is a list literal, e.g. [1, 2, 3]
                 // not to be confused with cons, which is parsed below
                 Expression::ListExp(self.parse_list_expr()?)
             }
@@ -149,7 +149,7 @@ impl Parser {
                 _ => break,
             };
             // handle binary operator
-            let prec = op.get_precedence();
+            let prec = get_precedence(&op);
             if prec < min_prec {
                 break;
             }
@@ -519,5 +519,17 @@ fn is_type(token: &TokenKind) -> bool {
         | TokenKind::Keyword(Keyword::List)
         | TokenKind::Keyword(Keyword::Unit) => true,
         _ => false,
+    }
+}
+
+fn get_precedence(op: &Operator) -> u8 {
+    match op {
+        Operator::Or => 2,
+        Operator::And => 3,
+        Operator::Eq | Operator::Ne => 4,
+        Operator::Lt | Operator::Le | Operator::Gt | Operator::Ge => 5,
+        Operator::Add | Operator::Sub => 6,
+        Operator::Mul | Operator::Div | Operator::Mod => 7,
+        _ => 0,
     }
 }
