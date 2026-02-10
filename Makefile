@@ -7,5 +7,5 @@ build:
 release:
 	cargo build --release -v
 
-rp:
-	cargo run -- run "./programs/$$(ls ./programs | fzf)"
+run:
+	cargo run -- "$$(printf "%s\n" lexer parser run | fzf)" "./programs/$$(ls ./programs | fzf)"
