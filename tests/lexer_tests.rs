@@ -47,11 +47,12 @@ fn test_tokenizer() {
 
 #[test]
 fn test_operators_separators() {
-    let program = "[]%{}(())+ -/ * ==!= <;; > <=>= && || ! =: - ->".to_string();
+    let program = "[]%::{}(())+ -/ * ==!= <;; > <=>= && || ! =: - ->".to_string();
     let expected = vec![
         TokenKind::Separator(Separator::LBracket),
         TokenKind::Separator(Separator::RBracket),
         TokenKind::Operator(Operator::Mod),
+        TokenKind::Cons,
         TokenKind::Separator(Separator::LBrace),
         TokenKind::Separator(Separator::RBrace),
         TokenKind::Separator(Separator::LParen),
@@ -88,7 +89,6 @@ fn test_error() {
     assert!(tokens.is_err());
     print_err(&tokens.unwrap_err().display(), false);
     let program = r#" 
-        // this number is really big lol
         3965264536463463462346243643664326646243623462436643
     "#
     .to_string();

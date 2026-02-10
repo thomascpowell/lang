@@ -5,4 +5,4 @@ fn() -> i32 { return 1 }
 fn() -> i32 { 1 }
 
 // this is invalid (must end with a return)
-fn() -> i32 { }
+fn() -> unit { }
