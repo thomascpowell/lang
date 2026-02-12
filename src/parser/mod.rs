@@ -49,19 +49,15 @@ impl Parser {
             // may or may not be valid though
             _ => Ok(Statement::Expression(self.parse_expression(0)?)),
         };
-        self.optional(|x| matches!(x, TokenKind::Separator(Separator::Semicolon)));
+        self.optional(TokenKind::Separator(Separator::Semicolon));
         res
     }
 
     fn parse_return(&mut self) -> Result<Return, Error> {
-        // not needed, the expression already conveys that info
-        // let tok = self.advance().ok_or_else(|| Error::generic())?;
         self.advance();
-        // parse the expression
-        let ret = Return {
+        Ok(Return {
             expression: self.parse_expression(0)?,
-        };
-        Ok(ret)
+        })
     }
 
     fn parse_assignment(&mut self) -> Result<Assignment, Error> {
@@ -172,8 +168,7 @@ impl Parser {
         let pos = tok.position.clone();
         // no args
         let mut args = Vec::new();
-        if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
-            self.advance();
+        if self.optional(TokenKind::Separator(Separator::RParen)) {
             return Ok(Call {
                 position: pos,
                 callee: Box::new(callee),
@@ -186,8 +181,7 @@ impl Parser {
                 position: pos.clone(),
                 value: self.parse_expression(0)?,
             });
-            if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::Comma))) {
-                self.advance();
+            if self.optional(TokenKind::Separator(Separator::Comma)) {
                 continue;
             }
             break;
@@ -206,11 +200,11 @@ impl Parser {
         let mut items = Vec::new();
         // could probably be cleaner
         loop {
-            if self.optional(|x| matches!(x, TokenKind::Separator(Separator::RBracket))) {
+            if self.optional(TokenKind::Separator(Separator::RBracket)) {
                 break;
             }
             items.push(self.parse_expression(0)?);
-            if self.optional(|x| matches!(x, TokenKind::Separator(Separator::RBracket))) {
+            if self.optional(TokenKind::Separator(Separator::RBracket)) {
                 break;
             }
             self.expect(|x| matches!(x, TokenKind::Separator(Separator::Comma)))?;
@@ -314,21 +308,18 @@ impl Parser {
         self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
         let mut res = Vec::new();
         // case: no params
-        if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
-            self.advance();
+        if self.optional(TokenKind::Separator(Separator::RParen)) {
             return Ok(res);
         }
         // loop: params until Rparen
         loop {
             res.push(self.parse_param()?);
             // case: finished
-            if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
-                self.advance();
+            if self.optional(TokenKind::Separator(Separator::RParen)) {
                 break;
-            }
+            };
             // case: comma, go again
-            if self.compare_kind(|x| matches!(x, TokenKind::Separator(Separator::Comma))) {
-                self.advance();
+            if self.optional(TokenKind::Separator(Separator::Comma)) {
                 continue;
             }
             // case: anything else
@@ -386,7 +377,7 @@ impl Parser {
             then_branch: Box::new(self.parse_branch()?),
             else_branch: None,
         };
-        if self.optional(|x| matches!(x, TokenKind::Keyword(Keyword::Else))) {
+        if self.optional(TokenKind::Keyword(Keyword::Else)) {
             let else_branch = self.parse_branch()?;
             res.else_branch = Some(Box::new(else_branch));
         }
@@ -394,8 +385,7 @@ impl Parser {
     }
 
     fn parse_branch(&mut self) -> Result<Statement, Error> {
-        let braces_present =
-            self.optional(|x| matches!(x, TokenKind::Separator(Separator::LBrace)));
+        let braces_present = self.optional(TokenKind::Separator(Separator::LBrace));
         let branch = self.parse_statement()?;
         if braces_present {
             self.expect(|x| matches!(x, TokenKind::Separator(Separator::RBrace)))?;
@@ -406,7 +396,7 @@ impl Parser {
     fn parse_paren_expr(&mut self) -> Result<Expression, Error> {
         let left = self.expect(|x| matches!(x, TokenKind::Separator(Separator::LParen)))?;
         // special case, unit literal
-        if self.optional(|x| matches!(x, TokenKind::Separator(Separator::RParen))) {
+        if self.optional(TokenKind::Separator(Separator::RParen)) {
             return Ok(Expression::LiteralExp(Literal {
                 position: left.position,
                 value: LiteralValue::Unit,
@@ -462,28 +452,12 @@ impl Parser {
         }
     }
 
-    // like expect but optional
-    // returns a boolean representing if the token was consumed
-    fn optional<F>(&mut self, cond: F) -> bool
-    where
-        F: Fn(&TokenKind) -> bool,
-    {
+    fn optional(&mut self, kind: TokenKind) -> bool {
         match self.peek() {
-            Some(tok) if cond(&tok.kind) => {
+            Some(tok) if tok.kind == kind => {
                 self.pos += 1;
                 true
             }
-            _ => false,
-        }
-    }
-
-    // like optional but does not consume
-    fn compare_kind<F>(&self, cond: F) -> bool
-    where
-        F: Fn(&TokenKind) -> bool,
-    {
-        match self.peek() {
-            Some(tok) if cond(&tok.kind) => true,
             _ => false,
         }
     }
